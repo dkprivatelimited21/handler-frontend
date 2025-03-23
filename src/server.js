@@ -1,3 +1,3 @@
-export const server = "https://mernhandlerbackend.onrender.com";
+export const server = "https://handler-backend.vercel.app";
 
 
