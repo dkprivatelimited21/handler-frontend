@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./App.css";
-import { HashRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {
   LoginPage,
   SignupPage,
@@ -77,7 +77,7 @@ const App = () => {
   }, []);
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       {stripeApikey && (
         <Elements stripe={loadStripe(stripeApikey)}>
           <Routes>
@@ -329,7 +329,7 @@ const App = () => {
         pauseOnHover
         theme="dark"
       />
-    </HashRouter>
+    </BrowserRouter>
   );
 };
 
