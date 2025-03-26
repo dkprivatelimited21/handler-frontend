@@ -57,10 +57,10 @@ const Header = ({ activeHeading }) => {
         <div className="hidden 800px:h-[50px] 800px:my-[20px] 800px:flex items-center justify-between">
           <div>
             <Link to="/">
-              
-                
-                <h1><b>handler</b></h1>
-              
+              <img
+                src="https://shopo.quomodothemes.website/assets/images/logo.svg"
+                alt=""
+              />
             </Link>
           </div>
           {/* search box */}

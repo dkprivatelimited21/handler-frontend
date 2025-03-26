@@ -25,8 +25,9 @@ const Events = () => {
            allEvents?.length === 0 && (
             'No Events have!'
            )
-            }
-          </h4>
+          }
+
+         </h4>
       </div>
      
     </div>
