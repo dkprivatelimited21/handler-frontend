@@ -24,6 +24,5 @@ export {
     ShopOrderDetails,
     ShopAllRefunds,
     ShopSettingsPage,
-    ShopWithDrawMoneyPage,
-    ShopInboxPage
+    ShopWithDrawMoneyPage
 }
