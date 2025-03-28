@@ -19,8 +19,7 @@ import {
   SellerActivationPage,
   ShopLoginPage,
   OrderDetailsPage,
-  TrackOrderPage,
-  UserInbox,
+  TrackOrderPage
 } from "./routes/Routes.js";
 import {
   ShopDashboardPage,
@@ -34,8 +33,7 @@ import {
   ShopOrderDetails,
   ShopAllRefunds,
   ShopSettingsPage,
-  ShopWithDrawMoneyPage,
-  ShopInboxPage,
+  ShopWithDrawMoneyPage
 } from "./routes/ShopRoutes";
 import {
   AdminDashboardPage,
