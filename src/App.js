@@ -127,14 +127,6 @@ const App = () => {
           }
         />
         <Route
-          path="/inbox"
-          element={
-            <ProtectedRoute>
-              <UserInbox />
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/user/order/:id"
           element={
             <ProtectedRoute>
@@ -250,14 +242,8 @@ const App = () => {
               <ShopWithDrawMoneyPage />
             </SellerProtectedRoute>
           }
-        />
-        <Route
-          path="/dashboard-messages"
-          element={
-            <SellerProtectedRoute>
-              <ShopInboxPage />
-            </SellerProtectedRoute>
-          }
+
+          
         />
         {/* Admin Routes */}
         <Route
