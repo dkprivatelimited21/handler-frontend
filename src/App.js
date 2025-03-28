@@ -58,9 +58,20 @@ import axios from "axios";
 import { server } from "./server";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import Axios from "axios";
 
-Axios.defaults.baseURL = "https://handler-backend.vercel.app";
+
+axios({
+    method:'post',
+    url:'logout',
+    baseURL: 'https://handler-backend.vercel.app',
+   })
+   .then(response => {
+      window.location.reload();
+   })
+   .catch(error => {
+       console.log(error);
+   });
+
 const App = () => {
   const [stripeApikey, setStripeApiKey] = useState("");
 
