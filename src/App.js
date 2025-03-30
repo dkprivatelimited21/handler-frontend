@@ -63,7 +63,7 @@ import { loadStripe } from "@stripe/stripe-js";
 axios({
     method:'post',
     url:'/',
-    baseURL: 'https://handler-backend.vercel.app',
+    baseURL: 'https://handler-backend.vercel.app/',
    })
    .then(response => {
       window.location.reload();
