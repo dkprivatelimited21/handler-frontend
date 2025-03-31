@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy":"https://local-handler.vercel.app",
+  "proxy":"https://handler-backend.vercel.app",
   "dependencies": {
     "@material-ui/core": "^4.12.4",
     "@material-ui/data-grid": "^4.0.0-alpha.37",
