@@ -2,7 +2,6 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy":"https://handler-backend.vercel.app/api/v2:8000",
   "dependencies": {
     "@material-ui/core": "^4.12.4",
     "@material-ui/data-grid": "^4.0.0-alpha.37",
@@ -33,10 +32,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "set PORT=8000 && react-scripts start",
-    "build": "set PORT=8000 && react-scripts build",
-    "test": "set PORT=8000 && react-scripts test",
-    "eject": "set PORT=8000 && react-scripts eject"
+    "start": " react-scripts start",
+    "build": " react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
