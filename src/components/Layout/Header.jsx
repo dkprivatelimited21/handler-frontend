@@ -175,7 +175,7 @@ const Header = ({ activeHeading }) => {
                 {isAuthenticated ? (
                   <Link to="/profile">
                     <img
-                      src={`${user?.avatar?.url}`}
+                	src="https://shopo.quomodothemes.website/assets/images/logo.svg"
                       className="w-[35px] h-[35px] rounded-full"
                       alt=""
                     />
