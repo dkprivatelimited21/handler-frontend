@@ -174,8 +174,7 @@ const Header = ({ activeHeading }) => {
               <div className="relative cursor-pointer mr-[15px]">
                 {isAuthenticated ? (
                   <Link to="/profile">
-                    <img
-                	src="https://shopo.quomodothemes.website/assets/images/logo.svg"
+                    <
                       className="w-[35px] h-[35px] rounded-full"
                       alt=""
                     />
