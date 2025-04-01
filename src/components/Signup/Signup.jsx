@@ -181,4 +181,4 @@ const Singup = () => {
   );
 };
 
-export default Singup;
+export Singup;
