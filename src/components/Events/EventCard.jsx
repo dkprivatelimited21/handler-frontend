@@ -24,5 +24,5 @@ const EventCard = ({ active, data }) => {
         dispatch(addTocart(cartData));
         toast.success("Item added to cart successfully!");
       };
-    };
-  };
+   };
+};
