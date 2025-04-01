@@ -34,7 +34,7 @@ const EventCard = ({ active, data }) => {
         <img src={`${data}?.url}`} alt="" />
       </div>
       <div className="w-full lg:[w-50%] flex flex-col justify-center">
-        <h2 className={`${styles.productTitle}`}>{data.name}</h2>
+        <h2 className={`${styles.productTitle}`}>{data}</h2>
         <p>{data.description}</p>
         <div className="flex py-2 justify-between">
           <div className="flex">
