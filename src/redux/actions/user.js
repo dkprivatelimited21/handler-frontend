@@ -7,7 +7,7 @@ export const loadUser = () => async (dispatch) => {
     dispatch({
       type: "LoadUserRequest",
     });
-    const data  = await axios.get(`${server}/user/getuser`, {
+    const { data } = await axios.get(`${server}/user/getuser`, {
       withCredentials: true,
     });
     dispatch({
@@ -28,7 +28,7 @@ export const loadSeller = () => async (dispatch) => {
     dispatch({
       type: "LoadSellerRequest",
     });
-    const data = await axios.get(`${server}/shop/getSeller`, {
+    const { data } = await axios.get(`${server}/shop/getSeller`, {
       withCredentials: true,
     });
     dispatch({
@@ -51,7 +51,7 @@ export const updateUserInformation =
         type: "updateUserInfoRequest",
       });
 
-      const data  = await axios.put(
+      const { data } = await axios.put(
         `${server}/user/update-user-info`,
         {
           email,
@@ -88,7 +88,7 @@ export const updatUserAddress =
         type: "updateUserAddressRequest",
       });
 
-      const  data  = await axios.put(
+      const { data } = await axios.put(
         `${server}/user/update-user-addresses`,
         {
           country,
@@ -123,7 +123,7 @@ export const deleteUserAddress = (id) => async (dispatch) => {
       type: "deleteUserAddressRequest",
     });
 
-    const data = await axios.delete(
+    const { data } = await axios.delete(
       `${server}/user/delete-user-address/${id}`,
       { withCredentials: true }
     );
@@ -150,7 +150,7 @@ export const getAllUsers = () => async (dispatch) => {
       type: "getAllUsersRequest",
     });
 
-    const data  = await axios.get(`${server}/user/admin-all-users`, {
+    const { data } = await axios.get(`${server}/user/admin-all-users`, {
       withCredentials: true,
     });
 

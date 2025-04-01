@@ -28,7 +28,7 @@ export const getAllEventsShop = (id) => async (dispatch) => {
       type: "getAlleventsShopRequest",
     });
 
-    const data  = await axios.get(`${server}/event/get-all-events/${id}`);
+    const { data } = await axios.get(`${server}/event/get-all-events/${id}`);
     dispatch({
       type: "getAlleventsShopSuccess",
       payload: data.events,
@@ -48,7 +48,7 @@ export const deleteEvent = (id) => async (dispatch) => {
       type: "deleteeventRequest",
     });
 
-    const  data  = await axios.delete(
+    const { data } = await axios.delete(
       `${server}/event/delete-shop-event/${id}`,
       {
         withCredentials: true,
@@ -74,7 +74,7 @@ export const getAllEvents = () => async (dispatch) => {
       type: "getAlleventsRequest",
     });
 
-    const  data  = await axios.get(`${server}/event/get-all-events`);
+    const { data } = await axios.get(`${server}/event/get-all-events`);
     dispatch({
       type: "getAlleventsSuccess",
       payload: data.events,
