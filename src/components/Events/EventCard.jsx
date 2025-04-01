@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { addTocart } from "../../redux/actions/cart";
 import { toast } from "react-toastify";
 
+export default EventCard;
+
 const EventCard = ({ active, data }) => {
   const { cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
@@ -24,5 +26,4 @@ const EventCard = ({ active, data }) => {
       };
     };
   };
- 
-export default EventCard;
+
