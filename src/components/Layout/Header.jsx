@@ -16,7 +16,6 @@ import { useSelector } from "react-redux";
 import Cart from "../cart/Cart";
 import Wishlist from "../Wishlist/Wishlist";
 import { RxCross1 } from "react-icons/rx";
-import { backend_url } from "../../server";
 
 const Header = ({ activeHeading }) => {
   const { isAuthenticated, user } = useSelector((state) => state.user);
@@ -176,7 +175,7 @@ const Header = ({ activeHeading }) => {
                 {isAuthenticated ? (
                   <Link to="/profile">
                     <img
-                      src={`${backend_url}${user.avatar}`}
+                      src = {`${i.images[0]?.url}`}
                       className="w-[35px] h-[35px] rounded-full"
                       alt=""
                     />
