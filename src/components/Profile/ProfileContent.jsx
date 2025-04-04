@@ -206,7 +206,7 @@ const AllOrders = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getAllOrdersOfUser(user._id));
+    dispatch(getAllOrdersOfUser(user?._id));
   }, []);
 
   const columns = [
