@@ -15,7 +15,7 @@ const AllProducts = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getAllProductsShop(seller._id));
+    dispatch(getAllProductsShop(seller?._id));
   }, [dispatch]);
 
   const handleDelete = (id) => {
