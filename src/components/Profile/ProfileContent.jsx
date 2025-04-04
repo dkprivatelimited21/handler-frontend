@@ -291,7 +291,7 @@ const AllRefundOrders = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getAllOrdersOfUser(user._id));
+    dispatch(getAllOrdersOfUser(user?._id));
   }, []);
 
   const eligibleOrders =
@@ -379,7 +379,7 @@ const TrackOrder = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getAllOrdersOfUser(user._id));
+    dispatch(getAllOrdersOfUser(user?._id));
   }, []);
 
   const columns = [
