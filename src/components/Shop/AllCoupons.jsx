@@ -27,7 +27,7 @@ const AllCoupons = () => {
   useEffect(() => {
     setIsLoading(true);
     axios
-      .get(`${server}/coupon/get-coupon/${seller._id}`, {
+      .get(`${server}/coupon/get-coupon/${seller?._id}`, {
         withCredentials: true,
       })
       .then((res) => {
