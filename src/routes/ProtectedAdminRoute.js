@@ -6,7 +6,7 @@ const ProtectedAdminRoute = ({ children }) => {
   if (loading === false) {
     if (!isAuthenticated) {
       return <Navigate to="/login" replace />;
-    } else if(user.role !== "Admin"){
+    } else if(user?.role !== "Admin"){
         return <Navigate to="/" replace />;
     }
     return children;
