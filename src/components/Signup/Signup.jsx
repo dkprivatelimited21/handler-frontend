@@ -30,7 +30,7 @@ const Singup = () => {
     e.preventDefault();
 
     axios
-      .posts(`${server}/user/create-user`, { name, email, password, avatar })
+      .post(`${server}/user/create-user`, { name, email, password, avatar })
       .then((res) => {
         toast.success(res.data.message);
         setName("");
