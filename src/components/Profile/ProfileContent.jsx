@@ -71,9 +71,9 @@ const ProfileContent = ({ active }) => {
             toast.error(error);
           });
       }
+    
     };
-
-    reader?.readAsDataURL(e.target.files[0]);
+    return(reader?.readAsDataURL(e.target.files[0]));
   };
 
   return (
