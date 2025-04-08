@@ -1,3 +1,3 @@
-export const server = "https://local-handler.vercel.app/api/v2";
+export const server = "https://handler-backend.vercel.app/api/v2";
 
 
