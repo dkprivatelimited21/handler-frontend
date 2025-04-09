@@ -29,8 +29,8 @@ export const navItems = [
   export const brandingData = [
     {
       id: 1,
-      title: "Free Shipping",
-      Description: "From all orders over 100$",
+      title: "Self Shipping",
+      Description: "Order shipped personally by sellers",
       icon: (
         <svg
           width="36"
@@ -215,7 +215,7 @@ export const navItems = [
     },
     {
       id: 4,
-      title: "Cloths",
+      title: "Clothes",
       subTitle: "",
       image_Url:
         "https://www.shift4shop.com/2015/images/industries/clothing/clothing-apparel.png",
@@ -233,12 +233,6 @@ export const navItems = [
       subTitle: "",
       image_Url:
         "https://securecdn.pymnts.com/wp-content/uploads/2014/11/Gifts-Photo-700x489.jpg",
-    },
-    {
-      id: 7,
-      title: "Pet Care",
-      subTitle: "",
-      image_Url: "https://cdn.openpr.com/T/c/Tc15444071_g.jpg",
     },
     {
       id: 8,
@@ -644,9 +638,6 @@ export const navItems = [
     },
     {
       name: "Shipping",
-    },
-    {
-      name: "Live chat",
     },
   ];
   
