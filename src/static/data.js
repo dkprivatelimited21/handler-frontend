@@ -275,7 +275,7 @@ export const navItems = [
           url: "https://www.istorebangladesh.com/images/thumbs/0000286_macbook-pro-m1_550.png",
         },
       ],
-    {
+    
       id: 2,
       category:"Mobile and Tablets",
       name: "Iphone 14 pro max 256 gb ssd and 8 gb ram silver colour",
@@ -291,7 +291,7 @@ export const navItems = [
           url: "https://m.media-amazon.com/images/I/31Vle5fVdaL.jpg",
         },
       ],
-     {
+     
       discount_price: 1099,
       rating: 5,
       total_sell: 80,
