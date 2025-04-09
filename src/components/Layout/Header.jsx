@@ -57,7 +57,9 @@ const Header = ({ activeHeading }) => {
         <div className="hidden 800px:h-[50px] 800px:my-[20px] 800px:flex items-center justify-between">
           <div>
             <Link to="/">
-              <h1 className={`text-[35px] leading-[1.2] 800px:text-[60px] text-[#3d3a3a] font-[600] capitalize` }>local-handler</h1>
+              <h1 className={`text-[25px] leading-[1.2] 800px:text-[50px] text-[#3d3a3a] font-[600] capitalize` }>
+		local-handler
+		</h1>
             </Link>
           </div>
           {/* search box */}
@@ -213,7 +215,9 @@ const Header = ({ activeHeading }) => {
           </div>
           <div>
             <Link to="/">
-              <h1>local-handler</h1>
+              <h1 className={`text-[25px] leading-[1.2] 800px:text-[50px] text-[#3d3a3a] font-[600] capitalize` }>
+		local-handler
+		</h1>
             </Link>
           </div>
           <div>
