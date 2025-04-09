@@ -1,6 +1,3 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-
 // navigation Data
 export const navItems = [
     {
@@ -29,8 +26,8 @@ export const navItems = [
   export const brandingData = [
     {
       id: 1,
-      title: "Self Shipping",
-      Description: "Order shipped personally by sellers",
+      title: "Shipping details",
+      Description: "Shipped personally by sellers",
       icon: (
         <svg
           width="36"
@@ -215,7 +212,7 @@ export const navItems = [
     },
     {
       id: 4,
-      title: "Clothes",
+      title: "Cloths",
       subTitle: "",
       image_Url:
         "https://www.shift4shop.com/2015/images/industries/clothing/clothing-apparel.png",
@@ -233,6 +230,12 @@ export const navItems = [
       subTitle: "",
       image_Url:
         "https://securecdn.pymnts.com/wp-content/uploads/2014/11/Gifts-Photo-700x489.jpg",
+    },
+    {
+      id: 7,
+      title: "Pet Care",
+      subTitle: "",
+      image_Url: "https://cdn.openpr.com/T/c/Tc15444071_g.jpg",
     },
     {
       id: 8,
@@ -275,7 +278,21 @@ export const navItems = [
           url: "https://www.istorebangladesh.com/images/thumbs/0000286_macbook-pro-m1_550.png",
         },
       ],
-    
+      shop: {
+        name: "Apple inc.",
+        shop_avatar: {
+          public_id: "test",
+          url: "https://www.hatchwise.com/wp-content/uploads/2022/05/amazon-logo-1024x683.png",
+        },
+        ratings: 4.2,
+      },
+      price: 1099,
+      discount_price: 1049,
+      rating: 4,
+      total_sell: 35,
+      stock: 10,
+    },
+    {
       id: 2,
       category:"Mobile and Tablets",
       name: "Iphone 14 pro max 256 gb ssd and 8 gb ram silver colour",
@@ -291,7 +308,14 @@ export const navItems = [
           url: "https://m.media-amazon.com/images/I/31Vle5fVdaL.jpg",
         },
       ],
-     
+      shop: {
+        name: "Amazon Ltd",
+        shop_avatar: {
+          public_id: "test",
+          url: "https://www.hatchwise.com/wp-content/uploads/2022/05/amazon-logo-1024x683.png",
+        },
+        ratings: 4.2,
+      },
       discount_price: 1099,
       rating: 5,
       total_sell: 80,
@@ -314,6 +338,14 @@ export const navItems = [
           url: "https://www.istorebangladesh.com/images/thumbs/0000286_macbook-pro-m1_550.png",
         },
       ],
+      shop: {
+        name: "Apple inc.",
+        shop_avatar: {
+          public_id: "test",
+          url: "https://www.hatchwise.com/wp-content/uploads/2022/05/amazon-logo-1024x683.png",
+        },
+        ratings: 4.2,
+      },
       price: 1099,
       discount_price: 1049,
       rating: 4,
@@ -398,6 +430,14 @@ export const navItems = [
           url: "https://eratablet.com/wp-content/uploads/2022/08/H51ba6537405f4948972e293927673546u.jpg",
         },
       ],
+      shop: {
+        name: "Asus Ltd",
+        shop_avatar: {
+          public_id: "test",
+          url: "https://www.hatchwise.com/wp-content/uploads/2022/05/amazon-logo-1024x683.png",
+        },
+        ratings: 4.2,
+      },
       price: 300,
       discount_price: 239,
       rating: 4.5,
@@ -497,7 +537,14 @@ export const navItems = [
           url: "https://m.media-amazon.com/images/I/31Vle5fVdaL.jpg",
         },
       ],
-      
+      shop: {
+        name: "Amazon Ltd",
+        shop_avatar: {
+          public_id: "test",
+          url: "https://www.hatchwise.com/wp-content/uploads/2022/05/amazon-logo-1024x683.png",
+        },
+        ratings: 4.2,
+      },
       discount_price: 1099,
       rating: 5,
       total_sell: 20,
@@ -594,6 +641,9 @@ export const navItems = [
     },
     {
       name: "Shipping",
+    },
+    {
+      name: "Live chat",
     },
   ];
   
