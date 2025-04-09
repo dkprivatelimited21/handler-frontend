@@ -212,7 +212,7 @@ export const navItems = [
     },
     {
       id: 4,
-      title: "Cloths",
+      title: "Clothes",
       subTitle: "",
       image_Url:
         "https://www.shift4shop.com/2015/images/industries/clothing/clothing-apparel.png",
