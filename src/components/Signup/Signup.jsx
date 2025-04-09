@@ -28,7 +28,7 @@ const Singup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+	console.log(Singup);
     axios
       .post(`${server}/user/create-user`, { name, email, password, avatar })
       .then((res) => {
