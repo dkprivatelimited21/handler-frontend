@@ -13,7 +13,6 @@ const DashboardHeader = () => {
       <div>
         <Link to="/dashboard">
            <h1>local-handler</h1>
-          />
         </Link>
       </div>
       <div className="flex items-center">
