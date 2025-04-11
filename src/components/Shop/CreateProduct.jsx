@@ -20,6 +20,11 @@ const CreateProduct = () => {
   const [originalPrice, setOriginalPrice] = useState();
   const [discountPrice, setDiscountPrice] = useState();
   const [stock, setStock] = useState();
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const sizeOptions = ["XS", "S", "M", "L", "XL", "XXL"];
+  const colorOptions = ["Red", "Blue", "Black", "White", "Green", "Yellow"];
+
 
   useEffect(() => {
     if (error) {
@@ -57,6 +62,10 @@ const CreateProduct = () => {
     images.forEach((image) => {
       newForm.set("images", image);
     });
+    if (category === "Clothes") {
+       newForm.append("sizes", JSON.stringify(selectedSizes));
+       newForm.append("colors", JSON.stringify(selectedColors));
+     }
     newForm.append("name", name);
     newForm.append("description", description);
     newForm.append("category", category);
@@ -67,20 +76,25 @@ const CreateProduct = () => {
     newForm.append("shopId", seller?._id);
     dispatch(
       createProduct({
-        name,
-        description,
-        category,
-        tags,
-        originalPrice,
-        discountPrice,
-        stock,
-        shopId: seller?._id,
-        images,
-      })
-    );
-  };
+      name,
+      description,
+      category,
+      tags,
+      originalPrice,
+      discountPrice,
+      stock,
+      shopId: seller?._id,
+      images,
+       ...(category === "Clothes" && {
+          sizes: selectedSizes,
+         colors: selectedColors,
+    })
+  })
+    )};
 
-  return (
+
+
+return (
     <div className="w-[90%] 800px:w-[50%] bg-white  shadow h-[80vh] rounded-[4px] p-3 overflow-y-scroll">
       <h5 className="text-[30px] font-Poppins text-center">Create Product</h5>
       {/* create product form */}
@@ -135,6 +149,59 @@ const CreateProduct = () => {
               ))}
           </select>
         </div>
+
+        {category === "Clothes" && (
+  <>
+    <br />
+    <div>
+      <label className="pb-2 font-medium">Available Sizes</label>
+      <div className="flex flex-wrap gap-2 mt-2">
+        {sizeOptions.map((size) => (
+          <label key={size} className="flex items-center gap-1">
+            <input
+              type="checkbox"
+              value={size}
+              checked={selectedSizes.includes(size)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setSelectedSizes((prev) =>
+                  checked ? [...prev, size] : prev.filter((s) => s !== size)
+                );
+              }}
+            />
+            {size}
+          </label>
+        ))}
+      </div>
+    </div>
+    <br />
+    <div>
+      <label className="pb-2 font-medium">Available Colors</label>
+      <div className="flex flex-wrap gap-2 mt-2">
+        {colorOptions.map((color) => (
+          <label key={color} className="flex items-center gap-1">
+            <input
+              type="checkbox"
+              value={color}
+              checked={selectedColors.includes(color)}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                setSelectedColors((prev) =>
+                  checked ? [...prev, color] : prev.filter((c) => c !== color)
+                );
+              }}
+            />
+            {color}
+          </label>
+        ))}
+      </div>
+    </div>
+  </>
+        )}
+
+
+
+
         <br />
         <div>
           <label className="pb-2">Tags</label>
@@ -227,5 +294,4 @@ const CreateProduct = () => {
     </div>
   );
 };
-
 export default CreateProduct;
