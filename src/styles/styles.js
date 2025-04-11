@@ -12,9 +12,7 @@ const styles = {
     cart_button_text:"text-[#fff] text-[16px] font-[600]",
     input:"w-full border p-1 rounded-[5px]",
     activeStatus:"w-[10px] h-[10px] rounded-full absolute top-0 right-1 bg-[#40d132]",
-    noramlFlex:"flex items-center",
-    spinner:'w-[18px] h-[18px] border: 3px solid rgba(0, 0, 0, 0.2) border-top-color: #000 border-radius: 50% animation: spin 1s linear infinite display: inline-block vertical-align: middle',
-    transform:'rotate(360deg)'
+    noramlFlex:"flex items-center"
   
 
       
