@@ -120,12 +120,30 @@ const Login = () => {
               </div>
             </div>
             <div>
-              <button
-                type="submit"
-                className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-               disabled={handleSubmit}>
-                Submit
-              </button>
+              <button 
+		   type="submit" 
+		    className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"			
+			onclick="handleClick()">Submit</button>
+
+		<script>
+  			let canClick = true;
+
+ 			 function handleClick() {
+  			  if (canClick) {
+    			  canClick = false;
+    			  document.getElementById('myButton').disabled = true;
+
+    			  // Your custom logic on button click
+    			  alert("Button clicked!");
+
+    			  // Enable the button after 10 seconds
+     				 setTimeout(() => {
+      				  canClick = true;
+       				 document.getElementById('myButton').disabled = false;
+     				 }, 10000); // 10000 milliseconds = 10 seconds
+   					 }
+						  }
+				</script>
             </div>
             <div className={`${styles.noramlFlex} w-full`}>
               <h4>Not have any account?</h4>
