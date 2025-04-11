@@ -15,6 +15,18 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (disabled) return;
+
+    setLoading(true);
+    setDisabled(true);
+
+    // Simulate async login or API call
+    setTimeout(() => {
+      setLoading(false);
+      setDisabled(false);
+    }, 10000); // 10 seconds
+  
+
     await axios
       .post(
         `${server}/user/login-user`,
@@ -120,30 +132,15 @@ const Login = () => {
               </div>
             </div>
             <div>
-              <button 
-		   type="submit" 
-		    className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"			
-			onclick="handleClick()">Submit</button>
-
-		<script>
-  			let canClick = true;
-
- 			 function handleClick() {
-  			  if (canClick) {
-    			  canClick = false;
-    			  document.getElementById('myButton').disabled = true;
-
-    			  // Your custom logic on button click
-    			  alert("Button clicked!");
-
-    			  // Enable the button after 10 seconds
-     				 setTimeout(() => {
-      				  canClick = true;
-       				 document.getElementById('myButton').disabled = false;
-     				 }, 10000); // 10000 milliseconds = 10 seconds
-   					 }
-						  }
-				</script>
+            <button type="submit"
+            className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+             disabled={disabled}>
+        {loading ? (
+          <span className="spinner"></span>
+        ) : (
+          'Login'
+        )}
+      </button>
             </div>
             <div className={`${styles.noramlFlex} w-full`}>
               <h4>Not have any account?</h4>
