@@ -20,11 +20,50 @@ const Checkout = () => {
   const [couponCode, setCouponCode] = useState("");
   const [couponCodeData, setCouponCodeData] = useState(null);
   const [discountPrice, setDiscountPrice] = useState(null);
+  const [fullName, setFullName] = useState("");
+const [address, setAddress] = useState("");
+const [city, setCity] = useState("");
+const [state, setState] = useState("");
+const [zipCode, setZipCode] = useState("");
+const [phoneNumber, setPhoneNumber] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+
+const autofillFromLocation = async () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+        );
+        const data = await response.json();
+
+        const addressData = data.address;
+
+        setAddress(
+          `${addressData.road || ""} ${addressData.neighbourhood || ""}`.trim()
+        );
+        setCity(addressData.city || addressData.town || addressData.village || "");
+        setState(addressData.state || "");
+        setZipCode(addressData.postcode || "");
+
+        toast.success("Shipping details filled from your location!");
+      } catch (error) {
+        toast.error("Unable to fetch address from location.");
+        console.error(error);
+      }
+    });
+  };
 
   const paymentSubmit = () => {
    if(address1 === "" || address2 === "" || zipCode === null || country === "" || city === ""){
@@ -60,7 +99,7 @@ const Checkout = () => {
   );
 
   // this is shipping cost variable
-  const shipping = subTotalPrice * 0.1;
+  const shipping = subTotalPrice * 50;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -333,6 +372,13 @@ const CartData = ({
       <h5 className="text-[18px] font-[600] text-end pt-3">${totalPrice}</h5>
       <br />
       <form onSubmit={handleSubmit}>
+<button
+    type="button"
+    onClick={autofillFromLocation}
+    className="mb-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+  >
+    Autofill Using My Current Location
+  </button>
         <input
           type="text"
           className={`${styles.input} h-[40px] pl-2`}

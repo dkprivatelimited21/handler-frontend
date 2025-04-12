@@ -18,6 +18,7 @@ import { RxCross1 } from "react-icons/rx";
 
 const Payment = () => {
   const [orderData, setOrderData] = useState([]);
+  const [upiMethod, setUpiMethod] = useState("");
   const [open, setOpen] = useState(false);
   const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
@@ -376,38 +377,66 @@ const PaymentInfo = ({
       </div>
 
       <br />
-      {/* cash on delivery */}
-      <div>
-        <div className="flex w-full pb-5 border-b mb-2">
-          <div
-            className="w-[25px] h-[25px] rounded-full bg-transparent border-[3px] border-[#1d1a1ab4] relative flex items-center justify-center"
-            onClick={() => setSelect(3)}
-          >
-            {select === 3 ? (
-              <div className="w-[13px] h-[13px] bg-[#1d1a1acb] rounded-full" />
-            ) : null}
-          </div>
-          <h4 className="text-[18px] pl-2 font-[600] text-[#000000b1]">
-            Cash on Delivery
-          </h4>
-        </div>
-
-        {/* cash on delivery */}
-        {select === 3 ? (
-          <div className="w-full flex">
-            <form className="w-full" onSubmit={cashOnDeliveryHandler}>
-              <input
-                type="submit"
-                value="Confirm"
-                className={`${styles.button} !bg-[#f63b60] text-[#fff] h-[45px] rounded-[5px] cursor-pointer text-[18px] font-[600]`}
-              />
-            </form>
-          </div>
-        ) : null}
-      </div>
+      <div className="payment-section">
+  {/* ✅ Insert this UPI selection code here */}
+  <div className="mt-4">
+    <h4 className="text-sm font-semibold mb-2">Select UPI Payment Method:</h4>
+    <div className="flex flex-col gap-2">
+      <label className="flex items-center gap-2">
+        <input
+          type="radio"
+          name="upi"
+          value="PhonePe"
+          checked={upiMethod === "PhonePe"}
+          onChange={(e) => setUpiMethod(e.target.value)}
+        />
+        PhonePe
+      </label>
+      <label className="flex items-center gap-2">
+        <input
+          type="radio"
+          name="upi"
+          value="Google Pay"
+          checked={upiMethod === "Google Pay"}
+          onChange={(e) => setUpiMethod(e.target.value)}
+        />
+        Google Pay
+      </label>
+      <label className="flex items-center gap-2">
+        <input
+          type="radio"
+          name="upi"
+          value="Other UPI"
+          checked={upiMethod === "Other UPI"}
+          onChange={(e) => setUpiMethod(e.target.value)}
+        />
+        Other UPI
+      </label>
     </div>
-  );
+  </div>
+
+  {/* Existing place order button */}
+  <button onClick={orderHandler} className="mt-4">
+    Place Order
+  </button>
+</div>
+const orderHandler = () => {
+  if (!upiMethod) {
+    toast.error("Please select a UPI payment method.");
+    return;
+  }
+
+  const order = {
+    // other order details like cart, user, etc.
+    paymentMethod: upiMethod,
+  };
+
+  // proceed with dispatch or navigation
+  dispatch(placeOrder(order));
+  toast.success("Order placed using " + upiMethod);
+  navigate("/order/success");
 };
+
 
 const CartData = ({ orderData }) => {
   const shipping = orderData?.shipping?.toFixed(2);

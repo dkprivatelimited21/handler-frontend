@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AiFillHeart,
   AiOutlineHeart,
@@ -20,6 +21,8 @@ import Ratings from "./Ratings";
 import axios from "axios";
 
 const ProductDetails = ({ data }) => {
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
   const { wishlist } = useSelector((state) => state.wishlist);
   const { cart } = useSelector((state) => state.cart);
   const { user, isAuthenticated } = useSelector((state) => state.user);
@@ -89,7 +92,17 @@ const ProductDetails = ({ data }) => {
 
   const averageRating = avg.toFixed(2);
 
+const handleBuyNow = () => {
+  // Add product to cart (optional, depends on your flow)
+  const itemToBuy = {
+    ...product,
+    quantity: 1,
+    // Optionally include selected size/color here
+  };
 
+  dispatch(addToCart(itemToBuy)); // if you're using Redux cart
+  navigate("/checkout"); // or wherever your checkout route is
+};
   const handleMessageSubmit = async () => {
     if (isAuthenticated) {
       const groupTitle = data._id + user._id;
@@ -197,6 +210,53 @@ const ProductDetails = ({ data }) => {
                     )}
                   </div>
                 </div>
+{product?.category === "Clothes" && (
+  <>
+    {product?.sizes?.length > 0 && (
+      <div className="mt-4">
+        <h4 className="text-sm font-semibold mb-1">Select Size:</h4>
+        <div className="flex gap-2">
+          {product.sizes.map((size) => (
+            <button
+              key={size}
+              onClick={() => setSelectedSize(size)}
+              className={`px-3 py-1 border rounded-md ${
+                selectedSize === size ? "bg-blue-600 text-white" : "bg-white"
+              }`}
+            >
+              {size}
+            </button>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {product?.colors?.length > 0 && (
+      <div className="mt-4">
+        <h4 className="text-sm font-semibold mb-1">Select Color:</h4>
+        <div className="flex gap-2">
+          {product.colors.map((color) => (
+            <button
+              key={color}
+              onClick={() => setSelectedColor(color)}
+              className={`px-3 py-1 border rounded-md ${
+                selectedColor === color ? "bg-blue-600 text-white" : "bg-white"
+              }`}
+            >
+              {color}
+            </button>
+          ))}
+        </div>
+      </div>
+    )}
+  </>
+)}
+<button
+  onClick={handleBuyNow}
+  className="mt-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+>
+  Buy Now
+</button>
                 <div
                   className={`${styles.button} !mt-6 !rounded !h-11 flex items-center`}
                   onClick={() => addToCartHandler(data._id)}

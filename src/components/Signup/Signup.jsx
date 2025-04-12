@@ -6,6 +6,7 @@ import { RxAvatar } from "react-icons/rx";
 import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
+import imageCompression from "browser-image-compression";
 
 const Singup = () => {
   const [email, setEmail] = useState("");
@@ -14,33 +15,50 @@ const Singup = () => {
   const [visible, setVisible] = useState(false);
   const [avatar, setAvatar] = useState(null);
 
-  const handleFileInputChange = (e) => {
-    const reader = new FileReader();
+  const handleFileInputChange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
 
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        setAvatar(reader.result);
-      }
-    };
-
-    reader.readAsDataURL(e.target.files[0]);
+  const options = {
+    maxSizeMB: 0.5,
+    maxWidthOrHeight: 800,
+    useWebWorker: true,
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-	console.log(Singup);
-    axios
-      .post(`${server}/user/create-user`, { name, email, password, avatar })
-      .then((res) => {
-        toast.success(res.data.message);
-        setName("");
-        setEmail("");
-        setPassword("");
-        setAvatar();
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
-      });
+  try {
+    const compressedFile = await imageCompression(file, options);
+    setAvatar(compressedFile); // store compressed file
+
+    // Optional: preview the image
+    const preview = URL.createObjectURL(compressedFile);
+    document.getElementById("avatar-preview").src = preview;
+  } catch (error) {
+    console.error("Image compression error:", error);
+    toast.error("Failed to compress image.");
+  }
+};
+
+  const formData = new FormData();
+formData.append("name", name);
+formData.append("email", email);
+formData.append("password", password);
+if (avatar) {
+  formData.append("avatar", avatar);
+}
+
+axios
+  .post(`${server}/user/create-user`, formData)
+  .then((res) => {
+    toast.success(res.data.message);
+    setName("");
+    setEmail("");
+    setPassword("");
+    setAvatar(null);
+  })
+  .catch((error) => {
+    toast.error(error.response.data.message);
+  });
+
   };
 
   return (
@@ -133,16 +151,17 @@ const Singup = () => {
               ></label>
               <div className="mt-2 flex items-center">
                 <span className="inline-block h-8 w-8 rounded-full overflow-hidden">
-                  {avatar ? (
-                    <img
-                      src={avatar}
-                      alt="avatar"
-                      className="h-full w-full object-cover rounded-full"
-                    />
-                  ) : (
-                    <RxAvatar className="h-8 w-8" />
-                  )}
-                </span>
+		  {avatar ? (	
+			<img
+			      id="avatar-preview"
+      src={URL.createObjectURL(avatar)}
+      alt="avatar"
+      className="h-full w-full object-cover rounded-full"
+    />
+  ) : (
+    <RxAvatar className="h-8 w-8 text-gray-400" />
+  )}
+</span>
                 <label
                   htmlFor="file-input"
                   className="ml-5 flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
