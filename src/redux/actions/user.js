@@ -54,24 +54,79 @@ export const logoutUser = () => async (dispatch) => {
   }
 };
 
-// Update user address
-export const updateUserAddress = (address) => async (dispatch) => {
-  try {
-    dispatch({ type: "UpdateUserAddressRequest" });
 
-    const { data } = await axios.put(`${server}/user/update-addresses`, address, {
-      withCredentials: true,
-    });
+// user update information
+export const updateUserInformation =
+  (name, email, phoneNumber, password) => async (dispatch) => {
+    try {
+      dispatch({
+        type: "updateUserInfoRequest",
+      });
 
-    dispatch({ type: "UpdateUserAddressSuccess", payload: data.user });
-  } catch (error) {
-    dispatch({
-      type: "UpdateUserAddressFail",
-      payload: error?.response?.data?.message || error.message,
-    });
-  }
-};
+      const { data } = await axios.put(
+        `${server}/user/update-user-info`,
+        {
+          email,
+          password,
+          phoneNumber,
+          name,
+        },
+        {
+          withCredentials: true,
+          headers: {
+            "Access-Control-Allow-Credentials": true,
+          },
+        }
+      );
 
+      dispatch({
+        type: "updateUserInfoSuccess",
+        payload: data.user,
+      });
+    } catch (error) {
+      dispatch({
+        type: "updateUserInfoFailed",
+        payload: error.response.data.message,
+      });
+    }
+  };
+
+// update user address
+export const updatUserAddress =
+  (country, city, address1, address2, zipCode, addressType) =>
+  async (dispatch) => {
+    try {
+      dispatch({
+        type: "updateUserAddressRequest",
+      });
+
+      const { data } = await axios.put(
+        `${server}/user/update-user-addresses`,
+        {
+          country,
+          city,
+          address1,
+          address2,
+          zipCode,
+          addressType,
+        },
+        { withCredentials: true }
+      );
+
+      dispatch({
+        type: "updateUserAddressSuccess",
+        payload: {
+          successMessage: "User address updated succesfully!",
+          user: data.user,
+        },
+      });
+    } catch (error) {
+      dispatch({
+        type: "updateUserAddressFailed",
+        payload: error.response.data.message,
+      });
+    }
+  };
 // Delete user address
 export const deleteUserAddress = (id) => async (dispatch) => {
   try {
