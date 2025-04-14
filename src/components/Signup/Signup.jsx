@@ -1,4 +1,4 @@
-import { React, useState } from "react";
+import React, { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import styles from "../../styles/styles";
 import { Link } from "react-router-dom";
@@ -8,7 +8,7 @@ import { server } from "../../server";
 import { toast } from "react-toastify";
 import imageCompression from "browser-image-compression";
 
-const Singup = () => {
+const Signup = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -16,49 +16,47 @@ const Singup = () => {
   const [avatar, setAvatar] = useState(null);
 
   const handleFileInputChange = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const options = {
-    maxSizeMB: 0.5,
-    maxWidthOrHeight: 800,
-    useWebWorker: true,
+    const options = {
+      maxSizeMB: 0.5,
+      maxWidthOrHeight: 800,
+      useWebWorker: true,
+    };
+
+    try {
+      const compressedFile = await imageCompression(file, options);
+      setAvatar(compressedFile);
+
+      // Optional preview (updates via avatar state)
+    } catch (error) {
+      console.error("Image compression error:", error);
+      toast.error("Failed to compress image.");
+    }
   };
 
-  try {
-    const compressedFile = await imageCompression(file, options);
-    setAvatar(compressedFile); // store compressed file
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-    // Optional: preview the image
-    const preview = URL.createObjectURL(compressedFile);
-    document.getElementById("avatar-preview").src = preview;
-  } catch (error) {
-    console.error("Image compression error:", error);
-    toast.error("Failed to compress image.");
-  }
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+    if (avatar) {
+      formData.append("avatar", avatar);
+    }
 
-
-  const formData = new FormData();
-formData.append("name", name);
-formData.append("email", email);
-formData.append("password", password);
-if (avatar) {
-  formData.append("avatar", avatar);
-}
-
-axios
-  .post(`${server}/user/create-user`, formData)
-  .then((res) => {
-    toast.success(res.data.message);
-    setName("");
-    setEmail("");
-    setPassword("");
-    setAvatar(null);
-  })
-  .catch((error) => {
-    toast.error(error.response.data.message);
-  });
-
+    try {
+      const res = await axios.post(`${server}/user/create-user`, formData);
+      toast.success(res.data.message);
+      setName("");
+      setEmail("");
+      setPassword("");
+      setAvatar(null);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Signup failed.");
+    }
   };
 
   return (
@@ -72,16 +70,13 @@ axios
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Full Name
               </label>
               <div className="mt-1">
                 <input
                   type="text"
-                  name="text"
+                  name="name"
                   autoComplete="name"
                   required
                   value={name}
@@ -92,10 +87,7 @@ axios
             </div>
 
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
               </label>
               <div className="mt-1">
@@ -112,10 +104,7 @@ axios
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Password
               </label>
               <div className="mt-1 relative">
@@ -145,23 +134,22 @@ axios
             </div>
 
             <div>
-              <label
-                htmlFor="avatar"
-                className="block text-sm font-medium text-gray-700"
-              ></label>
+              <label htmlFor="avatar" className="block text-sm font-medium text-gray-700">
+                Avatar
+              </label>
               <div className="mt-2 flex items-center">
                 <span className="inline-block h-8 w-8 rounded-full overflow-hidden">
-		  {avatar ? (	
-			<img
-			      id="avatar-preview"
-      src={URL.createObjectURL(avatar)}
-      alt="avatar"
-      className="h-full w-full object-cover rounded-full"
-    />
-  ) : (
-    <RxAvatar className="h-8 w-8 text-gray-400" />
-  )}
-</span>
+                  {avatar ? (
+                    <img
+                      id="avatar-preview"
+                      src={URL.createObjectURL(avatar)}
+                      alt="avatar"
+                      className="h-full w-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <RxAvatar className="h-8 w-8 text-gray-400" />
+                  )}
+                </span>
                 <label
                   htmlFor="file-input"
                   className="ml-5 flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
@@ -200,4 +188,4 @@ axios
   );
 };
 
-export default Singup;
+export default Signup;

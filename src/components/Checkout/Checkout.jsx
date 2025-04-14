@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "../../styles/styles";
 import { Country, State } from "country-state-city";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { useEffect } from "react";
 import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
@@ -20,18 +19,14 @@ const Checkout = () => {
   const [couponCode, setCouponCode] = useState("");
   const [couponCodeData, setCouponCodeData] = useState(null);
   const [discountPrice, setDiscountPrice] = useState(null);
-  const [fullName, setFullName] = useState("");
-const [address, setAddress] = useState("");
-const [state, setState] = useState("");
-const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-
-const autofillFromLocation = async () => {
+  const autofillFromLocation = async () => {
     if (!navigator.geolocation) {
       toast.error("Geolocation is not supported by your browser.");
       return;
@@ -48,11 +43,11 @@ const autofillFromLocation = async () => {
 
         const addressData = data.address;
 
-        setAddress(
+        setAddress1(
           `${addressData.road || ""} ${addressData.neighbourhood || ""}`.trim()
         );
         setCity(addressData.city || addressData.town || addressData.village || "");
-        setState(addressData.state || "");
+        setCountry(addressData.country_code?.toUpperCase() || "");
         setZipCode(addressData.postcode || "");
 
         toast.success("Shipping details filled from your location!");
@@ -63,52 +58,57 @@ const autofillFromLocation = async () => {
     });
   };
 
-  const paymentSubmit = () => {
-   if(address1 === "" || address2 === "" || zipCode === null || country === "" || city === ""){
-      toast.error("Please choose your delivery address!")
-   } else{
-    const shippingAddress = {
-      address1,
-      address2,
-      zipCode,
-      country,
-      city,
-    };
-
-    const orderData = {
-      cart,
-      totalPrice,
-      subTotalPrice,
-      shipping,
-      discountPrice,
-      shippingAddress,
-      user,
-    }
-
-    // update local storage with the updated orders array
-    localStorage.setItem("latestOrder", JSON.stringify(orderData));
-    navigate("/payment");
-   }
-  };
-
   const subTotalPrice = cart.reduce(
     (acc, item) => acc + item.qty * item.discountPrice,
     0
   );
 
-  // this is shipping cost variable
   const shipping = subTotalPrice * 50;
+
+  const discountPercentage = couponCodeData ? discountPrice : 0;
+
+  const totalPrice = couponCodeData
+    ? (subTotalPrice + shipping - discountPercentage).toFixed(2)
+    : (subTotalPrice + shipping).toFixed(2);
+
+  const paymentSubmit = () => {
+    if (address1 === "" || address2 === "" || zipCode === null || country === "" || city === "") {
+      toast.error("Please choose your delivery address!");
+    } else {
+      const shippingAddress = {
+        address1,
+        address2,
+        zipCode,
+        country,
+        city,
+      };
+
+      const orderData = {
+        cart,
+        totalPrice,
+        subTotalPrice,
+        shipping,
+        discountPrice,
+        shippingAddress,
+        user,
+      };
+
+      localStorage.setItem("latestOrder", JSON.stringify(orderData));
+      navigate("/payment");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const name = couponCode;
 
-    await axios.get(`${server}/coupon/get-coupon-value/${name}`).then((res) => {
+    try {
+      const res = await axios.get(`${server}/coupon/get-coupon-value/${name}`);
       const shopId = res.data.couponCode?.shopId;
       const couponCodeValue = res.data.couponCode?.value;
-      if (res.data.couponCode !== null) {
-        const isCouponValid =
-          cart && cart.filter((item) => item.shopId === shopId);
+
+      if (res.data.couponCode) {
+        const isCouponValid = cart.filter((item) => item.shopId === shopId);
 
         if (isCouponValid.length === 0) {
           toast.error("Coupon code is not valid for this shop");
@@ -123,21 +123,14 @@ const autofillFromLocation = async () => {
           setCouponCodeData(res.data.couponCode);
           setCouponCode("");
         }
-      }
-      if (res.data.couponCode === null) {
-        toast.error("Coupon code doesn't exists!");
+      } else {
+        toast.error("Coupon code doesn't exist!");
         setCouponCode("");
       }
-    });
+    } catch (error) {
+      toast.error("Error applying coupon code.");
+    }
   };
-
-  const discountPercentenge = couponCodeData ? discountPrice : "";
-
-  const totalPrice = couponCodeData
-    ? (subTotalPrice + shipping - discountPercentenge).toFixed(2)
-    : (subTotalPrice + shipping).toFixed(2);
-
-  console.log(discountPercentenge);
 
   return (
     <div className="w-full flex flex-col items-center py-8">
@@ -157,6 +150,8 @@ const autofillFromLocation = async () => {
             setAddress2={setAddress2}
             zipCode={zipCode}
             setZipCode={setZipCode}
+            phoneNumber={phoneNumber}
+            setPhoneNumber={setPhoneNumber}
           />
         </div>
         <div className="w-full 800px:w-[35%] 800px:mt-0 mt-8">
@@ -167,7 +162,8 @@ const autofillFromLocation = async () => {
             subTotalPrice={subTotalPrice}
             couponCode={couponCode}
             setCouponCode={setCouponCode}
-            discountPercentenge={discountPercentenge}
+            discountPercentenge={discountPercentage}
+            autofillFromLocation={autofillFromLocation}
           />
         </div>
       </div>
@@ -195,6 +191,8 @@ const ShippingInfo = ({
   setAddress2,
   zipCode,
   setZipCode,
+  phoneNumber,
+  setPhoneNumber,
 }) => {
   return (
     <div className="w-full 800px:w-[95%] bg-white rounded-md p-5 pb-8">
@@ -209,6 +207,7 @@ const ShippingInfo = ({
               value={user && user.name}
               required
               className={`${styles.input} !w-[95%]`}
+              readOnly
             />
           </div>
           <div className="w-[50%]">
@@ -218,6 +217,7 @@ const ShippingInfo = ({
               value={user && user.email}
               required
               className={`${styles.input}`}
+              readOnly
             />
           </div>
         </div>
@@ -226,17 +226,18 @@ const ShippingInfo = ({
           <div className="w-[50%]">
             <label className="block pb-2">Phone Number</label>
             <input
-              type="number"
+              type="text"
               required
-              value={user && user.phoneNumber}
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
               className={`${styles.input} !w-[95%]`}
             />
           </div>
           <div className="w-[50%]">
             <label className="block pb-2">Zip Code</label>
             <input
-              type="number"
-              value={zipCode}
+              type="text"
+              value={zipCode || ""}
               onChange={(e) => setZipCode(e.target.value)}
               required
               className={`${styles.input}`}
@@ -252,15 +253,12 @@ const ShippingInfo = ({
               value={country}
               onChange={(e) => setCountry(e.target.value)}
             >
-              <option className="block pb-2" value="">
-                Choose your country
-              </option>
-              {Country &&
-                Country.getAllCountries().map((item) => (
-                  <option key={item.isoCode} value={item.isoCode}>
-                    {item.name}
-                  </option>
-                ))}
+              <option value="">Choose your country</option>
+              {Country.getAllCountries().map((item) => (
+                <option key={item.isoCode} value={item.isoCode}>
+                  {item.name}
+                </option>
+              ))}
             </select>
           </div>
           <div className="w-[50%]">
@@ -270,15 +268,12 @@ const ShippingInfo = ({
               value={city}
               onChange={(e) => setCity(e.target.value)}
             >
-              <option className="block pb-2" value="">
-                Choose your City
-              </option>
-              {State &&
-                State.getStatesOfCountry(country).map((item) => (
-                  <option key={item.isoCode} value={item.isoCode}>
-                    {item.name}
-                  </option>
-                ))}
+              <option value="">Choose your City</option>
+              {State.getStatesOfCountry(country).map((item) => (
+                <option key={item.isoCode} value={item.name}>
+                  {item.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -287,7 +282,7 @@ const ShippingInfo = ({
           <div className="w-[50%]">
             <label className="block pb-2">Address1</label>
             <input
-              type="address"
+              type="text"
               required
               value={address1}
               onChange={(e) => setAddress1(e.target.value)}
@@ -297,7 +292,7 @@ const ShippingInfo = ({
           <div className="w-[50%]">
             <label className="block pb-2">Address2</label>
             <input
-              type="address"
+              type="text"
               value={address2}
               onChange={(e) => setAddress2(e.target.value)}
               required
@@ -305,8 +300,6 @@ const ShippingInfo = ({
             />
           </div>
         </div>
-
-        <div></div>
       </form>
       <h5
         className="text-[18px] cursor-pointer inline-block"
@@ -314,28 +307,23 @@ const ShippingInfo = ({
       >
         Choose From saved address
       </h5>
-      {userInfo && (
-        <div>
-          {user &&
-            user.addresses.map((item, index) => (
-              <div className="w-full flex mt-1">
-                <input
-                  type="checkbox"
-                  className="mr-3"
-                  value={item.addressType}
-                  onClick={() =>
-                    setAddress1(item.address1) ||
-                    setAddress2(item.address2) ||
-                    setZipCode(item.zipCode) ||
-                    setCountry(item.country) ||
-                    setCity(item.city)
-                  }
-                />
-                <h2>{item.addressType}</h2>
-              </div>
-            ))}
+      {userInfo && user?.addresses?.map((item, index) => (
+        <div className="w-full flex mt-1" key={index}>
+          <input
+            type="checkbox"
+            className="mr-3"
+            value={item.addressType}
+            onClick={() => {
+              setAddress1(item.address1);
+              setAddress2(item.address2);
+              setZipCode(item.zipCode);
+              setCountry(item.country);
+              setCity(item.city);
+            }}
+          />
+          <h2>{item.addressType}</h2>
         </div>
-      )}
+      ))}
     </div>
   );
 };
@@ -348,6 +336,7 @@ const CartData = ({
   couponCode,
   setCouponCode,
   discountPercentenge,
+  autofillFromLocation,
 }) => {
   return (
     <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
@@ -364,30 +353,29 @@ const CartData = ({
       <div className="flex justify-between border-b pb-3">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
         <h5 className="text-[18px] font-[600]">
-          - {discountPercentenge ? "$" + discountPercentenge.toString() : null}
+          - {discountPercentenge ? "$" + discountPercentenge.toFixed(2) : "-"}
         </h5>
       </div>
       <h5 className="text-[18px] font-[600] text-end pt-3">${totalPrice}</h5>
       <br />
       <form onSubmit={handleSubmit}>
-<button
-    type="button"
-    onClick={autofillFromLocation}
-    className="mb-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-  >
-    Autofill Using My Current Location
-  </button>
+        <button
+          type="button"
+          onClick={autofillFromLocation}
+          className="mb-4 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+        >
+          Autofill Using My Current Location
+        </button>
         <input
           type="text"
           className={`${styles.input} h-[40px] pl-2`}
-          placeholder="Coupoun code"
+          placeholder="Coupon code"
           value={couponCode}
           onChange={(e) => setCouponCode(e.target.value)}
           required
         />
         <input
           className={`w-full h-[40px] border border-[#f63b60] text-center text-[#f63b60] rounded-[3px] mt-8 cursor-pointer`}
-          required
           value="Apply code"
           type="submit"
         />
