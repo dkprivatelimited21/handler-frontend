@@ -22,9 +22,7 @@ const Checkout = () => {
   const [discountPrice, setDiscountPrice] = useState(null);
   const [fullName, setFullName] = useState("");
 const [address, setAddress] = useState("");
-const [city, setCity] = useState("");
 const [state, setState] = useState("");
-const [zipCode, setZipCode] = useState("");
 const [phoneNumber, setPhoneNumber] = useState("");
   const navigate = useNavigate();
 

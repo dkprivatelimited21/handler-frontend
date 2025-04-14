@@ -36,7 +36,7 @@ const Singup = () => {
     console.error("Image compression error:", error);
     toast.error("Failed to compress image.");
   }
-};
+
 
   const formData = new FormData();
 formData.append("name", name);
