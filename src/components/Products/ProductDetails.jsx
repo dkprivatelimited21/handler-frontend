@@ -78,9 +78,16 @@ const ProductDetails = ({ data }) => {
   const averageRating = (totalRatings / totalReviewsLength || 0).toFixed(2);
 
   const handleBuyNow = () => {
+    if (data.category === "Clothes") {
+      if (!selectedSize || !selectedColor) {
+        toast.error("Please select both size and color before buying.");
+        return;
+      }
+    }
+
     const itemToBuy = {
       ...data,
-      quantity: 1,
+      qty: 1,
       selectedSize,
       selectedColor,
     };
@@ -115,13 +122,15 @@ const ProductDetails = ({ data }) => {
           <div className="w-full py-5">
             <div className="block w-full 800px:flex">
               <div className="w-full 800px:w-[50%]">
-                <img
-                  src={data.images[select]?.url}
-                  alt=""
-                  className="w-[80%]"
-                />
+                {data.images?.length > 0 && (
+                  <img
+                    src={data.images[select]?.url}
+                    alt="product"
+                    className="w-[80%]"
+                  />
+                )}
                 <div className="w-full flex">
-                  {data.images.map((i, index) => (
+                  {data.images?.map((i, index) => (
                     <div
                       key={index}
                       className={`${
@@ -245,8 +254,8 @@ const ProductDetails = ({ data }) => {
                 <div className="flex items-center pt-8">
                   <Link to={`/shop/preview/${data?.shop._id}`}>
                     <img
-                      src={data?.shop?.avatar?.url}
-                      alt=""
+                      src={data?.shop?.avatar?.url || "/default-avatar.png"}
+                      alt="shop"
                       className="w-[50px] h-[50px] rounded-full mr-2"
                     />
                   </Link>
@@ -287,6 +296,16 @@ const ProductDetails = ({ data }) => {
   );
 };
 
-// ProductDetailsInfo component remains unchanged
+const ProductDetailsInfo = ({ data, products, totalReviewsLength, averageRating }) => {
+  return (
+    <div className="bg-gray-100 p-5 rounded-md">
+      <h2 className="text-xl font-semibold mb-2">Product Information</h2>
+      <p className="text-gray-700 whitespace-pre-line">{data?.description}</p>
+      <p className="mt-2 text-sm text-gray-600">Average Rating: {averageRating} ⭐</p>
+      <p className="text-sm text-gray-600">Total Reviews: {totalReviewsLength}</p>
+      <p className="text-sm text-gray-600">Total Shop Products: {products?.length || 0}</p>
+    </div>
+  );
+};
 
 export default ProductDetails;
