@@ -1,29 +1,38 @@
+// Connected ProductDetails page with Redux and backend integration
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { getAllProducts } from "../redux/actions/product"; // adjust path as needed
 import { AiOutlineStar, AiFillStar } from "react-icons/ai";
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const products = useSelector((state) => state.product?.products || []);
+  const dispatch = useDispatch();
+
+  const { products = [], isLoading } = useSelector((state) => state.product);
   const data = products.find((item) => item._id === id);
 
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
+
+  useEffect(() => {
+    dispatch(getAllProducts());
+  }, [dispatch]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
 
   const handleBuyNow = () => {
     if (!selectedSize || !selectedColor) {
       alert("Please select size and color");
       return;
     }
-    // Proceed to payment or add to cart logic here
     console.log("Buying", data.name, selectedSize, selectedColor);
+    // You can redirect to checkout page or Razorpay here
   };
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [id]);
-
+  if (isLoading) return <div className="p-6">Loading product...</div>;
   if (!data) return <div className="p-6 text-red-600">Product not found</div>;
 
   return (
