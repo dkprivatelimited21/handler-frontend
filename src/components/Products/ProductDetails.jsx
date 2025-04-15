@@ -1,4 +1,3 @@
-// Cleaned ProductDetails.jsx
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -6,7 +5,7 @@ import { AiOutlineStar, AiFillStar } from "react-icons/ai";
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const { products } = useSelector((state) => state.product);
+  const products = useSelector((state) => state.product?.products || []);
   const data = products.find((item) => item._id === id);
 
   const [selectedSize, setSelectedSize] = useState("");
@@ -29,30 +28,33 @@ const ProductDetails = () => {
 
   return (
     <div className="p-6 w-full flex flex-col md:flex-row gap-6">
+      {/* Product Image and Thumbnails */}
       <div className="w-full md:w-1/2">
         <img
-          src={data?.images[0]?.url || "/default-product.png"}
+          src={data?.images?.[0]?.url || "/default-product.png"}
           alt={data.name}
           className="rounded-lg object-cover w-full max-h-[500px]"
         />
         <div className="flex gap-2 mt-4">
-          {data.images.map((img, index) => (
+          {data.images?.map((img, index) => (
             <img
               key={index}
               src={img.url}
-              alt=""
+              alt={`Thumbnail ${index + 1} for ${data.name}`}
               className="w-16 h-16 object-cover rounded border"
             />
           ))}
         </div>
       </div>
 
+      {/* Product Info */}
       <div className="w-full md:w-1/2">
         <h2 className="text-2xl font-semibold mb-2">{data.name}</h2>
         <p className="text-gray-600 mb-4">{data.description}</p>
         <p className="text-lg font-bold text-green-600 mb-2">₹{data.discountPrice}</p>
         <p className="text-sm line-through text-gray-400 mb-4">₹{data.originalPrice}</p>
 
+        {/* Size Selection */}
         <div className="mb-4">
           <h4 className="font-medium mb-1">Select Size:</h4>
           <div className="flex gap-2">
@@ -70,6 +72,7 @@ const ProductDetails = () => {
           </div>
         </div>
 
+        {/* Color Selection */}
         <div className="mb-4">
           <h4 className="font-medium mb-1">Select Color:</h4>
           <div className="flex gap-2">
@@ -94,19 +97,20 @@ const ProductDetails = () => {
         </button>
       </div>
 
+      {/* Reviews Section */}
       <div className="w-full mt-8">
         <h3 className="text-xl font-semibold mb-2">Product Reviews</h3>
-        {data.reviews && data.reviews.length > 0 ? (
+        {data.reviews?.length > 0 ? (
           <div className="space-y-4">
             {data.reviews.map((item, index) => (
               <div
-                key={index}
+                key={item._id || index}
                 className="p-4 border rounded-lg shadow-sm bg-white"
               >
                 <div className="flex items-center gap-2 mb-2">
                   <img
                     src={item?.user?.avatar?.url || "/default-avatar.png"}
-                    alt="avatar"
+                    alt="User avatar"
                     className="w-8 h-8 rounded-full object-cover"
                   />
                   <span className="text-sm font-medium">Verified Customer</span>
