@@ -7,19 +7,7 @@ import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
 
-const styles = {
-  spinner: {
-    width: "18px",
-    height: "18px",
-    border: "3px solid rgba(0, 0, 0, 0.2)",
-    borderTopColor: "#fff",
-    borderRadius: "50%",
-    animation: "spin 1s linear infinite",
-    display: "inline-block",
-    verticalAlign: "middle",
-  },
-  spinnerKeyframes: `@keyframes spin { to { transform: rotate(360deg); } }`,
-};
+
 
 
 const Singup = () => {

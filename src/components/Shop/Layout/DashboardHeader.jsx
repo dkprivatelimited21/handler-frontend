@@ -11,7 +11,7 @@ const DashboardHeader = () => {
   return (
     <div className="w-full h-[80px] bg-white shadow sticky top-0 left-0 z-30 flex items-center justify-between px-4">
       <div>
-        <Link to="/dashboard">
+        <Link to="/home">
            <h1>local-handler</h1>
         </Link>
       </div>
