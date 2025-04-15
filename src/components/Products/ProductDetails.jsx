@@ -38,6 +38,21 @@ const ProductDetails = ({ data }) => {
     }
   }, [data, wishlist]);
 
+
+
+useEffect(() => {
+  const script = document.createElement("script");
+  script.src = "https://checkout.razorpay.com/v1/checkout.js";
+  script.async = true;
+  document.body.appendChild(script);
+}, []);
+
+
+
+
+
+
+
   const incrementCount = () => {
     setCount(count + 1);
   };
@@ -88,6 +103,55 @@ const ProductDetails = ({ data }) => {
   const avg =  totalRatings / totalReviewsLength || 0;
 
   const averageRating = avg.toFixed(2);
+
+
+  const handleBuyNow = async (product) => {
+  if (!isAuthenticated) {
+    toast.error("Please login to continue");
+    return;
+  }
+
+  try {
+    const response = await axios.post(`${server}/payment/razorpay-checkout`, {
+      amount: product.discountPrice * 100, // in paise
+      productId: product._id,
+      userId: user._id,
+    });
+
+    const options = {
+      key: "YOUR_RAZORPAY_KEY_ID", // Replace with your Razorpay key
+      amount: response.data.amount,
+      currency: "INR",
+      name: product.name,
+      description: "Product Purchase",
+      image: product.images[0]?.url,
+      order_id: response.data.id,
+      handler: function (response) {
+        toast.success("Payment Successful!");
+        // Optional: Save order to DB here
+      },
+      prefill: {
+        name: user.name,
+        email: user.email,
+      },
+      notes: {
+        product_id: product._id,
+      },
+      theme: {
+        color: "#3399cc",
+      },
+    };
+
+    const razor = new window.Razorpay(options);
+    razor.open();
+  } catch (error) {
+    toast.error("Something went wrong with payment");
+    console.error(error);
+  }
+};
+
+
+
 
 
   const handleMessageSubmit = async () => {
@@ -155,7 +219,7 @@ const ProductDetails = ({ data }) => {
                     {data.discountPrice}$
                   </h4>
                   <h3 className={`${styles.price}`}>
-                    {data.originalPrice ? data.originalPrice + "$" : null}
+                    {data.originalPrice ? data.originalPrice + "" : null}
                   </h3>
                 </div>
 
@@ -197,6 +261,14 @@ const ProductDetails = ({ data }) => {
                     )}
                   </div>
                 </div>
+		<div
+		  className={`${styles.button} !mt-4 !rounded !h-11 flex items-center bg-green-600 hover:bg-green-700`}
+			  onClick={() => handleBuyNow(data._id)}
+		>
+ 			 <span className="text-white flex items-center">
+  				  Buy Now
+ 			 </span>
+		</div>
                 <div
                   className={`${styles.button} !mt-6 !rounded !h-11 flex items-center`}
                   onClick={() => addToCartHandler(data._id)}
