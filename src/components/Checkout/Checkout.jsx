@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Country, State } from "country-state-city";
-import { RxCross1 } from "react-icons/rx";
 import { toast } from "react-toastify";
 
 const Checkout = () => {
@@ -16,21 +15,73 @@ const Checkout = () => {
   const [address1, setAddress1] = useState("");
   const [address2, setAddress2] = useState("");
 
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
   const subTotalPrice = cart.reduce(
     (acc, item) => acc + item.qty * item.discountPrice,
     0
   );
 
   const shipping = subTotalPrice > 1000 ? 0 : 100;
-  const discountPercentage = 0; // You can fetch this from coupon logic
+  const discountPercentage = 0;
   const discountPrice = (subTotalPrice * discountPercentage) / 100;
   const totalPrice = subTotalPrice + shipping - discountPrice;
 
-  const paymentSubmit = () => {
-    if (address1 === "" || zipCode === null || country === "" || state === "") {
+  const paymentSubmit = async () => {
+    if (address1 === "" || zipCode === "" || country === "" || state === "") {
       toast.error("Please choose your delivery address!");
-    } else {
-      navigate("/payment");
+      return;
+    }
+
+    try {
+      const res = await fetch("https:handler-backend.vercel.app/api/v2/payment/razorpay-checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          amount: totalPrice * 100, // Razorpay expects paise
+          userId: user._id,
+        }),
+      });
+
+      const data = await res.json();
+
+      const options = {
+        key: "YOUR_RAZORPAY_KEY_ID", // Replace with your actual Razorpay Key ID
+        amount: data.amount,
+        currency: "INR",
+        name: "Local Handler",
+        description: "Order Payment",
+        image: "/logo.png",
+        order_id: data.id,
+        handler: function (response) {
+          toast.success("Payment Successful!");
+          // Here you can call your backend to save the order
+          navigate("/order/success");
+        },
+        prefill: {
+          name: user.name,
+          email: user.email,
+        },
+        notes: {
+          address: `${address1}, ${address2}, ${state}, ${country} - ${zipCode}`,
+        },
+        theme: {
+          color: "#22c55e",
+        },
+      };
+
+      const razor = new window.Razorpay(options);
+      razor.open();
+    } catch (error) {
+      toast.error("Payment Failed");
+      console.error(error);
     }
   };
 
@@ -179,7 +230,13 @@ const ShippingInfo = ({
   );
 };
 
-const CartData = ({ totalPrice, subTotalPrice, shipping, discountPrice, paymentSubmit }) => {
+const CartData = ({
+  totalPrice,
+  subTotalPrice,
+  shipping,
+  discountPrice,
+  paymentSubmit,
+}) => {
   return (
     <div className="w-full bg-[#fff] rounded-md p-5 shadow-sm">
       <h2 className="text-[20px] font-[600] pb-3">Cart Summary</h2>
