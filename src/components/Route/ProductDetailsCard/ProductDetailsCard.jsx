@@ -23,6 +23,12 @@ const ProductDetailsCard = ({ setOpen, data }) => {
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
   //   const [select, setSelect] = useState(false);
+  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedColor, setSelectedColor] = useState("");
+  
+
+
+
 
   const handleMessageSubmit = () => {};
 
@@ -44,7 +50,23 @@ const ProductDetailsCard = ({ setOpen, data }) => {
       if (data.stock < count) {
         toast.error("Product stock limited!");
       } else {
-        const cartData = { ...data, qty: count };
+        if (data.sizes?.length > 0 && !selectedSize) {
+  toast.error("Please select a size.");
+  return;
+}
+
+if (data.colors?.length > 0 && !selectedColor) {
+  toast.error("Please select a color.");
+  return;
+}
+
+const cartData = {
+  ...data,
+  qty: count,
+  selectedSize,
+  selectedColor,
+};
+
         dispatch(addTocart(cartData));
         toast.success("Item added to cart successfully!");
       }
@@ -123,6 +145,49 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                     {data.originalPrice ? data.originalPrice + "₹" : null}
                   </h3>
                 </div>
+
+
+		{data.sizes && data.sizes.length > 0 && (
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-gray-700">Select Size</label>
+    <select
+      value={selectedSize}
+      onChange={(e) => setSelectedSize(e.target.value)}
+      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+    >
+      <option value="">Choose a size</option>
+      {data.sizes.map((size) => (
+        <option key={size} value={size}>
+          {size}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
+
+{data.colors && data.colors.length > 0 && (
+  <div className="mb-4">
+    <label className="block text-sm font-medium text-gray-700 mb-2">Select Color</label>
+    <div className="flex gap-3 flex-wrap">
+      {data.colors.map((color) => (
+        <div
+          key={color}
+          className={`w-8 h-8 rounded-full cursor-pointer border-2 transition duration-200 ${
+            selectedColor === color ? "border-black scale-110" : "border-gray-300"
+          }`}
+          style={{ backgroundColor: color }}
+          title={color}
+          onClick={() => setSelectedColor(color)}
+        ></div>
+      ))}
+    </div>
+    {selectedColor && (
+      <p className="mt-2 text-sm text-gray-600">Selected: <span className="font-medium">{selectedColor}</span></p>
+    )}
+  </div>
+)}
+
+
                 <div className="flex items-center mt-12 justify-between pr-3">
                   <div>
                     <button

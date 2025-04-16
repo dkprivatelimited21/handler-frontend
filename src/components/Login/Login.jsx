@@ -18,39 +18,30 @@ const Login = () => {
 
 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (disabled) return;
+  if (disabled) return;
 
-    setLoading(true);
-    setDisabled(true);
+  setLoading(true);
+  setDisabled(true);
 
-    // Simulate async login or API call
-    setTimeout(() => {
-      setLoading(false);
-      setDisabled(false);
-    }, 10000); // 10 seconds
-  
+  try {
+    const res = await axios.post(
+      `${server}/user/login-user`,
+      { email, password },
+      { withCredentials: true }
+    );
 
-    await axios
-      .post(
-        `${server}/user/login-user`,
-        {
-          email,
-          password,
-        },
-        { withCredentials: true }
-      )
-      .then((res) => {
-        toast.success("Login Success!");
-        navigate("/");
-        window.location.reload(true); 
-      })
-      .catch((err) => {
-        toast.error(err.response.data.message);
-      },3000);
-  };
+    toast.success("Login Success!");
+    navigate("/");
+    window.location.reload(); // no need for `true`
+  } catch (err) {
+    toast.error(err.response?.data?.message || "Login failed");
+    setLoading(false);
+    setDisabled(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -138,15 +129,17 @@ const Login = () => {
               </div>
             </div>
             <div>
-            <button type="submit"
-            className="group relative w-full h-[40px] flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-             disabled={disabled}>
-        {loading ? (
-          <span className="spinner"></span>
-        ) : (
-          'Login'
-        )}
-      </button>
+            <button
+  type="submit"
+  className="group relative w-full h-[40px] flex justify-center items-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+  disabled={disabled}
+>
+  {loading ? (
+    <div className="spinner-border animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+  ) : (
+    "Login"
+  )}
+</button>
             </div>
             <div className={`${styles.noramlFlex} w-full`}>
               <h4>Not have any account?</h4>

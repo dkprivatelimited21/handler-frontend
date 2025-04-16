@@ -22,24 +22,22 @@ export const createProduct =
         type: "productCreateRequest",
       });
 
-      const { data } = await axios.post(
-        `${server}/product/create-product`,
-        name,
-        description,
-        category,
-sizes,
-    colors,
-        tags,
-        originalPrice,
-        discountPrice,
-        stock,
-        shopId,
-        images,
-      );
-      dispatch({
-        type: "productCreateSuccess",
-        payload: data.product,
-      });
+      const payload = {
+  name,
+  description,
+  category,
+  sizes,
+  colors,
+  tags,
+  originalPrice,
+  discountPrice,
+  stock,
+  shopId,
+  images,
+};
+
+const { data } = await axios.post(`${server}/product/create-product`, payload);
+
     } catch (error) {
       dispatch({
         type: "productCreateFail",

@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 
 
-const Singup = () => {
+const Signup = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -18,35 +18,38 @@ const Singup = () => {
   const [avatar, setAvatar] = useState(null);
   const [loading, setLoading] = useState(false);
 
-
   const handleFileInputChange = (e) => {
     const reader = new FileReader();
-
     reader.onload = () => {
       if (reader.readyState === 2) {
         setAvatar(reader.result);
       }
     };
-
     reader.readAsDataURL(e.target.files[0]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    axios
-      .post(`${server}/user/create-user`, { name, email, password, avatar })
-      .then((res) => {
-        toast.success(res.data.message);
-        setName("");
-        setEmail("");
-        setPassword("");
-        setAvatar();
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
+    setLoading(true);
+    try {
+      const res = await axios.post(`${server}/user/create-user`, {
+        name,
+        email,
+        password,
+        avatar,
       });
+      toast.success(res.data.message);
+      setName("");
+      setEmail("");
+      setPassword("");
+      setAvatar(null);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Signup failed");
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -167,12 +170,15 @@ const Singup = () => {
 
             <div>
                <button
-          type="submit"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full flex justify-center items-center gap-2"
-          disabled={loading}
-        >
-          {loading && <span style={styles.spinner} />} Sign Up
-        </button>
+  type="submit"
+  className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full flex justify-center items-center gap-2"
+  disabled={loading}
+>
+  {loading && (
+    <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+  )}
+  {loading ? "Processing..." : "Sign Up"}
+</button>
             </div>
             <div className={`${styles.noramlFlex} w-full`}>
               <h4>Already have an account?</h4>
@@ -187,4 +193,4 @@ const Singup = () => {
   );
 };
 
-export default Singup;
+export default Signup;

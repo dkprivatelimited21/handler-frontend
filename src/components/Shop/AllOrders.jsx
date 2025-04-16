@@ -14,12 +14,13 @@ const AllOrders = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getAllOrdersOfShop(seller?._id));
-  }, [dispatch]);
+    if (seller?._id) {
+      dispatch(getAllOrdersOfShop(seller._id));
+    }
+  }, [dispatch, seller?._id]);
 
   const columns = [
     { field: "id", headerName: "Order ID", minWidth: 150, flex: 0.7 },
-
     {
       field: "status",
       headerName: "Status",
@@ -38,7 +39,6 @@ const AllOrders = () => {
       minWidth: 130,
       flex: 0.7,
     },
-
     {
       field: "total",
       headerName: "Total",
@@ -46,7 +46,34 @@ const AllOrders = () => {
       minWidth: 130,
       flex: 0.8,
     },
-
+    {
+      field: "print",
+      headerName: "Print",
+      minWidth: 120,
+      flex: 0.6,
+      sortable: false,
+      renderCell: (params) => (
+        <Link to={`/order/${params.id}?print=true`}>
+          <Button variant="outlined" size="small">Print</Button>
+        </Link>
+      ),
+    },
+    {
+      field: "invoice",
+      headerName: "Download",
+      minWidth: 150,
+      flex: 0.8,
+      sortable: false,
+      renderCell: (params) => {
+        return (
+          <Link to={`/order/${params.id}?pdf=true`}>
+            <Button variant="outlined" color="primary">
+              Download Invoice
+            </Button>
+          </Link>
+        );
+      },
+    },
     {
       field: " ",
       flex: 1,
@@ -56,13 +83,11 @@ const AllOrders = () => {
       sortable: false,
       renderCell: (params) => {
         return (
-          <>
-            <Link to={`/order/${params.id}`}>
-              <Button>
-                <AiOutlineArrowRight size={20} />
-              </Button>
-            </Link>
-          </>
+          <Link to={`/order/${params.id}`}>
+            <Button>
+              <AiOutlineArrowRight size={20} />
+            </Button>
+          </Link>
         );
       },
     },
@@ -75,7 +100,10 @@ const AllOrders = () => {
       row.push({
         id: item._id,
         itemsQty: item.cart.length,
-        total: "₹" + item.totalPrice,
+        total: item.totalPrice.toLocaleString("en-IN", {
+          style: "currency",
+          currency: "INR",
+        }),
         status: item.status,
       });
     });

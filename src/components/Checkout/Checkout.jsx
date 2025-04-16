@@ -9,6 +9,7 @@ const Checkout = () => {
   const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
   const [country, setCountry] = useState("");
   const [state, setState] = useState("");
   const [zipCode, setZipCode] = useState("");
@@ -17,7 +18,7 @@ const Checkout = () => {
 
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.src = "https://checkout.razorpay.com/v2/checkout.js";
     script.async = true;
     document.body.appendChild(script);
   }, []);
@@ -32,58 +33,67 @@ const Checkout = () => {
   const discountPrice = (subTotalPrice * discountPercentage) / 100;
   const totalPrice = subTotalPrice + shipping - discountPrice;
 
-  const paymentSubmit = async () => {
-    if (address1 === "" || zipCode === "" || country === "" || state === "") {
-      toast.error("Please choose your delivery address!");
-      return;
-    }
+ const paymentSubmit = async () => {
+  if (address1 === "" || zipCode === "" || country === "" || state === "") {
+    toast.error("Please choose your delivery address!");
+    return;
+  }
 
-    try {
-      const res = await fetch("https:handler-backend.vercel.app/api/v2/payment/razorpay-checkout", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          amount: totalPrice * 100, // Razorpay expects paise
-          userId: user._id,
-        }),
-      });
+  setLoading(true); // start spinner
 
-      const data = await res.json();
+  try {
+    const res = await fetch("https://handler-backend.vercel.app/api/v2/payment/razorpay-checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: totalPrice * 100,
+        userId: user._id,
+      }),
+    });
 
-      const options = {
-        key: "YOUR_RAZORPAY_KEY_ID", // Replace with your actual Razorpay Key ID
-        amount: data.amount,
-        currency: "INR",
-        name: "Local Handler",
-        description: "Order Payment",
-        image: "/logo.png",
-        order_id: data.id,
-        handler: function (response) {
-          toast.success("Payment Successful!");
-          // Here you can call your backend to save the order
-          navigate("/order/success");
-        },
-        prefill: {
-          name: user.name,
-          email: user.email,
-        },
-        notes: {
-          address: `${address1}, ${address2}, ${state}, ${country} - ${zipCode}`,
-        },
-        theme: {
-          color: "#22c55e",
-        },
-      };
+    const data = await res.json();
 
-      const razor = new window.Razorpay(options);
-      razor.open();
-    } catch (error) {
-      toast.error("Payment Failed");
-      console.error(error);
-    }
-  };
+    const options = {
+      key: "YOUR_RAZORPAY_KEY_ID",
+      amount: data.amount,
+      currency: "INR",
+      name: "Local Handler",
+      description: "Order Payment",
+      image: "/logo.png",
+      order_id: data.id,
+      handler: function (response) {
+        toast.success("Payment Successful!");
+        navigate("/order/success");
+      },
+      prefill: {
+        name: user.name,
+        email: user.email,
+      },
+      notes: {
+        address: `${address1}, ${address2}, ${state}, ${country} - ${zipCode}`,
+      },
+      theme: {
+        color: "#22c55e",
+      },
+    };
+
+    const razor = new window.Razorpay(options);
+    razor.open();
+
+    razor.on('payment.failed', function () {
+      setLoading(false);
+      toast.error("Payment failed.");
+    });
+
+  } catch (error) {
+    toast.error("Payment Failed");
+    console.error(error);
+    setLoading(false);
+  }
+};
+
 
   const autofillFromLocation = async () => {
     if (!navigator.geolocation) {
@@ -132,12 +142,13 @@ const Checkout = () => {
       </div>
       <div className="w-full 800px:w-[35%]">
         <CartData
-          totalPrice={totalPrice}
-          subTotalPrice={subTotalPrice}
-          shipping={shipping}
-          discountPrice={discountPrice}
-          paymentSubmit={paymentSubmit}
-        />
+  totalPrice={totalPrice}
+  subTotalPrice={subTotalPrice}
+  shipping={shipping}
+  discountPrice={discountPrice}
+  paymentSubmit={paymentSubmit}
+  loading={loading}
+/>
       </div>
     </div>
   );
@@ -236,6 +247,7 @@ const CartData = ({
   shipping,
   discountPrice,
   paymentSubmit,
+  loading,
 }) => {
   return (
     <div className="w-full bg-[#fff] rounded-md p-5 shadow-sm">
@@ -257,11 +269,15 @@ const CartData = ({
         <h5 className="text-[20px] font-[700] text-green-600">₹{totalPrice}</h5>
       </div>
       <button
-        onClick={paymentSubmit}
-        className="mt-6 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
-      >
-        Proceed to Payment
-      </button>
+  onClick={paymentSubmit}
+  className="mt-6 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 flex justify-center items-center gap-2"
+  disabled={loading}
+>
+  {loading && (
+    <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+  )}
+  {loading ? "Processing..." : "Proceed to Payment"}
+</button>
     </div>
   );
 };
