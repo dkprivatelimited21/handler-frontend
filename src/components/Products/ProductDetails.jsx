@@ -27,6 +27,9 @@ const ProductDetails = ({ data }) => {
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
+const [selectedSize, setSelectedSize] = useState("");
+const [selectedColor, setSelectedColor] = useState("");
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
   useEffect(() => {
@@ -73,20 +76,33 @@ useEffect(() => {
     dispatch(addToWishlist(data));
   };
 
-  const addToCartHandler = (id) => {
-    const isItemExists = cart && cart.find((i) => i._id === id);
-    if (isItemExists) {
-      toast.error("Item already in cart!");
-    } else {
-      if (data.stock < 1) {
-        toast.error("Product stock limited!");
-      } else {
-        const cartData = { ...data, qty: count };
-        dispatch(addTocart(cartData));
-        toast.success("Item added to cart successfully!");
-      }
+const addToCartHandler = (id) => {
+  const isItemExists = cart && cart.find((i) => i._id === id);
+
+  if (isItemExists) {
+    toast.error("Item already in cart!");
+  } else {
+    if (!selectedSize || !selectedColor) {
+      toast.error("Please select size and color");
+      return;
     }
-  };
+
+    if (data.stock < 1) {
+      toast.error("Product stock limited!");
+    } else {
+      const cartData = {
+        ...data,
+        qty: count,
+        selectedSize,
+        selectedColor,
+      };
+
+      dispatch(addTocart(cartData));
+      toast.success("Item added to cart successfully!");
+    }
+  }
+};
+
 
   const totalReviewsLength =
     products &&
@@ -105,21 +121,28 @@ useEffect(() => {
   const averageRating = avg.toFixed(2);
 
 
-  const handleBuyNow = async (product) => {
+const handleBuyNow = async (product) => {
   if (!isAuthenticated) {
     toast.error("Please login to continue");
     return;
   }
 
+  if (!selectedSize || !selectedColor) {
+    toast.error("Please select size and color");
+    return;
+  }
+
   try {
     const response = await axios.post(`${server}/payment/razorpay-checkout`, {
-      amount: product.discountPrice * 100, // in paise
+      amount: product.discountPrice * 100,
       productId: product._id,
       userId: user._id,
+      size: selectedSize,
+      color: selectedColor,
     });
 
     const options = {
-      key: "YOUR_RAZORPAY_KEY_ID", // Replace with your Razorpay key
+      key: "YOUR_RAZORPAY_KEY_ID",
       amount: response.data.amount,
       currency: "INR",
       name: product.name,
@@ -128,7 +151,7 @@ useEffect(() => {
       order_id: response.data.id,
       handler: function (response) {
         toast.success("Payment Successful!");
-        // Optional: Save order to DB here
+        // Add your order-save logic here with selectedSize and selectedColor
       },
       prefill: {
         name: user.name,
@@ -136,6 +159,8 @@ useEffect(() => {
       },
       notes: {
         product_id: product._id,
+        size: selectedSize,
+        color: selectedColor,
       },
       theme: {
         color: "#3399cc",
@@ -149,6 +174,7 @@ useEffect(() => {
     console.error(error);
   }
 };
+
 
 
 
@@ -222,6 +248,43 @@ useEffect(() => {
                     {data.originalPrice ? data.originalPrice + "" : null}
                   </h3>
                 </div>
+
+<span className="inline-block bg-gray-100 rounded px-2 py-1 mr-2 text-sm">
+{data.sizes && data.sizes.length > 0 && (
+  <div className="mt-4">
+    <label className="font-semibold">Select Size:</label>
+    <select
+      className="ml-2 border rounded p-1"
+      value={selectedSize}
+      onChange={(e) => setSelectedSize(e.target.value)}
+    >
+      <option value="">Choose</option>
+      {data.sizes.map((size) => (
+        <option key={size} value={size}>{size}</option>
+      ))}
+    </select>
+  </div>
+)}
+
+{data.colors && data.colors.length > 0 && (
+  <div className="mt-2">
+    <label className="font-semibold">Select Color:</label>
+    <select
+      className="ml-2 border rounded p-1"
+      value={selectedColor}
+      onChange={(e) => setSelectedColor(e.target.value)}
+    >
+      <option value="">Choose</option>
+      {data.colors.map((color) => (
+        <option key={color} value={color}>{color}</option>
+      ))}
+    </select>
+  </div>
+)}
+
+</span>
+
+
 
                 <div className="flex items-center mt-12 justify-between pr-3">
                   <div>
