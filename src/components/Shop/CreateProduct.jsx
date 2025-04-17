@@ -10,11 +10,10 @@ const categorySizeMap = {
   "Shirts - Men": ["S", "M", "L", "XL", "XXL"],
   "Pants - Men": ["28", "30", "32", "34", "36", "38"],
   "Shoes - Men": ["6", "7", "8", "9", "10", "11"],
-  "Sarees": [], // no size needed
+  "Sarees": [],
 };
 
-const sizeOptions = categorySizeMap[category] || [];
-
+const colorOptions = ["Red", "Blue", "Black", "White", "Green", "Yellow"];
 
 const CreateProduct = () => {
   const { seller } = useSelector((state) => state.seller);
@@ -32,9 +31,9 @@ const CreateProduct = () => {
   const [stock, setStock] = useState();
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
-  const sizeOptions = ["XS", "S", "M", "L", "XL", "XXL"];
-  const colorOptions = ["Red", "Blue", "Black", "White", "Green", "Yellow"];
 
+  const dynamicSizeOptions = categorySizeMap[category] || [];
+  const hasSizeOptions = dynamicSizeOptions.length > 0;
 
   useEffect(() => {
     if (error) {
@@ -49,12 +48,10 @@ const CreateProduct = () => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-
     setImages([]);
 
     files.forEach((file) => {
       const reader = new FileReader();
-
       reader.onload = () => {
         if (reader.readyState === 2) {
           setImages((old) => [...old, reader.result]);
@@ -67,16 +64,14 @@ const CreateProduct = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (!seller?._id) {
+      toast.error("Seller information not loaded.");
+      return;
+    }
+
     const newForm = new FormData();
+    images.forEach((image) => newForm.set("images", image));
 
-    images.forEach((image) => {
-      newForm.set("images", image);
-    });
-
-    if (category === "Clothes") {
-       newForm.append("sizes", JSON.stringify(selectedSizes));
-       newForm.append("colors", JSON.stringify(selectedColors));
-     }
     newForm.append("name", name);
     newForm.append("description", description);
     newForm.append("category", category);
@@ -84,134 +79,125 @@ const CreateProduct = () => {
     newForm.append("originalPrice", originalPrice);
     newForm.append("discountPrice", discountPrice);
     newForm.append("stock", stock);
-    newForm.append("shopId", seller?._id);
+    newForm.append("shopId", seller._id);
+
+    if (hasSizeOptions) {
+      newForm.append("sizes", JSON.stringify(selectedSizes));
+      newForm.append("colors", JSON.stringify(selectedColors));
+    }
+
     dispatch(
       createProduct({
-      name,
-      description,
-      category,
-      tags,
-      originalPrice,
-      discountPrice,
-      stock,
-      shopId: seller?._id,
-      images,
-       ...(category === "Clothes" && {
+        name,
+        description,
+        category,
+        tags,
+        originalPrice,
+        discountPrice,
+        stock,
+        shopId: seller._id,
+        images,
+        ...(hasSizeOptions && {
           sizes: selectedSizes,
-         colors: selectedColors,
-    })
-  })
-    )};
+          colors: selectedColors,
+        }),
+      })
+    );
+  };
 
-
-
-return (
-    <div className="w-[90%] 800px:w-[50%] bg-white  shadow h-[80vh] rounded-[4px] p-3 overflow-y-scroll">
+  return (
+    <div className="w-[90%] 800px:w-[50%] bg-white shadow h-[80vh] rounded-[4px] p-3 overflow-y-scroll">
       <h5 className="text-[30px] font-Poppins text-center">Create Product</h5>
-      {/* create product form */}
       <form onSubmit={handleSubmit}>
         <br />
         <div>
-          <label className="pb-2">
-            Name <span className="text-red-500">*</span>
-          </label>
+          <label className="pb-2">Name <span className="text-red-500">*</span></label>
           <input
             type="text"
             name="name"
             value={name}
-            className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="input"
             onChange={(e) => setName(e.target.value)}
             placeholder="Enter your product name..."
           />
         </div>
         <br />
         <div>
-          <label className="pb-2">
-            Description <span className="text-red-500">*</span>
-          </label>
+          <label className="pb-2">Description <span className="text-red-500">*</span></label>
           <textarea
             cols="30"
             required
             rows="8"
-            type="text"
             name="description"
             value={description}
-            className="mt-2 appearance-none block w-full pt-2 px-3 border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="input pt-2"
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Enter your product description..."
           ></textarea>
         </div>
         <br />
         <div>
-          <label className="pb-2">
-            Category <span className="text-red-500">*</span>
-          </label>
+          <label className="pb-2">Category <span className="text-red-500">*</span></label>
           <select
             className="w-full mt-2 border h-[35px] rounded-[5px]"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
           >
             <option value="Choose a category">Choose a category</option>
-            {categoriesData &&
-              categoriesData.map((i) => (
-                <option value={i.title} key={i.title}>
-                  {i.title}
-                </option>
-              ))}
+            {categoriesData && categoriesData.map((i) => (
+              <option value={i.title} key={i.title}>{i.title}</option>
+            ))}
           </select>
         </div>
 
-        {category === "Clothes" && (
-  <>
-    <br />
-    <div>
-      <label className="pb-2 font-medium">Available Sizes</label>
-      <div className="flex flex-wrap gap-2 mt-2">
-        {sizeOptions.map((size) => (
-          <label key={size} className="flex items-center gap-1">
-            <input
-              type="checkbox"
-              value={size}
-              checked={selectedSizes.includes(size)}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                setSelectedSizes((prev) =>
-                  checked ? [...prev, size] : prev.filter((s) => s !== size)
-                );
-              }}
-            />
-            {size}
-          </label>
-        ))}
-      </div>
-    </div>
-    <br />
-    <div>
-      <label className="pb-2 font-medium">Available Colors</label>
-      <div className="flex flex-wrap gap-2 mt-2">
-        {colorOptions.map((color) => (
-          <label key={color} className="flex items-center gap-1">
-            <input
-              type="checkbox"
-              value={color}
-              checked={selectedColors.includes(color)}
-              onChange={(e) => {
-                const checked = e.target.checked;
-                setSelectedColors((prev) =>
-                  checked ? [...prev, color] : prev.filter((c) => c !== color)
-                );
-              }}
-            />
-            {color}
-          </label>
-        ))}
-      </div>
-    </div>
-  </>
+        {hasSizeOptions && (
+          <>
+            <br />
+            <div>
+              <label className="pb-2 font-medium">Available Sizes</label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {dynamicSizeOptions.map((size) => (
+                  <label key={size} className="flex items-center gap-1">
+                    <input
+                      type="checkbox"
+                      value={size}
+                      checked={selectedSizes.includes(size)}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setSelectedSizes((prev) =>
+                          checked ? [...prev, size] : prev.filter((s) => s !== size)
+                        );
+                      }}
+                    />
+                    {size}
+                  </label>
+                ))}
+              </div>
+            </div>
+            <br />
+            <div>
+              <label className="pb-2 font-medium">Available Colors</label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {colorOptions.map((color) => (
+                  <label key={color} className="flex items-center gap-1">
+                    <input
+                      type="checkbox"
+                      value={color}
+                      checked={selectedColors.includes(color)}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setSelectedColors((prev) =>
+                          checked ? [...prev, color] : prev.filter((c) => c !== color)
+                        );
+                      }}
+                    />
+                    {color}
+                  </label>
+                ))}
+              </div>
+            </div>
+          </>
         )}
-
-
-
 
         <br />
         <div>
@@ -220,7 +206,7 @@ return (
             type="text"
             name="tags"
             value={tags}
-            className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="input"
             onChange={(e) => setTags(e.target.value)}
             placeholder="Enter your product tags..."
           />
@@ -232,47 +218,40 @@ return (
             type="number"
             name="price"
             value={originalPrice}
-            className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="input"
             onChange={(e) => setOriginalPrice(e.target.value)}
             placeholder="Enter your product price..."
           />
         </div>
         <br />
         <div>
-          <label className="pb-2">
-            Price (With Discount) <span className="text-red-500">*</span>
-          </label>
+          <label className="pb-2">Price (With Discount) <span className="text-red-500">*</span></label>
           <input
             type="number"
             name="price"
             value={discountPrice}
-            className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="input"
             onChange={(e) => setDiscountPrice(e.target.value)}
             placeholder="Enter your product price with discount..."
           />
         </div>
         <br />
         <div>
-          <label className="pb-2">
-            Product Stock <span className="text-red-500">*</span>
-          </label>
+          <label className="pb-2">Product Stock <span className="text-red-500">*</span></label>
           <input
             type="number"
             name="price"
             value={stock}
-            className="mt-2 appearance-none block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+            className="input"
             onChange={(e) => setStock(e.target.value)}
             placeholder="Enter your product stock..."
           />
         </div>
         <br />
         <div>
-          <label className="pb-2">
-            Upload Images <span className="text-red-500">*</span>
-          </label>
+          <label className="pb-2">Upload Images <span className="text-red-500">*</span></label>
           <input
             type="file"
-            name=""
             id="upload"
             className="hidden"
             multiple
@@ -293,16 +272,15 @@ return (
               ))}
           </div>
           <br />
-          <div>
-            <input
-              type="submit"
-              value="Create"
-              className="mt-2 cursor-pointer appearance-none text-center block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
-          </div>
+          <input
+            type="submit"
+            value="Create"
+            className="mt-2 cursor-pointer text-center block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+          />
         </div>
       </form>
     </div>
   );
 };
+
 export default CreateProduct;
