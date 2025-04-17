@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@material-ui/core";
 import { toast } from "react-toastify";
 import { server } from "../../server";
-import { loadSeller } from "../redux/actions/user";
+import { getAllOrdersOfShop } from "../../redux/actions/order";
 
 const UserOrderDetails = () => {
   const { id } = useParams();
