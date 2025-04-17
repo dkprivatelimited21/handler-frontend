@@ -20,7 +20,7 @@ export const brandingData = [
           viewBox="0 0 36 36"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-        >,
+         />),
   },
   {
     id: 2,
@@ -33,7 +33,7 @@ export const brandingData = [
           viewBox="0 0 32 34"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-        >,
+         />),
   },
   {
     id: 3,
@@ -45,7 +45,8 @@ export const brandingData = [
           height="35"
           viewBox="0 0 32 35"
           fill="none"
-          xmlns="http://www.w3.org/2000/svg,
+          xmlns="http://www.w3.org/2000/svg"
+        /> ),
   },
   {
     id: 4,
@@ -58,7 +59,7 @@ export const brandingData = [
           viewBox="0 0 32 38"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-        >,
+         />),
   },
 ];
 
