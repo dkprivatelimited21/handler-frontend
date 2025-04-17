@@ -64,5 +64,3 @@ export const sellerReducer = (state = initialState, action) => {
       return state;
   }
 };
-
-});
