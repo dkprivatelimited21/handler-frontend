@@ -24,6 +24,9 @@ const ProductDetails = ({ data }) => {
   const { cart } = useSelector((state) => state.cart);
   const { user, isAuthenticated } = useSelector((state) => state.user);
   const { products } = useSelector((state) => state.products);
+const [selectedSize, setSelectedSize] = useState("");
+const [selectedColor, setSelectedColor] = useState("");
+
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
@@ -58,20 +61,39 @@ const ProductDetails = ({ data }) => {
     dispatch(addToWishlist(data));
   };
 
-  const addToCartHandler = (id) => {
-    const isItemExists = cart && cart.find((i) => i._id === id);
-    if (isItemExists) {
-      toast.error("Item already in cart!");
-    } else {
-      if (data.stock < 1) {
-        toast.error("Product stock limited!");
-      } else {
-        const cartData = { ...data, qty: count };
-        dispatch(addTocart(cartData));
-        toast.success("Item added to cart successfully!");
-      }
-    }
+ const addToCartHandler = (id) => {
+  const isItemExists = cart && cart.find((i) => i._id === id);
+  if (isItemExists) {
+    toast.error("Item already in cart!");
+    return;
+  }
+
+  if (data.stock < 1) {
+    toast.error("Product stock limited!");
+    return;
+  }
+
+  if (data.sizes?.length > 0 && !selectedSize) {
+    toast.error("Please select a size");
+    return;
+  }
+
+  if (data.colors?.length > 0 && !selectedColor) {
+    toast.error("Please select a color");
+    return;
+  }
+
+  const cartData = {
+    ...data,
+    qty: count,
+    selectedSize,
+    selectedColor,
   };
+
+  dispatch(addTocart(cartData));
+  toast.success("Item added to cart successfully!");
+};
+
 
   const totalReviewsLength =
     products &&
@@ -158,6 +180,44 @@ const ProductDetails = ({ data }) => {
                     {data.originalPrice ? data.originalPrice + "$" : null}
                   </h3>
                 </div>
+
+{data?.sizes?.length > 0 && (
+  <div className="mt-4">
+    <label className="font-medium">Select Size</label>
+    <select
+      value={selectedSize}
+      onChange={(e) => setSelectedSize(e.target.value)}
+      className="border px-2 py-1 rounded ml-2"
+    >
+      <option value="">Choose</option>
+      {data.sizes.map((size) => (
+        <option value={size} key={size}>
+          {size}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
+
+{data?.colors?.length > 0 && (
+  <div className="mt-4">
+    <label className="font-medium">Select Color</label>
+    <select
+      value={selectedColor}
+      onChange={(e) => setSelectedColor(e.target.value)}
+      className="border px-2 py-1 rounded ml-2"
+    >
+      <option value="">Choose</option>
+      {data.colors.map((color) => (
+        <option value={color} key={color}>
+          {color}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
+
+
 
                 <div className="flex items-center mt-12 justify-between pr-3">
                   <div>

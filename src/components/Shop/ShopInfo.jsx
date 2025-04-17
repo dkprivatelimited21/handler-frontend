@@ -6,6 +6,8 @@ import styles from "../../styles/styles";
 import Loader from "../Layout/Loader";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllProductsShop } from "../../redux/actions/product";
+import { logoutSeller } from "../../redux/actions/user";
+
 
 const ShopInfo = ({ isOwner }) => {
   const [data,setData] = useState({});
@@ -27,12 +29,11 @@ const ShopInfo = ({ isOwner }) => {
   }, [])
   
 
-  const logoutHandler = async () => {
-    axios.get(`${server}/shop/logout`,{
-      withCredentials: true,
-    });
-    window.location.reload();
-  };
+  const handleLogout = () => {
+  dispatch(logoutSeller());
+  toast.success("Logged out successfully!");
+  navigate("/");
+};
 
   const totalReviewsLength =
     products &&
@@ -90,7 +91,7 @@ const ShopInfo = ({ isOwner }) => {
           </div>
            </Link>
           <div className={`${styles.button} !w-full !h-[42px] !rounded-[5px]`}
-          onClick={logoutHandler}
+          onClick={handleLogout}
           >
             <span className="text-white">Log Out</span>
           </div>

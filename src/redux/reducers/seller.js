@@ -18,6 +18,12 @@ export const sellerReducer = createReducer(initialState, {
     state.error = action.payload;
     state.isSeller = false;
   },
+case "LogoutSellerSuccess":
+  return {
+    ...state,
+    isSeller: false,
+    seller: null,
+  };
 
   // get all sellers ---admin
   getAllSellersRequest: (state) => {

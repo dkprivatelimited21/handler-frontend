@@ -45,6 +45,16 @@ const ShopCreate = () => {
       });
   };
 
+
+const categorySizeMap = {
+  "Shirts - Men": ["S", "M", "L", "XL", "XXL"],
+  "Pants - Men": ["28", "30", "32", "34", "36", "38"],
+  "Shoes - Men": ["6", "7", "8", "9", "10", "11"],
+  "Sarees": [], // no size needed
+};
+
+const sizeOptions = categorySizeMap[category] || [];
+
   const handleFileInputChange = (e) => {
     const reader = new FileReader();
 

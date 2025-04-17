@@ -171,7 +171,21 @@ export const loadSeller = () => async (dispatch) => {
   }
 };
 
+// logout seller
+export const logoutSeller = () => async (dispatch) => {
+  try {
+    await axios.get(`${server}/shop/logout`, {
+      withCredentials: true,
+    });
 
+    dispatch({ type: "LogoutSellerSuccess" });
+  } catch (error) {
+    dispatch({
+      type: "LogoutSellerFail",
+      payload: error?.response?.data?.message || error.message,
+    });
+  }
+};
 
 
 
