@@ -105,7 +105,7 @@ export const footerProductLinks = [
   { name: "Reviews", link: "/reviews" },
 ];
 
-export const footerCompanyLinks = [
+export const footercompanyLinks = [
   { name: "Shirts" },
   { name: "Shoes" },
   { name: "Accessories" },
