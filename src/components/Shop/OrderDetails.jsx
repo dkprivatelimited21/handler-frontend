@@ -227,7 +227,7 @@ useEffect(() => {
   </div>
       )}
       {
-        data?.status === "Processing refund" || data?.status === "Refund Success" ? (
+        (data?.status === "Processing refund" || data?.status === "Refund Success" ? (
           <select value={status} 
        onChange={(e) => setStatus(e.target.value)}
        className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
