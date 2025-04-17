@@ -6,6 +6,16 @@ import { createProduct } from "../../redux/actions/product";
 import { categoriesData } from "../../static/data";
 import { toast } from "react-toastify";
 
+const categorySizeMap = {
+  "Shirts - Men": ["S", "M", "L", "XL", "XXL"],
+  "Pants - Men": ["28", "30", "32", "34", "36", "38"],
+  "Shoes - Men": ["6", "7", "8", "9", "10", "11"],
+  "Sarees": [], // no size needed
+};
+
+const sizeOptions = categorySizeMap[category] || [];
+
+
 const CreateProduct = () => {
   const { seller } = useSelector((state) => state.seller);
   const { success, error } = useSelector((state) => state.products);

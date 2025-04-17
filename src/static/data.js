@@ -65,16 +65,16 @@ export const brandingData = [
 
 // updated categories
 export const categoriesData = [
-  { id: 1, title: "Shirts - Men", image_Url: "https://www.shift4shop.com/2015/images/industries/clothing/clothing-apparel.png" },
-  { id: 2, title: "Shirts - Women", image_Url: "https://www.shift4shop.com/2015/images/industries/clothing/clothing-apparel.png" },
+  { id: 1, title: "Shirts - Men", image_Url: "https://img.freepik.com/free-photo/shirt_1203-8194.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740" },
+  { id: 2, title: "Shirts - Women", image_Url: "https://img.freepik.com/free-photo/woman-holding-shirts-choosing-what-outfit-wear_176420-16662.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740" },
   { id: 3, title: "Pants - Men", image_Url: "https://www.shift4shop.com/2015/images/industries/clothing/clothing-apparel.png" },
-  { id: 4, title: "Pants - Women", image_Url: "https://www.shift4shop.com/2015/images/industries/clothing/clothing-apparel.png" },
-  { id: 5, title: "Shoes - Men", image_Url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvBQPQMVNRd6TtDkGs2dCri0Y-rxKkFOiEWw&usqp=CAU"},
-  { id: 6, title: "Shoes - Women", image_Url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvBQPQMVNRd6TtDkGs2dCri0Y-rxKkFOiEWw&usqp=CAU" },
-  { id: 7, title: "Sarees", image_Url: "https://example.com/sarees.jpg" },
-  { id: 8, title: "Accessories - Men", image_Url: "https://img.freepik.com/free-vector/ordering-goods-online-internet-store-online-shopping-niche-e-commerce-website-mother-buying-babies-clothes-footwear-toys-infant-accessories_335657-2345.jpg?w=2000" },
-  { id: 9, title: "Accessories - Women", image_Url: "https://img.freepik.com/free-vector/ordering-goods-online-internet-store-online-shopping-niche-e-commerce-website-mother-buying-babies-clothes-footwear-toys-infant-accessories_335657-2345.jpg?w=2000" },
-  { id: 10, title: "Gifts", image_Url: "https://securecdn.pymnts.com/wp-content/uploads/2014/11/Gifts-Photo-700x489.jpg" },
+  { id: 4, title: "Pants - Women", image_Url: "https://img.freepik.com/free-photo/low-section-man-using-smartphone_23-2147845781.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740" },
+  { id: 5, title: "Shoes - Men", image_Url: "https://img.freepik.com/free-photo/fashion-shoes-sneakers_1203-7529.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740"},
+  { id: 6, title: "Shoes - Women", image_Url: "https://img.freepik.com/free-photo/high-heels-black-velvet_53876-102771.jpg?t=st=1744915529~exp=1744919129~hmac=76d6c1e419ab72bf9002a01757eed80250223e5465cb64d6742ede015a80dca4&w=740" },
+  { id: 7, title: "Sarees", image_Url: "https://img.freepik.com/free-photo/young-indian-woman-wearing-sari_23-2149400867.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740" },
+  { id: 8, title: "Accessories - Men", image_Url: "https://img.freepik.com/free-photo/rehearsal-preparation-groom-s-watch-hand_8353-5810.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740" },
+  { id: 9, title: "Accessories - Women", image_Url: "https://img.freepik.com/free-photo/woman-showing-her-nail-art-fingernails-with-watch_23-2149820445.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740" },
+  { id: 10, title: "Gifts", image_Url: "https://img.freepik.com/free-photo/composition-different-traveling-elements_23-2148884935.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740" },
 ];
 
 // cleaned product data (can be updated similarly to match new categories)
