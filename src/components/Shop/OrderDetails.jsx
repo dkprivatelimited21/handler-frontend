@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@material-ui/core";
 import { toast } from "react-toastify";
-import { server } from "../server";
+import { server } from "../../server";
 import Loader from "./Layout/Loader";
 import { loadSeller } from "../redux/actions/user";
 
