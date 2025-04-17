@@ -11,7 +11,6 @@ export const sellerReducer = (state = initialState, action) => {
   switch (action.type) {
     // Load current logged-in seller
     case "LoadSellerRequest":
-    case "getAllSellersRequest":
       return {
         ...state,
         isLoading: true,
@@ -25,6 +24,21 @@ export const sellerReducer = (state = initialState, action) => {
         error: null,
       };
 
+    case "LoadSellerFail":
+      return {
+        ...state,
+        isLoading: false,
+        seller: null,
+        error: action.payload,
+      };
+
+    // --- Admin Access: Get All Sellers ---
+    case "getAllSellersRequest":
+      return {
+        ...state,
+        isLoading: true,
+      };
+
     case "getAllSellersSuccess":
       return {
         ...state,
@@ -33,12 +47,10 @@ export const sellerReducer = (state = initialState, action) => {
         error: null,
       };
 
-    case "LoadSellerFail":
-    case "getAllSellerFailed":
+    case "getAllSellersFailed":
       return {
         ...state,
         isLoading: false,
-        seller: null,
         error: action.payload,
       };
 
@@ -50,21 +62,7 @@ export const sellerReducer = (state = initialState, action) => {
 
     default:
       return state;
-  },
+  }
+};
 
-  // get all sellers ---admin
-  getAllSellersRequest: (state) => {
-    state.isLoading = true;
-  },
-  getAllSellersSuccess: (state, action) => {
-    state.isLoading = false;
-    state.sellers = action.payload;
-  },
-  getAllSellerFailed: (state, action) => {
-    state.isLoading = false;
-    state.error = action.payload;
-  },
-  clearErrors: (state) => {
-    state.error = null;
-  },
 });
