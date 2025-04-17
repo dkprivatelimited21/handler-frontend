@@ -249,7 +249,7 @@ const handleBuyNow = async (product) => {
                   </h3>
                 </div>
 
-<span className="inline-block bg-gray-100 rounded px-2 py-1 mr-2 text-sm">
+<div className="inline-block bg-gray-100 rounded px-2 py-1 mr-2 text-sm">
 {data.sizes && data.sizes.length > 0 && (
   <div className="mt-4">
     <label className="font-semibold">Select Size:</label>
@@ -282,7 +282,7 @@ const handleBuyNow = async (product) => {
   </div>
 )}
 
-</span>
+</div>
 
 
 
