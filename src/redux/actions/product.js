@@ -13,7 +13,7 @@ export const createProduct =
     originalPrice,
     discountPrice,
     stock,
-    shopId,
+    shopId: seller._id,
     images
   ) =>
   async (dispatch) => {

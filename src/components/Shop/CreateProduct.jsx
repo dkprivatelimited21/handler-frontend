@@ -62,6 +62,12 @@ const CreateProduct = () => {
     images.forEach((image) => {
       newForm.set("images", image);
     });
+
+if (!seller || !seller._id) {
+  toast.error("Seller not authenticated. Please log in.");
+  return;
+}
+
     if (category === "Clothes") {
        newForm.append("sizes", JSON.stringify(selectedSizes));
        newForm.append("colors", JSON.stringify(selectedColors));
