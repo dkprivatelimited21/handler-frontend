@@ -14,7 +14,7 @@ const OrderDetails = () => {
   const dispatch = useDispatch();
   const [status, setStatus] = useState("");
   const navigate = useNavigate();
-const [trackingId, setTrackingId] = useState("");
+  const [trackingId, setTrackingId] = useState("");
 
   const { id } = useParams();
 
@@ -24,7 +24,7 @@ const [trackingId, setTrackingId] = useState("");
 
   const data = orders && orders.find((item) => item._id === id);
 
-const isValidTrackingId = (id) => {
+ const isValidTrackingId = (id) => {
   const courierPatterns = {
     delhivery: /^[0-9]{9,14}$/,                   // Numeric, 9–14 digits
     bluedart: /^[A-Z0-9]{8,12}$/,                 // Alphanumeric, 8–12 chars
@@ -32,7 +32,8 @@ const isValidTrackingId = (id) => {
     ecomExpress: /^[A-Z]{2}[0-9]{9}$/,            // Like EX123456789
     xpressbees: /^XB[0-9]{9}$/,                   // Starts with XB and 9 digits
     shadowfax: /^[A-Z0-9]{10,15}$/                // Alphanumeric, 10–15 chars
-  };
+  
+ };
 
   return Object.values(courierPatterns).some((pattern) => pattern.test(id));
 };
@@ -215,7 +216,8 @@ useEffect(() => {
               </option>
             ))}
         </select>
-{status === "Shipping" && (
+      )},
+      {status === "Shipping" && (
   <div className="mt-2">
     <input
       type="text"
@@ -227,7 +229,7 @@ useEffect(() => {
   </div>
       )}
       {
-        (data?.status === "Processing refund" || data?.status === "Refund Success" ? (
+        data?.status === "Processing refund" || data?.status === "Refund Success" ? (
           <select value={status} 
        onChange={(e) => setStatus(e.target.value)}
        className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
