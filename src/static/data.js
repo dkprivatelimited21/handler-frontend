@@ -13,40 +13,67 @@ export const brandingData = [
     id: 1,
     title: "Shipping details",
     Description: "Shipped personally by sellers",
-    icon: "svg-1",
+    icon: (
+        <svg
+          width="36"
+          height="36"
+          viewBox="0 0 36 36"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >,
   },
   {
     id: 2,
     title: "Daily Surprise Offers",
     Description: "Save up to 25% off",
-    icon: "svg-2",
+    icon: (
+        <svg
+          width="32"
+          height="34"
+          viewBox="0 0 32 34"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >,
   },
   {
     id: 3,
     title: "Affordable Prices",
     Description: "Get Factory direct price",
-    icon: "svg-3",
+    icon:  (
+        <svg
+          width="32"
+          height="35"
+          viewBox="0 0 32 35"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg,
   },
   {
     id: 4,
     title: "Secure Payments",
     Description: "100% protected payments",
-    icon: "svg-4",
+    icon:  (
+        <svg
+          width="32"
+          height="38"
+          viewBox="0 0 32 38"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >,
   },
 ];
 
 // updated categories
 export const categoriesData = [
-  { id: 1, title: "Shirts - Men", image_Url: "https://example.com/shirts-men.jpg" },
-  { id: 2, title: "Shirts - Women", image_Url: "https://example.com/shirts-women.jpg" },
-  { id: 3, title: "Pants - Men", image_Url: "https://example.com/pants-men.jpg" },
-  { id: 4, title: "Pants - Women", image_Url: "https://example.com/pants-women.jpg" },
-  { id: 5, title: "Shoes - Men", image_Url: "https://example.com/shoes-men.jpg" },
-  { id: 6, title: "Shoes - Women", image_Url: "https://example.com/shoes-women.jpg" },
+  { id: 1, title: "Shirts - Men", image_Url: "https://www.shift4shop.com/2015/images/industries/clothing/clothing-apparel.png" },
+  { id: 2, title: "Shirts - Women", image_Url: "https://www.shift4shop.com/2015/images/industries/clothing/clothing-apparel.png" },
+  { id: 3, title: "Pants - Men", image_Url: "https://www.shift4shop.com/2015/images/industries/clothing/clothing-apparel.png" },
+  { id: 4, title: "Pants - Women", image_Url: "https://www.shift4shop.com/2015/images/industries/clothing/clothing-apparel.png" },
+  { id: 5, title: "Shoes - Men", image_Url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvBQPQMVNRd6TtDkGs2dCri0Y-rxKkFOiEWw&usqp=CAU"},
+  { id: 6, title: "Shoes - Women", image_Url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQvBQPQMVNRd6TtDkGs2dCri0Y-rxKkFOiEWw&usqp=CAU" },
   { id: 7, title: "Sarees", image_Url: "https://example.com/sarees.jpg" },
-  { id: 8, title: "Accessories - Men", image_Url: "https://example.com/accessories-men.jpg" },
-  { id: 9, title: "Accessories - Women", image_Url: "https://example.com/accessories-women.jpg" },
-  { id: 10, title: "Gifts", image_Url: "https://example.com/gifts.jpg" },
+  { id: 8, title: "Accessories - Men", image_Url: "https://img.freepik.com/free-vector/ordering-goods-online-internet-store-online-shopping-niche-e-commerce-website-mother-buying-babies-clothes-footwear-toys-infant-accessories_335657-2345.jpg?w=2000" },
+  { id: 9, title: "Accessories - Women", image_Url: "https://img.freepik.com/free-vector/ordering-goods-online-internet-store-online-shopping-niche-e-commerce-website-mother-buying-babies-clothes-footwear-toys-infant-accessories_335657-2345.jpg?w=2000" },
+  { id: 10, title: "Gifts", image_Url: "https://securecdn.pymnts.com/wp-content/uploads/2014/11/Gifts-Photo-700x489.jpg" },
 ];
 
 // cleaned product data (can be updated similarly to match new categories)
