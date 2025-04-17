@@ -18,8 +18,8 @@ export const getAllSellers = () => async (dispatch) => {
     });
   } catch (error) {
     dispatch({
-      type: "getAllSellersFailed",
-      payload: error.response?.data?.message || error.message,
+      type: "getAllSellerFailed",
+    //   payload: error.response.data.message,
     });
   }
 };

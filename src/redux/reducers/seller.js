@@ -2,65 +2,36 @@ import { createReducer } from "@reduxjs/toolkit";
 
 const initialState = {
   isLoading: true,
-  seller: null,
-  sellers: [],
-  error: null,
 };
 
-export const sellerReducer = (state = initialState, action) => {
-  switch (action.type) {
-    // Load current logged-in seller
-    case "LoadSellerRequest":
-      return {
-        ...state,
-        isLoading: true,
-      };
+export const sellerReducer = createReducer(initialState, {
+  LoadSellerRequest: (state) => {
+    state.isLoading = true;
+  },
+  LoadSellerSuccess: (state, action) => {
+    state.isSeller = true;
+    state.isLoading = false;
+    state.seller = action.payload;
+  },
+  LoadSellerFail: (state, action) => {
+    state.isLoading = false;
+    state.error = action.payload;
+    state.isSeller = false;
+  },
 
-    case "LoadSellerSuccess":
-      return {
-        ...state,
-        isLoading: false,
-        seller: action.payload,
-        error: null,
-      };
-
-    case "LoadSellerFail":
-      return {
-        ...state,
-        isLoading: false,
-        seller: null,
-        error: action.payload,
-      };
-
-    // --- Admin Access: Get All Sellers ---
-    case "getAllSellersRequest":
-      return {
-        ...state,
-        isLoading: true,
-      };
-
-    case "getAllSellersSuccess":
-      return {
-        ...state,
-        isLoading: false,
-        sellers: action.payload,
-        error: null,
-      };
-
-    case "getAllSellersFailed":
-      return {
-        ...state,
-        isLoading: false,
-        error: action.payload,
-      };
-
-    case "clearErrors":
-      return {
-        ...state,
-        error: null,
-      };
-
-    default:
-      return state;
-  }
-};
+  // get all sellers ---admin
+  getAllSellersRequest: (state) => {
+    state.isLoading = true;
+  },
+  getAllSellersSuccess: (state, action) => {
+    state.isLoading = false;
+    state.sellers = action.payload;
+  },
+  getAllSellerFailed: (state, action) => {
+    state.isLoading = false;
+    state.error = action.payload;
+  },
+  clearErrors: (state) => {
+    state.error = null;
+  },
+});
