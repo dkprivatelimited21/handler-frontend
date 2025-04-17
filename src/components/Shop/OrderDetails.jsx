@@ -23,6 +23,36 @@ const OrderDetails = () => {
 
   const data = orders && orders.find((item) => item._id === id);
 
+
+
+
+
+
+const handleMarkShipped = async (orderId) => {
+  const trackingId = prompt("Enter tracking ID:");
+
+  if (!trackingId) {
+    toast.error("Tracking ID is required!");
+    return;
+  }
+
+  try {
+    await axios.put(
+      `${server}/order/update-order-status/${orderId}`,
+      {
+        status: "Shipped",
+        trackingId,
+      },
+      { withCredentials: true }
+    );
+    toast.success("Order marked as shipped!");
+    dispatch(getAllOrdersOfShop(seller._id));
+  } catch (error) {
+    toast.error(error.response?.data?.message || "Error updating status");
+  }
+};
+
+
   const orderUpdateHandler = async (e) => {
     await axios
       .put(
@@ -137,6 +167,12 @@ const OrderDetails = () => {
       <br />
       <br />
       <h4 className="pt-3 text-[20px] font-[600]">Order Status:</h4>
+
+<Button onClick={() => handleMarkShipped(order._id)} variant="contained">
+  Mark as Shipped
+</Button>
+
+
       {data?.status !== "Processing refund" && data?.status !== "Refund Success" && (
         <select
           value={status}
