@@ -47,7 +47,8 @@ import {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Store from "./redux/store";
-import { loadSeller, loadUser } from "./redux/actions/user";
+import { loadUser } from "./redux/actions/user";
+import { loadSeller } from "./redux/actions/sellers";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
 import { ShopHomePage } from "./ShopRoutes.js";
