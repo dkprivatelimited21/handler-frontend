@@ -7,6 +7,8 @@ import { Button } from "@material-ui/core";
 import { toast } from "react-toastify";
 import { server } from "../../server";
 import { getAllOrdersOfShop } from "../../redux/actions/order";
+import { loadSeller } from "../../redux/actions/user"; // ✅ Added missing import
+import Loader from "../components/Loader"; // ✅ Adjust path if needed
 
 const UserOrderDetails = () => {
   const { id } = useParams();
@@ -89,7 +91,7 @@ const UserOrderDetails = () => {
 
       <h2 className="text-lg font-semibold mb-2">Items:</h2>
       <ul className="mb-4">
-        {order.cart.map((item, index) => (
+        {Array.isArray(order.cart) && order.cart.map((item, index) => (
           <li key={index} className="mb-2">
             <strong>{item.name}</strong> — {item.quantity} × ₹{item.price}
             {item.selectedSize && ` | Size: ${item.selectedSize}`}
