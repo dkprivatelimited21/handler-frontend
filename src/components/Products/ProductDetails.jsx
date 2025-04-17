@@ -27,9 +27,6 @@ const ProductDetails = ({ data }) => {
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
   const [select, setSelect] = useState(0);
-const [selectedSize, setSelectedSize] = useState("");
-const [selectedColor, setSelectedColor] = useState("");
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
   useEffect(() => {
@@ -40,21 +37,6 @@ const [selectedColor, setSelectedColor] = useState("");
       setClick(false);
     }
   }, [data, wishlist]);
-
-
-
-useEffect(() => {
-  const script = document.createElement("script");
-  script.src = "https://checkout.razorpay.com/v1/checkout.js";
-  script.async = true;
-  document.body.appendChild(script);
-}, []);
-
-
-
-
-
-
 
   const incrementCount = () => {
     setCount(count + 1);
@@ -76,33 +58,20 @@ useEffect(() => {
     dispatch(addToWishlist(data));
   };
 
-const addToCartHandler = (id) => {
-  const isItemExists = cart && cart.find((i) => i._id === id);
-
-  if (isItemExists) {
-    toast.error("Item already in cart!");
-  } else {
-    if (!selectedSize || !selectedColor) {
-      toast.error("Please select size and color");
-      return;
-    }
-
-    if (data.stock < 1) {
-      toast.error("Product stock limited!");
+  const addToCartHandler = (id) => {
+    const isItemExists = cart && cart.find((i) => i._id === id);
+    if (isItemExists) {
+      toast.error("Item already in cart!");
     } else {
-      const cartData = {
-        ...data,
-        qty: count,
-        selectedSize,
-        selectedColor,
-      };
-
-      dispatch(addTocart(cartData));
-      toast.success("Item added to cart successfully!");
+      if (data.stock < 1) {
+        toast.error("Product stock limited!");
+      } else {
+        const cartData = { ...data, qty: count };
+        dispatch(addTocart(cartData));
+        toast.success("Item added to cart successfully!");
+      }
     }
-  }
-};
-
+  };
 
   const totalReviewsLength =
     products &&
@@ -119,65 +88,6 @@ const addToCartHandler = (id) => {
   const avg =  totalRatings / totalReviewsLength || 0;
 
   const averageRating = avg.toFixed(2);
-
-
-const handleBuyNow = async (product) => {
-  if (!isAuthenticated) {
-    toast.error("Please login to continue");
-    return;
-  }
-
-  if (!selectedSize || !selectedColor) {
-    toast.error("Please select size and color");
-    return;
-  }
-
-  try {
-    const response = await axios.post(`${server}/payment/razorpay-checkout`, {
-      amount: product.discountPrice * 100,
-      productId: product._id,
-      userId: user._id,
-      size: selectedSize,
-      color: selectedColor,
-    });
-
-    const options = {
-      key: "YOUR_RAZORPAY_KEY_ID",
-      amount: response.data.amount,
-      currency: "INR",
-      name: product.name,
-      description: "Product Purchase",
-      image: product.images[0]?.url,
-      order_id: response.data.id,
-      handler: function (response) {
-        toast.success("Payment Successful!");
-        // Add your order-save logic here with selectedSize and selectedColor
-      },
-      prefill: {
-        name: user.name,
-        email: user.email,
-      },
-      notes: {
-        product_id: product._id,
-        size: selectedSize,
-        color: selectedColor,
-      },
-      theme: {
-        color: "#3399cc",
-      },
-    };
-
-    const razor = new window.Razorpay(options);
-    razor.open();
-  } catch (error) {
-    toast.error("Something went wrong with payment");
-    console.error(error);
-  }
-};
-
-
-
-
 
 
   const handleMessageSubmit = async () => {
@@ -245,46 +155,9 @@ const handleBuyNow = async (product) => {
                     {data.discountPrice}$
                   </h4>
                   <h3 className={`${styles.price}`}>
-                    {data.originalPrice ? data.originalPrice + "" : null}
+                    {data.originalPrice ? data.originalPrice + "$" : null}
                   </h3>
                 </div>
-
-<div className="inline-block bg-gray-100 rounded px-2 py-1 mr-2 text-sm">
-{data.sizes && data.sizes.length > 0 && (
-  <div className="mt-4">
-    <label className="font-semibold">Select Size:</label>
-    <select
-      className="ml-2 border rounded p-1"
-      value={selectedSize}
-      onChange={(e) => setSelectedSize(e.target.value)}
-    >
-      <option value="">Choose</option>
-      {data.sizes.map((size) => (
-        <option key={size} value={size}>{size}</option>
-      ))}
-    </select>
-  </div>
-)}
-
-{data.colors && data.colors.length > 0 && (
-  <div className="mt-2">
-    <label className="font-semibold">Select Color:</label>
-    <select
-      className="ml-2 border rounded p-1"
-      value={selectedColor}
-      onChange={(e) => setSelectedColor(e.target.value)}
-    >
-      <option value="">Choose</option>
-      {data.colors.map((color) => (
-        <option key={color} value={color}>{color}</option>
-      ))}
-    </select>
-  </div>
-)}
-
-</div>
-
-
 
                 <div className="flex items-center mt-12 justify-between pr-3">
                   <div>
@@ -324,14 +197,6 @@ const handleBuyNow = async (product) => {
                     )}
                   </div>
                 </div>
-		<div
-		  className={`${styles.button} !mt-4 !rounded !h-11 flex items-center bg-green-600 hover:bg-green-700`}
-			  onClick={() => handleBuyNow(data._id)}
-		>
- 			 <span className="text-white flex items-center">
-  				  Buy Now
- 			 </span>
-		</div>
                 <div
                   className={`${styles.button} !mt-6 !rounded !h-11 flex items-center`}
                   onClick={() => addToCartHandler(data._id)}
