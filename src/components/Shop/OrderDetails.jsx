@@ -77,12 +77,17 @@ const orderUpdateHandler = async (e) => {
   }
 };
 
-const courier = getCourierName(trackingId);
-if (!courier) {
-  toast.error("Invalid tracking ID. Try a valid one from major couriers.");
-  return;
-}
-toast.success(`Tracking ID matched with ${courier}`);
+useEffect(() => {
+  if (status === "Shipping" && trackingId) {
+    const courier = getCourierName(trackingId);
+    if (!courier) {
+      toast.error("Invalid tracking ID. Try a valid one from major couriers.");
+    } else {
+      toast.success(`Tracking ID matched with ${courier}`);
+    }
+  }
+}, [trackingId, status]);
+
 
   const refundOrderUpdateHandler = async (e) => {
     await axios
