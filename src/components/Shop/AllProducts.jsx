@@ -10,7 +10,6 @@ import Loader from "../Layout/Loader";
 import { toast } from "react-toastify";
 
 
-
 const AllProducts = () => {
   const { products, isLoading } = useSelector((state) => state.products);
   const { seller } = useSelector((state) => state.seller);
@@ -21,14 +20,16 @@ const AllProducts = () => {
     dispatch(getAllProductsShop(seller?._id));
   }, [dispatch]);
 
- const handleDelete = async (id) => {
+const handleDelete = async (id) => {
   try {
     await dispatch(deleteProduct(id));
     toast.success("Product deleted successfully");
   } catch (error) {
-    toast.error("Failed to delete product");
+    console.error("Delete error:", error.response?.data); // debug log
+    toast.error(error.response?.data?.message || "Failed to delete product");
   }
 };
+
   const columns = [
     { field: "id", headerName: "Product Id", minWidth: 150, flex: 0.7 },
     {
