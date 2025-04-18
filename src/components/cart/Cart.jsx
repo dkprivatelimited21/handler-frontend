@@ -44,40 +44,37 @@ const Cart = ({ setOpenCart }) => {
 
 
 
-          {cart && cart.length === 0 ? (
-            <div className="w-full h-full flex items-center justify-center">
-              <h5>Cart is empty!</h5>
-            </div>
-          ) : (
-       		<>
-              {/* Cart Items */}
-              <div className="w-full">
-                {cart.map((i, index) => (
-                  <CartSingle
-                    key={index}
-                    data={i}
-                    quantityChangeHandler={quantityChangeHandler}
-                    removeFromCartHandler={removeFromCartHandler}
-                  />
-                ))}
-              </div>
-
-              {/* Checkout */}
-              <div className="px-5 mb-3">
-                <Link to="/checkout">
-                  <div className="h-[45px] flex items-center justify-center w-full bg-[#e44343] rounded-[5px]">
-                    <h1 className="text-white text-[18px] font-[600]">
-                      Checkout Now (USD${totalPrice})
-                    </h1>
-                  </div>
-                </Link>
-              </div>
-          )}
-        </>
-      </div>
+{cart && cart.length === 0 ? (
+  <div className="w-full h-full flex items-center justify-center">
+    <h5>Cart is empty!</h5>
+  </div>
+) : (
+  <>
+    {/* Cart Items */}
+    <div className="w-full">
+      {cart.map((i, index) => (
+        <CartSingle
+          key={index}
+          data={i}
+          quantityChangeHandler={quantityChangeHandler}
+          removeFromCartHandler={removeFromCartHandler}
+        />
+      ))}
     </div>
-  );
-};
+
+    {/* Checkout */}
+    <div className="px-5 mb-3">
+      <Link to="/checkout">
+        <div className="h-[45px] flex items-center justify-center w-full bg-[#e44343] rounded-[5px]">
+          <h1 className="text-white text-[18px] font-[600]">
+            Checkout Now (USD${totalPrice})
+          </h1>
+        </div>
+      </Link>
+    </div>
+  </>
+)}
+
 
 const CartSingle = ({ data, quantityChangeHandler, removeFromCartHandler }) => {
   const [value, setValue] = useState(data.qty);
