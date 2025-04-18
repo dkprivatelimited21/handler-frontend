@@ -31,16 +31,17 @@ const Cart = ({ setOpenCart }) => {
         <>
           {/* Header with cart count and close button */}
           <div className="flex justify-between items-center px-4 py-2 border-b">
-            <h5 className="text-[17px] font-[500] flex items-center">
-              <IoBagHandleOutline size={20} className="mr-1" />
-              {cart.length} items
-            </h5>
-            <RxCross1
-              size={22}
-              className="cursor-pointer"
-              onClick={() => setOpenCart(false)}
-            />
-          </div>
+  <h5 className="text-[17px] font-[500] flex items-center">
+    <IoBagHandleOutline size={20} className="mr-1" />
+    {cart.length} items
+  </h5>
+  <RxCross1
+    size={22}
+    className="cursor-pointer"
+    onClick={() => setOpenCart(false)}
+  />
+</div>
+
 
           {cart && cart.length === 0 ? (
             <div className="w-full h-full flex items-center justify-center">
