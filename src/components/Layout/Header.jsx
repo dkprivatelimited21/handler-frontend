@@ -230,6 +230,15 @@ const Header = ({ activeHeading }) => {
               >
                 Become Seller
               </Link>
+{!isAuthenticated && (
+          <Link
+            to="/login"
+            className="bg-green-600 text-white px-4 py-2 rounded-md inline-block"
+            onClick={() => setOpen(false)}
+          >
+            Login / Signup
+          </Link>
+        )}
             </div>
           </div>
         </div>
