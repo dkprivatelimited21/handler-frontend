@@ -10,7 +10,7 @@ import { logoutSeller } from "../../redux/actions/user";
 import { toast } from "react-toastify";
 
 
-const { user } = useSelector((state) => state.user);
+
 
 const isAdmin = user?.role === "Admin";
 
@@ -55,7 +55,7 @@ const ShopInfo = ({ isOwner }) => {
         (product.reviews?.reduce((sum, review) => sum + review.rating, 0) || 0),
       0
     );
-
+const { user } = useSelector((state) => state.user);
   const averageRating = totalRatings / (totalReviewsLength || 1);
 
   return (
