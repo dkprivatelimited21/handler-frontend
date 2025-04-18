@@ -30,13 +30,18 @@ const Cart = ({ setOpenCart }) => {
       <div className="fixed top-0 right-0 h-full w-[80%] 800px:w-[25%] bg-white flex flex-col overflow-y-scroll justify-between shadow-sm">
         <>
           {/* Always visible close button */}
-          <div className="flex w-full justify-end pt-5 pr-5">
-            <RxCross1
-              size={25}
-              className="cursor-pointer"
-              onClick={() => setOpenCart(false)}
-            />
-          </div>
+          <div className="flex justify-between items-center px-4 pt-4 pb-2 border-b">
+  <h5 className="text-[18px] font-[500] flex items-center">
+    <IoBagHandleOutline size={22} className="mr-2" />
+    {cart.length} items
+  </h5>
+  <RxCross1
+    size={22}
+    className="cursor-pointer"
+    onClick={() => setOpenCart(false)}
+  />
+</div>
+
 
           {cart && cart.length === 0 ? (
             <div className="w-full h-full flex items-center justify-center">
