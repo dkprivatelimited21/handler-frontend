@@ -31,6 +31,7 @@ const CreateProduct = () => {
   const [stock, setStock] = useState();
   const [selectedSizes, setSelectedSizes] = useState([]);
   const [selectedColors, setSelectedColors] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   const dynamicSizeOptions = categorySizeMap[category] || [];
   const hasSizeOptions = dynamicSizeOptions.length > 0;
@@ -61,13 +62,41 @@ const CreateProduct = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!seller?._id) {
-      toast.error("Seller information not loaded.");
-      return;
-    }
+  if (!seller?._id) {
+    toast.error("Seller information not loaded.");
+    return;
+  }
+
+  setLoading(true); // Start loading
+
+  try {
+    await dispatch(
+      createProduct({
+        name,
+        description,
+        category,
+        tags,
+        originalPrice,
+        discountPrice,
+        stock,
+        shopId: seller._id,
+        images,
+        ...(hasSizeOptions && {
+          sizes: selectedSizes,
+          colors: selectedColors,
+        }),
+      })
+    );
+  } catch (err) {
+    toast.error("Failed to create product");
+  } finally {
+    setLoading(false); // Stop loading
+  }
+};
+
 
     const newForm = new FormData();
     images.forEach((image) => newForm.set("images", image));
@@ -272,11 +301,40 @@ const CreateProduct = () => {
               ))}
           </div>
           <br />
-          <input
-            type="submit"
-            value="Create"
-            className="mt-2 cursor-pointer text-center block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-          />
+         <button
+  type="submit"
+  disabled={loading}
+  className={`mt-2 text-center block w-full h-[40px] px-3 border border-gray-300 rounded-[3px] text-white font-medium ${
+    loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+  }`}
+>
+  {loading ? (
+    <svg
+      className="animate-spin h-5 w-5 mx-auto text-white"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      />
+    </svg>
+  ) : (
+    "Create"
+  )}
+</button>
+
+
         </div>
       </form>
     </div>

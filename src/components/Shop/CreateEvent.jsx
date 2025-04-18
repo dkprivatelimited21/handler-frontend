@@ -22,17 +22,42 @@ const CreateEvent = () => {
   const [stock, setStock] = useState();
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleStartDateChange = (e) => {
-    const startDate = new Date(e.target.value);
-    const minEndDate = new Date(startDate.getTime() + 3 * 24 * 60 * 60 * 1000);
-    setStartDate(startDate);
-    setEndDate(null);
-    document.getElementById("end-date").min = minEndDate.toISOString.slice(
-      0,
-      10
-    );
+
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true); // Show spinner
+
+  const newForm = new FormData();
+
+  images.forEach((image) => {
+    newForm.append("images", image);
+  });
+
+  const data = {
+    name,
+    description,
+    category,
+    tags,
+    originalPrice,
+    discountPrice,
+    stock,
+    images,
+    shopId: seller._id,
+    start_Date: startDate?.toISOString(),
+    Finish_Date: endDate?.toISOString(),
   };
+
+  try {
+    await dispatch(createevent(data));
+  } catch (error) {
+    toast.error("Event creation failed!");
+  } finally {
+    setLoading(false); // Hide spinner
+  }
+};
+
 
   const handleEndDateChange = (e) => {
     const endDate = new Date(e.target.value);
@@ -267,11 +292,39 @@ const CreateEvent = () => {
           </div>
           <br />
           <div>
-            <input
-              type="submit"
-              value="Create"
-              className="mt-2 cursor-pointer appearance-none text-center block w-full px-3 h-[35px] border border-gray-300 rounded-[3px] placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            />
+            <button
+  type="submit"
+  disabled={loading}
+  className={`mt-2 text-center block w-full h-[40px] px-3 border border-gray-300 rounded-[3px] text-white font-medium ${
+    loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+  }`}
+>
+  {loading ? (
+    <svg
+      className="animate-spin h-5 w-5 mx-auto text-white"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      />
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+      />
+    </svg>
+  ) : (
+    "Create"
+  )}
+</button>
+
           </div>
         </div>
       </form>

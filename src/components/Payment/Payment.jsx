@@ -23,6 +23,52 @@ const Payment = () => {
   const navigate = useNavigate();
   const stripe = useStripe();
   const elements = useElements();
+  const [loadingStripe, setLoadingStripe] = useState(false);
+  const [loadingCOD, setLoadingCOD] = useState(false);
+  const [loadingRazorpay, setLoadingRazorpay] = useState(false);
+
+const handleRazorpay = async () => {
+  setLoadingRazorpay(true);
+  const { data } = await axios.post(
+    `${server}/payment/razorpay-checkout`,
+    { amount: order.totalPrice * 100 },
+    { withCredentials: true }
+  );
+
+  const options = {
+    key: process.env.REACT_APP_RAZORPAY_KEY_ID,
+    amount: data.amount,
+    currency: "INR",
+    name: "LocalHandler",
+    description: "Order Payment",
+    order_id: data.id,
+    handler: async function (response) {
+      const config = {
+        headers: { "Content-Type": "application/json" },
+      };
+
+      order.paymentInfo = {
+        id: response.razorpay_payment_id,
+        status: "succeeded",
+        type: "UPI",
+      };
+
+      await axios.post(`${server}/order/create-order`, order, config);
+      localStorage.setItem("cartItems", JSON.stringify([]));
+      localStorage.setItem("latestOrder", JSON.stringify([]));
+      window.location.href = "/order/success";
+    },
+    prefill: {
+      name: user.name,
+      email: user.email,
+    },
+    theme: { color: "#f63b60" },
+  };
+
+  const razor = new window.Razorpay(options);
+  razor.open();
+  setLoadingRazorpay(false);
+};
 
   useEffect(() => {
     const orderData = JSON.parse(localStorage.getItem("latestOrder"));
@@ -36,7 +82,7 @@ const Payment = () => {
           {
             description: "Sunflower",
             amount: {
-              currency_code: "USD",
+              currency_code: "INR",
               value: orderData?.totalPrice,
             },
           },
@@ -100,13 +146,52 @@ const Payment = () => {
   };
 
   const paymentHandler = async (e) => {
-    e.preventDefault();
-    try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-        },
+  e.preventDefault();
+  setLoadingStripe(true);
+
+  try {
+    const config = {
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const { data } = await axios.post(
+      `${server}/payment/process`,
+      paymentData,
+      config
+    );
+
+    const client_secret = data.client_secret;
+
+    if (!stripe || !elements) return;
+    const result = await stripe.confirmCardPayment(client_secret, {
+      payment_method: {
+        card: elements.getElement(CardNumberElement),
+      },
+    });
+
+    if (result.error) {
+      toast.error(result.error.message);
+    } else if (result.paymentIntent.status === "succeeded") {
+      order.paymentInfo = {
+        id: result.paymentIntent.id,
+        status: result.paymentIntent.status,
+        type: "Credit Card",
       };
+
+      await axios.post(`${server}/order/create-order`, order, config);
+      navigate("/order/success");
+      toast.success("Order successful!");
+      localStorage.setItem("cartItems", JSON.stringify([]));
+      localStorage.setItem("latestOrder", JSON.stringify([]));
+      window.location.reload();
+    }
+  } catch (error) {
+    toast.error(error.message || "Payment failed");
+  } finally {
+    setLoadingStripe(false);
+  }
+};
+
 
       const { data } = await axios.post(
         `${server}/payment/process`,
@@ -376,38 +461,55 @@ const PaymentInfo = ({
       </div>
 
       <br />
-      {/* cash on delivery */}
-      <div>
-        <div className="flex w-full pb-5 border-b mb-2">
-          <div
-            className="w-[25px] h-[25px] rounded-full bg-transparent border-[3px] border-[#1d1a1ab4] relative flex items-center justify-center"
-            onClick={() => setSelect(3)}
-          >
-            {select === 3 ? (
-              <div className="w-[13px] h-[13px] bg-[#1d1a1acb] rounded-full" />
-            ) : null}
-          </div>
-          <h4 className="text-[18px] pl-2 font-[600] text-[#000000b1]">
-            Cash on Delivery
-          </h4>
-        </div>
+      {/* Razorpay UPI Option */}
+<div className="flex w-full pb-5 border-b mb-2">
+  <div
+    className="w-[25px] h-[25px] rounded-full bg-transparent border-[3px] border-[#1d1a1ab4] relative flex items-center justify-center"
+    onClick={() => setSelect(3)}
+  >
+    {select === 3 ? (
+      <div className="w-[13px] h-[13px] bg-[#1d1a1acb] rounded-full" />
+    ) : null}
+  </div>
+  <h4 className="text-[18px] pl-2 font-[600] text-[#000000b1]">
+    Pay using UPI / Razorpay
+  </h4>
+</div>
 
-        {/* cash on delivery */}
-        {select === 3 ? (
-          <div className="w-full flex">
-            <form className="w-full" onSubmit={cashOnDeliveryHandler}>
-              <input
-                type="submit"
-                value="Confirm"
-                className={`${styles.button} !bg-[#f63b60] text-[#fff] h-[45px] rounded-[5px] cursor-pointer text-[18px] font-[600]`}
-              />
-            </form>
-          </div>
-        ) : null}
-      </div>
-    </div>
-  );
-};
+{select === 3 && (
+  <div className="w-full">
+    <button
+      onClick={handleRazorpay}
+      className={`${styles.button} !bg-[#f63b60] text-white h-[45px] rounded-[5px] cursor-pointer text-[18px] font-[600] flex items-center justify-center`}
+    >
+      {loadingRazorpay ? (
+        <svg
+          className="animate-spin h-5 w-5 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+          />
+        </svg>
+      ) : (
+        "Pay Now"
+      )}
+    </button>
+  </div>
+)}
+
 
 const CartData = ({ orderData }) => {
   const shipping = orderData?.shipping?.toFixed(2);
