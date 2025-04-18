@@ -70,31 +70,31 @@ export const getAllProductsShop = (id) => async (dispatch) => {
   }
 };
 
-// delete product of a shop
 export const deleteProduct = (id) => async (dispatch) => {
   try {
-    dispatch({
-      type: "deleteProductRequest",
-    });
+    dispatch({ type: "deleteProductRequest" });
 
     const { data } = await axios.delete(
       `${server}/product/delete-shop-product/${id}`,
-      {
-        withCredentials: true,
-      }
+      { withCredentials: true }
     );
 
     dispatch({
       type: "deleteProductSuccess",
       payload: data.message,
     });
+
+    return { success: true };
   } catch (error) {
     dispatch({
       type: "deleteProductFailed",
-      payload: error.response.data.message,
+      payload: error.response?.data?.message || error.message,
     });
+
+    return { success: false, message: error.response?.data?.message };
   }
 };
+
 
 // get all products
 export const getAllProducts = () => async (dispatch) => {

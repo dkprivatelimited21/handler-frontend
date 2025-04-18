@@ -21,15 +21,13 @@ const AllProducts = () => {
   }, [dispatch]);
 
 const handleDelete = async (id) => {
-  try {
-    await dispatch(deleteProduct(id));
+  const result = await dispatch(deleteProduct(id));
+  if (result.success) {
     toast.success("Product deleted successfully");
-  } catch (error) {
-    console.error("Delete error:", error.response?.data); // debug log
-    toast.error(error.response?.data?.message || "Failed to delete product");
+  } else {
+    toast.error(result.message || "Failed to delete product");
   }
 };
-
   const columns = [
     { field: "id", headerName: "Product Id", minWidth: 150, flex: 0.7 },
     {
