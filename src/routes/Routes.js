@@ -37,6 +37,6 @@ export {
     ShopLoginPage,
     OrderDetailsPage,
     TrackOrderPage,
-    PrivacyPolicy
+    PrivacyPolicy,
 
 };

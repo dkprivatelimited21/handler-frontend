@@ -21,6 +21,7 @@ import {
   OrderDetailsPage,
   TrackOrderPage,
   PrivacyPolicy
+  
 } from "./routes/Routes.js";
 import {
   ShopDashboardPage,
@@ -34,7 +35,9 @@ import {
   ShopOrderDetails,
   ShopAllRefunds,
   ShopSettingsPage,
-  ShopWithDrawMoneyPage
+  ShopWithDrawMoneyPage,
+  ShopForgotPassword,
+  ShopResetPassword
 } from "./routes/ShopRoutes";
 import {
   AdminDashboardPage,
@@ -147,7 +150,10 @@ const App = () => {
         {/* shop Routes */}
         <Route path="/shop-create" element={<ShopCreatePage />} />
         <Route path="/shop-login" element={<ShopLoginPage />} />
-        <Route
+	<Route path="/shop-forgot-password" element={<ShopForgotPassword />} />
+<Route path="/shop/reset-password/:token" element={<ShopResetPassword />} />
+
+       <Route
           path="/shop/:id"
           element={
             <SellerProtectedRoute>
