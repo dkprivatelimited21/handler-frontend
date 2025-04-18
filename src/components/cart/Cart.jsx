@@ -48,9 +48,7 @@ const Cart = ({ setOpenCart }) => {
               <h5>Cart is empty!</h5>
             </div>
           ) : (
-            <>
-              
-
+       
               {/* Cart Items */}
               <div className="w-full border-t">
                 {cart.map((i, index) => (
@@ -73,7 +71,6 @@ const Cart = ({ setOpenCart }) => {
                   </div>
                 </Link>
               </div>
-            </>
           )}
         </>
       </div>
