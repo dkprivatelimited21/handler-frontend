@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "../../styles/styles";
-import { categoriesData, productData } from "../../static/data";
+import { categoriesData } from "../../static/data";
 import {
   AiOutlineHeart,
   AiOutlineSearch,
@@ -35,11 +35,17 @@ const Header = ({ activeHeading }) => {
     const term = e.target.value;
     setSearchTerm(term);
 
+    if (!term.trim()) {
+      setSearchData(null);
+      return;
+    }
+
     const filteredProducts =
       allProducts &&
       allProducts.filter((product) =>
         product.name.toLowerCase().includes(term.toLowerCase())
       );
+
     setSearchData(filteredProducts);
   };
 
@@ -62,7 +68,8 @@ const Header = ({ activeHeading }) => {
               </h1>
             </Link>
           </div>
-          {/* search box */}
+
+          {/* Desktop Search Bar */}
           <div className="w-[50%] relative">
             <input
               type="text"
@@ -75,11 +82,11 @@ const Header = ({ activeHeading }) => {
               size={30}
               className="absolute right-2 top-1.5 cursor-pointer"
             />
-            {searchData && searchData.length !== 0 && (
-              <div className="absolute min-h-[30vh] bg-slate-50 shadow-sm-2 z-[9] p-4">
-                {searchData.map((i, index) => (
-                  <Link to={`/product/${i._id}`} key={index}>
-                    <div className="w-full flex items-start py-3">
+            {searchData && searchData.length > 0 && searchTerm.trim() !== "" && (
+              <div className="absolute min-h-[30vh] bg-slate-50 shadow-sm-2 z-[9] p-4 w-full left-0">
+                {searchData.map((i) => (
+                  <Link to={`/product/${i._id}`} key={i._id}>
+                    <div className="w-full flex items-center py-2">
                       <img
                         src={`${i.images[0]?.url}`}
                         alt=""
@@ -234,7 +241,7 @@ const Header = ({ activeHeading }) => {
             size={25}
             className="absolute right-2 top-[8px] text-gray-500"
           />
-          {searchData && searchData.length > 0 && (
+          {searchData && searchData.length > 0 && searchTerm.trim() !== "" && (
             <div className="absolute bg-white z-10 shadow w-full left-0 p-3">
               {searchData.map((i) => (
                 <Link to={`/product/${i._id}`} key={i._id}>
