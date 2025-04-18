@@ -19,7 +19,8 @@ import {
   SellerActivationPage,
   ShopLoginPage,
   OrderDetailsPage,
-  TrackOrderPage
+  TrackOrderPage,
+  PrivacyPolicy
 } from "./routes/Routes.js";
 import {
   ShopDashboardPage,
@@ -245,6 +246,7 @@ const App = () => {
 
           
         />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         {/* Admin Routes */}
         <Route
           path="/admin/dashboard"

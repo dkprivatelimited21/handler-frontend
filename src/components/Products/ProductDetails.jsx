@@ -151,7 +151,8 @@ const [selectedColor, setSelectedColor] = useState("");
                     data.images.map((i, index) => (
                       <div
                         className={`${
-                          select === 0 ? "border" : "null"
+                          select === index ? "border" : ""
+
                         } cursor-pointer`}
                       >
                         <img

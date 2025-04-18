@@ -312,23 +312,26 @@ const CartData = ({
   setCouponCode,
   discountPercentenge,
 }) => {
+  const { cart } = useSelector((state) => state.cart);
+
   return (
     <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
-      <div className="flex justify-between">
-        <h3 className="text-[16px] font-[400] text-[#000000a4]">subtotal:</h3>
-        <h5 className="text-[18px] font-[600]">${subTotalPrice}</h5>
-      </div>
-      <br />
-      <div className="flex justify-between">
-        <h3 className="text-[16px] font-[400] text-[#000000a4]">shipping:</h3>
-        <h5 className="text-[18px] font-[600]">${shipping.toFixed(2)}</h5>
-      </div>
-      <br />
-      <div className="flex justify-between border-b pb-3">
-        <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
-        <h5 className="text-[18px] font-[600]">
-          - {discountPercentenge ? "$" + discountPercentenge.toString() : null}
-        </h5>
+      {/* Cart Summary */}
+      <h3 className="text-[18px] font-[600] mb-3">Your Order</h3>
+      <div className="max-h-[200px] overflow-y-scroll">
+        {cart.map((item, index) => (
+          <div key={index} className="mb-3 border-b pb-2">
+            <h4 className="font-[500]">{item.name}</h4>
+            <p className="text-sm text-gray-600">
+              Qty: {item.qty}
+              {item.selectedSize && ` | Size: ${item.selectedSize}`}
+              {item.selectedColor && ` | Color: ${item.selectedColor}`}
+            </p>
+            <p className="text-sm text-gray-800">
+              Price: ${(item.discountPrice * item.qty).toFixed(2)}
+            </p>
+          </div>
+        ))}
       </div>
       <h5 className="text-[18px] font-[600] text-end pt-3">${totalPrice}</h5>
       <br />

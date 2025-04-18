@@ -18,11 +18,15 @@ const AllProducts = () => {
     dispatch(getAllProductsShop(seller?._id));
   }, [dispatch]);
 
-  const handleDelete = (id) => {
-    dispatch(deleteProduct(id));
+ const handleDelete = async (id) => {
+  try {
+    await dispatch(deleteProduct(id));
+    toast.success("Product deleted successfully");
     window.location.reload();
-  };
-
+  } catch (error) {
+    toast.error("Failed to delete product");
+  }
+};
   const columns = [
     { field: "id", headerName: "Product Id", minWidth: 150, flex: 0.7 },
     {
