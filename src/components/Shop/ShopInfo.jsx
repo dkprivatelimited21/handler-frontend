@@ -9,6 +9,11 @@ import { getAllProductsShop } from "../../redux/actions/product";
 import { logoutSeller } from "../../redux/actions/user";
 import { toast } from "react-toastify";
 
+
+const { user } = useSelector((state) => state.user);
+
+const isAdmin = user?.role === "Admin";
+
 const ShopInfo = ({ isOwner }) => {
   const [data, setData] = useState({});
   const { products } = useSelector((state) => state.products);
@@ -72,14 +77,22 @@ const ShopInfo = ({ isOwner }) => {
               {data?.description || "No description provided."}
             </p>
           </div>
-          <div className="p-3">
-            <h5 className="font-[600]">Address</h5>
-            <h4 className="text-[#000000a6]">{data?.address || "N/A"}</h4>
-          </div>
-          <div className="p-3">
-            <h5 className="font-[600]">Phone Number</h5>
-            <h4 className="text-[#000000a6]">{data?.phoneNumber || "N/A"}</h4>
-          </div>
+          {isAdmin &&  (
+  <>
+    <div className="p-3">
+      <h5 className="font-[600]">Address</h5>
+      <h4 className="text-[#000000a6]">{data?.address || "N/A"}</h4>
+    </div>
+    <div className="p-3">
+      <h5 className="font-[600]">Phone Number</h5>
+      <h4 className="text-[#000000a6]">{data?.phoneNumber || "N/A"}</h4>
+    </div>
+    <div className="p-3">
+      <h5 className="font-[600]">Email</h5>
+      <h4 className="text-[#000000a6]">{data?.email || "N/A"}</h4>
+    </div>
+  </>
+)}
           <div className="p-3">
             <h5 className="font-[600]">Total Products</h5>
             <h4 className="text-[#000000a6]">{products?.length || 0}</h4>
