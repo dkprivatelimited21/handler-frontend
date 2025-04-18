@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styles from "../styles/styles";
 import axios from "axios";
-import { server } from "../server";
+import { server } from "../../server";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
