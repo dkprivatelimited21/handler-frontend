@@ -196,6 +196,7 @@ const Header = ({ activeHeading }) => {
           active ? "shadow-sm fixed top-0 left-0 z-10" : ""
         } w-full h-[60px] bg-[#fff] z-50 top-0 left-0 shadow-sm 800px:hidden`}
       >
+{open && (
         <div className="w-full flex items-center justify-between">
           <div>
             <BiMenuAltLeft
@@ -204,6 +205,7 @@ const Header = ({ activeHeading }) => {
               onClick={() => setOpen(true)}
             />
           </div>
+)}
           <div>
             <Link to="/">
               <h1 className="text-[25px] leading-[1.2] 800px:text-[50px] text-[#3d3a3a] font-[600] capitalize">
