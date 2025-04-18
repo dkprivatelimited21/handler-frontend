@@ -62,7 +62,7 @@ const CreateProduct = () => {
     });
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
 
   if (!seller?._id) {
@@ -70,7 +70,7 @@ const CreateProduct = () => {
     return;
   }
 
-  setLoading(true); // Start loading
+  setLoading(true);
 
   try {
     await dispatch(
@@ -93,46 +93,10 @@ const CreateProduct = () => {
   } catch (err) {
     toast.error("Failed to create product");
   } finally {
-    setLoading(false); // Stop loading
+    setLoading(false);
   }
 };
 
-
-    const newForm = new FormData();
-    images.forEach((image) => newForm.set("images", image));
-
-    newForm.append("name", name);
-    newForm.append("description", description);
-    newForm.append("category", category);
-    newForm.append("tags", tags);
-    newForm.append("originalPrice", originalPrice);
-    newForm.append("discountPrice", discountPrice);
-    newForm.append("stock", stock);
-    newForm.append("shopId", seller._id);
-
-    if (hasSizeOptions) {
-      newForm.append("sizes", JSON.stringify(selectedSizes));
-      newForm.append("colors", JSON.stringify(selectedColors));
-    }
-
-    dispatch(
-      createProduct({
-        name,
-        description,
-        category,
-        tags,
-        originalPrice,
-        discountPrice,
-        stock,
-        shopId: seller._id,
-        images,
-        ...(hasSizeOptions && {
-          sizes: selectedSizes,
-          colors: selectedColors,
-        }),
-      })
-    );
-  };
 
   return (
     <div className="w-[90%] 800px:w-[50%] bg-white shadow h-[80vh] rounded-[4px] p-3 overflow-y-scroll">

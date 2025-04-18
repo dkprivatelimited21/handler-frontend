@@ -1,538 +1,139 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import styles from "../../styles/styles";
-import { useEffect } from "react";
-import {
-  CardNumberElement,
-  CardCvcElement,
-  CardExpiryElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import styles from "../styles/styles";
 import axios from "axios";
-import { server } from "../../server";
+import { server } from "../server";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { RxCross1 } from "react-icons/rx";
 
 const Payment = () => {
-  const [orderData, setOrderData] = useState([]);
-  const [open, setOpen] = useState(false);
   const { user } = useSelector((state) => state.user);
+  const { cart } = useSelector((state) => state.cart);
+  const { shippingAddress } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const stripe = useStripe();
-  const elements = useElements();
-  const [loadingStripe, setLoadingStripe] = useState(false);
-  const [loadingCOD, setLoadingCOD] = useState(false);
+
   const [loadingRazorpay, setLoadingRazorpay] = useState(false);
 
-const handleRazorpay = async () => {
-  setLoadingRazorpay(true);
-  const { data } = await axios.post(
-    `${server}/payment/razorpay-checkout`,
-    { amount: order.totalPrice * 100 },
-    { withCredentials: true }
+  // Calculate order totals
+  const subTotalPrice = cart.reduce(
+    (acc, item) => acc + item.qty * item.discountPrice,
+    0
   );
-
-  const options = {
-    key: process.env.REACT_APP_RAZORPAY_KEY_ID,
-    amount: data.amount,
-    currency: "INR",
-    name: "LocalHandler",
-    description: "Order Payment",
-    order_id: data.id,
-    handler: async function (response) {
-      const config = {
-        headers: { "Content-Type": "application/json" },
-      };
-
-      order.paymentInfo = {
-        id: response.razorpay_payment_id,
-        status: "succeeded",
-        type: "UPI",
-      };
-
-      await axios.post(`${server}/order/create-order`, order, config);
-      localStorage.setItem("cartItems", JSON.stringify([]));
-      localStorage.setItem("latestOrder", JSON.stringify([]));
-      window.location.href = "/order/success";
-    },
-    prefill: {
-      name: user.name,
-      email: user.email,
-    },
-    theme: { color: "#f63b60" },
-  };
-
-  const razor = new window.Razorpay(options);
-  razor.open();
-  setLoadingRazorpay(false);
-};
-
-  useEffect(() => {
-    const orderData = JSON.parse(localStorage.getItem("latestOrder"));
-    setOrderData(orderData);
-  }, []);
-
-  const createOrder = (data, actions) => {
-    return actions.order
-      .create({
-        purchase_units: [
-          {
-            description: "Sunflower",
-            amount: {
-              currency_code: "INR",
-              value: orderData?.totalPrice,
-            },
-          },
-        ],
-        // not needed if a shipping address is actually needed
-        application_context: {
-          shipping_preference: "NO_SHIPPING",
-        },
-      })
-      .then((orderID) => {
-        return orderID;
-      });
-  };
+  const shipping = subTotalPrice * 0.1;
+  const totalPrice = subTotalPrice + shipping;
 
   const order = {
-    cart: orderData?.cart,
-    shippingAddress: orderData?.shippingAddress,
-    user: user && user,
-    totalPrice: orderData?.totalPrice,
+    cart,
+    shippingAddress,
+    user,
+    totalPrice,
   };
 
-  const onApprove = async (data, actions) => {
-    return actions.order.capture().then(function (details) {
-      const { payer } = details;
+  useEffect(() => {
+    // Load Razorpay script
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
 
-      let paymentInfo = payer;
+  const handleRazorpay = async () => {
+    setLoadingRazorpay(true);
 
-      if (paymentInfo !== undefined) {
-        paypalPaymentHandler(paymentInfo);
-      }
-    });
-  };
-
-  const paypalPaymentHandler = async (paymentInfo) => {
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    order.paymentInfo = {
-      id: paymentInfo.payer_id,
-      status: "succeeded",
-      type: "Paypal",
-    };
-
-    await axios
-      .post(`${server}/order/create-order`, order, config)
-      .then((res) => {
-        setOpen(false);
-        navigate("/order/success");
-        toast.success("Order successful!");
-        localStorage.setItem("cartItems", JSON.stringify([]));
-        localStorage.setItem("latestOrder", JSON.stringify([]));
-        window.location.reload();
+    try {
+      // Get Razorpay public key from backend
+      const { data: keyData } = await axios.get(`${server}/payment/razorpay-key`, {
+        withCredentials: true,
       });
-  };
 
-  const paymentData = {
-    amount: Math.round(orderData?.totalPrice * 100),
-  };
-
-  const paymentHandler = async (e) => {
-  e.preventDefault();
-  setLoadingStripe(true);
-
-  try {
-    const config = {
-      headers: { "Content-Type": "application/json" },
-    };
-
-    const { data } = await axios.post(
-      `${server}/payment/process`,
-      paymentData,
-      config
-    );
-
-    const client_secret = data.client_secret;
-
-    if (!stripe || !elements) return;
-    const result = await stripe.confirmCardPayment(client_secret, {
-      payment_method: {
-        card: elements.getElement(CardNumberElement),
-      },
-    });
-
-    if (result.error) {
-      toast.error(result.error.message);
-    } else if (result.paymentIntent.status === "succeeded") {
-      order.paymentInfo = {
-        id: result.paymentIntent.id,
-        status: result.paymentIntent.status,
-        type: "Credit Card",
-      };
-
-      await axios.post(`${server}/order/create-order`, order, config);
-      navigate("/order/success");
-      toast.success("Order successful!");
-      localStorage.setItem("cartItems", JSON.stringify([]));
-      localStorage.setItem("latestOrder", JSON.stringify([]));
-      window.location.reload();
-    }
-  } catch (error) {
-    toast.error(error.message || "Payment failed");
-  } finally {
-    setLoadingStripe(false);
-  }
-};
-
-
-      const { data } = await axios.post(
-        `${server}/payment/process`,
-        paymentData,
-        config
+      // Create Razorpay order from backend
+      const { data: orderData } = await axios.post(
+        `${server}/payment/razorpay-checkout`,
+        { amount: totalPrice * 100 },
+        { withCredentials: true }
       );
 
-      const client_secret = data.client_secret;
+      const options = {
+        key: keyData.key,
+        amount: orderData.amount,
+        currency: "INR",
+        name: "LocalHandler",
+        description: "Order Payment",
+        order_id: orderData.id,
+        handler: async (response) => {
+          try {
+            const config = {
+              headers: { "Content-Type": "application/json" },
+            };
 
-      if (!stripe || !elements) return;
-      const result = await stripe.confirmCardPayment(client_secret, {
-        payment_method: {
-          card: elements.getElement(CardNumberElement),
+            order.paymentInfo = {
+              id: response.razorpay_payment_id,
+              status: "succeeded",
+              type: "UPI",
+            };
+
+            await axios.post(`${server}/order/create-order`, order, config);
+
+            toast.success("Order placed successfully!");
+            localStorage.setItem("cartItems", JSON.stringify([]));
+            localStorage.setItem("latestOrder", JSON.stringify([]));
+            navigate("/order/success");
+          } catch (error) {
+            toast.error("Order creation failed");
+          }
         },
-      });
+        prefill: {
+          name: user.name,
+          email: user.email,
+        },
+        theme: { color: "#f63b60" },
+      };
 
-      if (result.error) {
-        toast.error(result.error.message);
-      } else {
-        if (result.paymentIntent.status === "succeeded") {
-          order.paymnentInfo = {
-            id: result.paymentIntent.id,
-            status: result.paymentIntent.status,
-            type: "Credit Card",
-          };
-
-          await axios
-            .post(`${server}/order/create-order`, order, config)
-            .then((res) => {
-              setOpen(false);
-              navigate("/order/success");
-              toast.success("Order successful!");
-              localStorage.setItem("cartItems", JSON.stringify([]));
-              localStorage.setItem("latestOrder", JSON.stringify([]));
-              window.location.reload();
-            });
-        }
-      }
+      const razor = new window.Razorpay(options);
+      razor.open();
     } catch (error) {
-      toast.error(error);
+      toast.error("Payment failed, please try again");
+    } finally {
+      setLoadingRazorpay(false);
     }
-  };
-
-  const cashOnDeliveryHandler = async (e) => {
-    e.preventDefault();
-
-    const config = {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-
-    order.paymentInfo = {
-      type: "Cash On Delivery",
-    };
-
-    await axios
-    .post(`${server}/order/create-order`, order, config)
-    .then((res) => {
-      setOpen(false);
-      navigate("/order/success");
-      toast.success("Order successful!");
-      localStorage.setItem("cartItems", JSON.stringify([]));
-      localStorage.setItem("latestOrder", JSON.stringify([]));
-      window.location.reload();
-    });
   };
 
   return (
     <div className="w-full flex flex-col items-center py-8">
-      <div className="w-[90%] 1000px:w-[70%] block 800px:flex">
-        <div className="w-full 800px:w-[65%]">
-          <PaymentInfo
-            user={user}
-            open={open}
-            setOpen={setOpen}
-            onApprove={onApprove}
-            createOrder={createOrder}
-            paymentHandler={paymentHandler}
-            cashOnDeliveryHandler={cashOnDeliveryHandler}
-          />
-        </div>
-        <div className="w-full 800px:w-[35%] 800px:mt-0 mt-8">
-          <CartData orderData={orderData} />
-        </div>
-      </div>
-    </div>
-  );
-};
+      <div className="w-[90%] max-w-[500px] border border-gray-300 rounded-md p-6 shadow-md bg-white">
+        <h2 className="text-2xl font-bold mb-4 text-center">Pay using UPI (Razorpay)</h2>
 
-const PaymentInfo = ({
-  user,
-  open,
-  setOpen,
-  onApprove,
-  createOrder,
-  paymentHandler,
-  cashOnDeliveryHandler,
-}) => {
-  const [select, setSelect] = useState(1);
-
-  return (
-    <div className="w-full 800px:w-[95%] bg-[#fff] rounded-md p-5 pb-8">
-      {/* select buttons */}
-      <div>
-        <div className="flex w-full pb-5 border-b mb-2">
-          <div
-            className="w-[25px] h-[25px] rounded-full bg-transparent border-[3px] border-[#1d1a1ab4] relative flex items-center justify-center"
-            onClick={() => setSelect(1)}
-          >
-            {select === 1 ? (
-              <div className="w-[13px] h-[13px] bg-[#1d1a1acb] rounded-full" />
-            ) : null}
-          </div>
-          <h4 className="text-[18px] pl-2 font-[600] text-[#000000b1]">
-            Pay with Debit/credit card
-          </h4>
-        </div>
-
-        {/* pay with card */}
-        {select === 1 ? (
-          <div className="w-full flex border-b">
-            <form className="w-full" onSubmit={paymentHandler}>
-              <div className="w-full flex pb-3">
-                <div className="w-[50%]">
-                  <label className="block pb-2">Name On Card</label>
-                  <input
-                    required
-                    placeholder={user && user.name}
-                    className={`${styles.input} !w-[95%] text-[#444]`}
-                    value={user && user.name}
-                  />
-                </div>
-                <div className="w-[50%]">
-                  <label className="block pb-2">Exp Date</label>
-                  <CardExpiryElement
-                    className={`${styles.input}`}
-                    options={{
-                      style: {
-                        base: {
-                          fontSize: "19px",
-                          lineHeight: 1.5,
-                          color: "#444",
-                        },
-                        empty: {
-                          color: "#3a120a",
-                          backgroundColor: "transparent",
-                          "::placeholder": {
-                            color: "#444",
-                          },
-                        },
-                      },
-                    }}
-                  />
-                </div>
-              </div>
-
-              <div className="w-full flex pb-3">
-                <div className="w-[50%]">
-                  <label className="block pb-2">Card Number</label>
-                  <CardNumberElement
-                    className={`${styles.input} !h-[35px] !w-[95%]`}
-                    options={{
-                      style: {
-                        base: {
-                          fontSize: "19px",
-                          lineHeight: 1.5,
-                          color: "#444",
-                        },
-                        empty: {
-                          color: "#3a120a",
-                          backgroundColor: "transparent",
-                          "::placeholder": {
-                            color: "#444",
-                          },
-                        },
-                      },
-                    }}
-                  />
-                </div>
-                <div className="w-[50%]">
-                  <label className="block pb-2">CVV</label>
-                  <CardCvcElement
-                    className={`${styles.input} !h-[35px]`}
-                    options={{
-                      style: {
-                        base: {
-                          fontSize: "19px",
-                          lineHeight: 1.5,
-                          color: "#444",
-                        },
-                        empty: {
-                          color: "#3a120a",
-                          backgroundColor: "transparent",
-                          "::placeholder": {
-                            color: "#444",
-                          },
-                        },
-                      },
-                    }}
-                  />
-                </div>
-              </div>
-              <input
-                type="submit"
-                value="Submit"
-                className={`${styles.button} !bg-[#f63b60] text-[#fff] h-[45px] rounded-[5px] cursor-pointer text-[18px] font-[600]`}
-              />
-            </form>
-          </div>
-        ) : null}
-      </div>
-
-      <br />
-      {/* paypal payment */}
-      <div>
-        <div className="flex w-full pb-5 border-b mb-2">
-          <div
-            className="w-[25px] h-[25px] rounded-full bg-transparent border-[3px] border-[#1d1a1ab4] relative flex items-center justify-center"
-            onClick={() => setSelect(2)}
-          >
-            {select === 2 ? (
-              <div className="w-[13px] h-[13px] bg-[#1d1a1acb] rounded-full" />
-            ) : null}
-          </div>
-          <h4 className="text-[18px] pl-2 font-[600] text-[#000000b1]">
-            Pay with Paypal
-          </h4>
-        </div>
-
-        {/* pay with payement */}
-        {select === 2 ? (
-          <div className="w-full flex border-b">
-            <div
-              className={`${styles.button} !bg-[#f63b60] text-white h-[45px] rounded-[5px] cursor-pointer text-[18px] font-[600]`}
-              onClick={() => setOpen(true)}
-            >
-              Pay Now
-            </div>
-            {open && (
-              <div className="w-full fixed top-0 left-0 bg-[#00000039] h-screen flex items-center justify-center z-[99999]">
-                <div className="w-full 800px:w-[40%] h-screen 800px:h-[80vh] bg-white rounded-[5px] shadow flex flex-col justify-center p-8 relative overflow-y-scroll">
-                  <div className="w-full flex justify-end p-3">
-                    <RxCross1
-                      size={30}
-                      className="cursor-pointer absolute top-3 right-3"
-                      onClick={() => setOpen(false)}
-                    />
-                  </div>
-                    <PayPalScriptProvider
-                      options={{
-                        "client-id":
-                          "Aczac4Ry9_QA1t4c7TKH9UusH3RTe6onyICPoCToHG10kjlNdI-qwobbW9JAHzaRQwFMn2-k660853jn",
-                      }}
-                    >
-                      <PayPalButtons
-                        style={{ layout: "vertical" }}
-                        onApprove={onApprove}
-                        createOrder={createOrder}
-                      />
-                    </PayPalScriptProvider>
-                </div>
-              </div>
-            )}
-          </div>
-        ) : null}
-      </div>
-
-      <br />
-      {/* Razorpay UPI Option */}
-<div className="flex w-full pb-5 border-b mb-2">
-  <div
-    className="w-[25px] h-[25px] rounded-full bg-transparent border-[3px] border-[#1d1a1ab4] relative flex items-center justify-center"
-    onClick={() => setSelect(3)}
-  >
-    {select === 3 ? (
-      <div className="w-[13px] h-[13px] bg-[#1d1a1acb] rounded-full" />
-    ) : null}
-  </div>
-  <h4 className="text-[18px] pl-2 font-[600] text-[#000000b1]">
-    Pay using UPI / Razorpay
-  </h4>
-</div>
-
-{select === 3 && (
-  <div className="w-full">
-    <button
-      onClick={handleRazorpay}
-      className={`${styles.button} !bg-[#f63b60] text-white h-[45px] rounded-[5px] cursor-pointer text-[18px] font-[600] flex items-center justify-center`}
-    >
-      {loadingRazorpay ? (
-        <svg
-          className="animate-spin h-5 w-5 text-white"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
+        <button
+          onClick={handleRazorpay}
+          disabled={loadingRazorpay}
+          className={`${styles.button} !bg-[#f63b60] text-white w-full h-[45px] rounded-md font-semibold flex items-center justify-center`}
         >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-          />
-        </svg>
-      ) : (
-        "Pay Now"
-      )}
-    </button>
-  </div>
-)}
-
-
-const CartData = ({ orderData }) => {
-  const shipping = orderData?.shipping?.toFixed(2);
-  return (
-    <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
-      <div className="flex justify-between">
-        <h3 className="text-[16px] font-[400] text-[#000000a4]">subtotal:</h3>
-        <h5 className="text-[18px] font-[600]">${orderData?.subTotalPrice}</h5>
+          {loadingRazorpay ? (
+            <svg
+              className="animate-spin h-5 w-5 text-white"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              />
+            </svg>
+          ) : (
+            "Pay Now"
+          )}
+        </button>
       </div>
-      <br />
-      <div className="flex justify-between">
-        <h3 className="text-[16px] font-[400] text-[#000000a4]">shipping:</h3>
-        <h5 className="text-[18px] font-[600]">${shipping}</h5>
-      </div>
-      <br />
-      <div className="flex justify-between border-b pb-3">
-        <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
-        <h5 className="text-[18px] font-[600]">{orderData?.discountPrice? "$" + orderData.discountPrice : "-"}</h5>
-      </div>
-      <h5 className="text-[18px] font-[600] text-end pt-3">
-        ${orderData?.totalPrice}
-      </h5>
-      <br />
     </div>
   );
 };

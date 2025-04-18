@@ -25,15 +25,9 @@ const CreateEvent = () => {
   const [loading, setLoading] = useState(false);
 
 
- const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
   e.preventDefault();
-  setLoading(true); // Show spinner
-
-  const newForm = new FormData();
-
-  images.forEach((image) => {
-    newForm.append("images", image);
-  });
+  setLoading(true);
 
   const data = {
     name,
@@ -54,9 +48,16 @@ const CreateEvent = () => {
   } catch (error) {
     toast.error("Event creation failed!");
   } finally {
-    setLoading(false); // Hide spinner
+    setLoading(false);
   }
 };
+
+
+const handleStartDateChange = (e) => {
+  const start = new Date(e.target.value);
+  setStartDate(start);
+};
+
 
 
   const handleEndDateChange = (e) => {
@@ -100,29 +101,6 @@ const CreateEvent = () => {
     });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    const newForm = new FormData();
-
-    images.forEach((image) => {
-      newForm.append("images", image);
-    });
-    const data = {
-      name,
-      description,
-      category,
-      tags,
-      originalPrice,
-      discountPrice,
-      stock,
-      images,
-      shopId: seller._id,
-      start_Date: startDate?.toISOString(),
-      Finish_Date: endDate?.toISOString(),
-    };
-    dispatch(createevent(data));
-  };
 
   return (
     <div className="w-[90%] 800px:w-[50%] bg-white  shadow h-[80vh] rounded-[4px] p-3 overflow-y-scroll">
