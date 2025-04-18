@@ -6,7 +6,12 @@ const CategoryGrid = () => {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4">
       {categoriesData.map((category) => (
-        <Link to={`/products?category=${category.title}`} key={category.id}>
+        <Link
+  to={`/products?category=${category.title}`}
+  onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+  key={category.id}
+>
+
           <div className="relative group rounded-lg overflow-hidden shadow-md cursor-pointer">
             <img
               src={category.image_Url}
