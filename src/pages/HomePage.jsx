@@ -7,20 +7,22 @@ import FeaturedProduct from "../components/Route/FeaturedProduct/FeaturedProduct
 import Events from "../components/Events/Events";
 import Sponsored from "../components/Route/Sponsored";
 import Footer from "../components/Layout/Footer";
+import CategoryGrid from "../components/Route/Categories/CategoryGrid"; // NEW
 
 const HomePage = () => {
   return (
     <div>
-        <Header activeHeading={1} />
-        <Hero />
-        <Categories />
-        <BestDeals />
-        <Events />
-        <FeaturedProduct />
-        <Sponsored />
-        <Footer />
+      <Header activeHeading={1} />
+      <Hero />
+      <CategoryGrid /> {/* Replaces old Categories component */}
+      <BestDeals />
+      <Events />
+      <FeaturedProduct />
+      <Sponsored />
+      <Footer />
     </div>
-  )
-}
+  );
+};
+
 
 export default HomePage

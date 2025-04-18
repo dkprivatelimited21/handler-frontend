@@ -65,10 +65,10 @@ export const brandingData = [
 
 // updated categories
 export const categoriesData = [
-  { id: 1, title: "Shirts - Men", image_Url: "https://img.freepik.com/free-photo/shirt_1203-8194.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740" },
-  { id: 2, title: "Shirts - Women", image_Url: "https://img.freepik.com/free-photo/woman-holding-shirts-choosing-what-outfit-wear_176420-16662.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740" },
-  { id: 3, title: "Pants - Men", image_Url: "https://img.freepik.com/free-photo/low-section-man-using-smartphone_23-2147845781.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740" },
-  { id: 4, title: "Pants - Women", image_Url: "https://img.freepik.com/free-photo/view-beige-tone-colored-pants_23-2150773371.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740" },
+  { id: 1, title: "Shirts - Men", image_Url: "https://th.bing.com/th/id/OIP.kaPeDxDmkN-fBawbjmbInAHaHa?w=177&h=180&c=7&r=0&o=5&pid=1.7" },
+  { id: 2, title: "Shirts - Women", image_Url: "https://i.pinimg.com/736x/30/95/98/3095989f2bab704c7b1e747de009f171.jpg" },
+  { id: 3, title: "Pants - Men", image_Url: "https://i.pinimg.com/736x/45/d8/ad/45d8adc8130689a1a1da75741b362b9b.jpg" },
+  { id: 4, title: "Pants - Women", image_Url: "https://i.pinimg.com/originals/98/f4/6d/98f46d12f4eb74a61442c706c7abc034.jpg" },
   { id: 5, title: "Shoes - Men", image_Url: "https://img.freepik.com/free-photo/fashion-shoes-sneakers_1203-7529.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740"},
   { id: 6, title: "Shoes - Women", image_Url: "https://img.freepik.com/free-photo/high-heels-black-velvet_53876-102771.jpg?t=st=1744915529~exp=1744919129~hmac=76d6c1e419ab72bf9002a01757eed80250223e5465cb64d6742ede015a80dca4&w=740" },
   { id: 7, title: "Sarees", image_Url: "https://img.freepik.com/free-photo/young-indian-woman-wearing-sari_23-2149400867.jpg?ga=GA1.1.197922806.1740460915&semt=ais_hybrid&w=740" },
