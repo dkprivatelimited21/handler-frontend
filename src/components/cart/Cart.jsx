@@ -31,49 +31,119 @@ const Cart = ({ setOpenCart }) => {
         <>
           {/* Header with cart count and close button */}
           <div className="flex justify-between items-center px-4 py-2 border-b">
-  <h5 className="text-[17px] font-[500] flex items-center">
-    <IoBagHandleOutline size={20} className="mr-1" />
-    {cart.length} items
-  </h5>
-  <RxCross1
-    size={22}
-    className="cursor-pointer"
-    onClick={() => setOpenCart(false)}
-  />
-</div>
-
-
-          {cart && cart.length === 0 ? (
-            <div className="w-full h-full flex items-center justify-center">
-              <h5>Cart is empty!</h5>
+ <RxCross1
+                size={25}
+                className="cursor-pointer"
+                onClick={() => setOpenCart(false)}
+              />
             </div>
-          ) : (
-            <>
-              {/* Cart Items */}
-              <div className="w-full">
-                {cart.map((i, index) => (
-                  <CartSingle
-                    key={index}
-                    data={i}
-                    quantityChangeHandler={quantityChangeHandler}
-                    removeFromCartHandler={removeFromCartHandler}
-                  />
-                ))}
+            <h5>Cart Items is empty!</h5>
+          </div>
+        ) : (
+          <>
+            <div>
+              <div className="flex w-full justify-end pt-5 pr-5">
+                <RxCross1
+                  size={25}
+                  className="cursor-pointer"
+                  onClick={() => setOpenCart(false)}
+                />
+              </div>
+              {/* Item length */}
+              <div className={`${styles.noramlFlex} p-4`}>
+                <IoBagHandleOutline size={25} />
+                <h5 className="pl-2 text-[20px] font-[500]">
+                  {cart && cart.length} items
+                </h5>
               </div>
 
-              {/* Checkout */}
-              <div className="px-5 mb-3">
-                <Link to="/checkout">
-                  <div className="h-[45px] flex items-center justify-center w-full bg-[#e44343] rounded-[5px]">
-                    <h1 className="text-white text-[18px] font-[600]">
-                      Checkout Now (USD${totalPrice})
-                    </h1>
-                  </div>
-                </Link>
+              {/* cart Single Items */}
+              <br />
+              <div className="w-full border-t">
+                {cart &&
+                  cart.map((i, index) => (
+                    <CartSingle
+                      key={index}
+                      data={i}
+                      quantityChangeHandler={quantityChangeHandler}
+                      removeFromCartHandler={removeFromCartHandler}
+                    />
+                  ))}
               </div>
-            </>
-          )}
-        </>
+            </div>
+
+            <div className="px-5 mb-3">
+              {/* checkout buttons */}
+              <Link to="/checkout">
+                <div
+                  className={`h-[45px] flex items-center justify-center w-[100%] bg-[#e44343] rounded-[5px]`}
+                >
+                  <h1 className="text-[#fff] text-[18px] font-[600]">
+                    Checkout Now (USD${totalPrice})
+                  </h1>
+                </div>
+              </Link>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}; <RxCross1
+                size={25}
+                className="cursor-pointer"
+                onClick={() => setOpenCart(false)}
+              />
+            </div>
+            <h5>Cart Items is empty!</h5>
+          </div>
+        ) : (
+          <>
+            <div>
+              <div className="flex w-full justify-end pt-5 pr-5">
+                <RxCross1
+                  size={25}
+                  className="cursor-pointer"
+                  onClick={() => setOpenCart(false)}
+                />
+              </div>
+              {/* Item length */}
+              <div className={`${styles.noramlFlex} p-4`}>
+                <IoBagHandleOutline size={25} />
+                <h5 className="pl-2 text-[20px] font-[500]">
+                  {cart && cart.length} items
+                </h5>
+              </div>
+
+              {/* cart Single Items */}
+              <br />
+              <div className="w-full border-t">
+                {cart &&
+                  cart.map((i, index) => (
+                    <CartSingle
+                      key={index}
+                      data={i}
+                      quantityChangeHandler={quantityChangeHandler}
+                      removeFromCartHandler={removeFromCartHandler}
+                    />
+                  ))}
+              </div>
+            </div>
+
+            <div className="px-5 mb-3">
+              {/* checkout buttons */}
+              <Link to="/checkout">
+                <div
+                  className={`h-[45px] flex items-center justify-center w-[100%] bg-[#e44343] rounded-[5px]`}
+                >
+                  <h1 className="text-[#fff] text-[18px] font-[600]">
+                    Checkout Now (USD${totalPrice})
+                  </h1>
+                </div>
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
