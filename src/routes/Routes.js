@@ -16,7 +16,7 @@ import SellerActivationPage from "../pages/SellerActivationPage";
 import ShopLoginPage from "../pages/ShopLoginPage";
 import OrderDetailsPage from "../pages/OrderDetailsPage";
 import TrackOrderPage from "../pages/TrackOrderPage";
-
+import PrivacyPolicy from '../pages/PrivacyPolicy';
 
 export { 
     LoginPage,
@@ -36,6 +36,7 @@ export {
     SellerActivationPage,
     ShopLoginPage,
     OrderDetailsPage,
-    TrackOrderPage
+    TrackOrderPage,
+    PrivacyPolicy
 
 };
