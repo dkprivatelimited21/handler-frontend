@@ -25,7 +25,6 @@ const AllProducts = () => {
   try {
     await dispatch(deleteProduct(id));
     toast.success("Product deleted successfully");
-    window.location.reload();
   } catch (error) {
     toast.error("Failed to delete product");
   }
