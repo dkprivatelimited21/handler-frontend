@@ -62,32 +62,6 @@ const Checkout = () => {
   // this is shipping cost variable
   const shipping = subTotalPrice * 0.1;
 
-const handlePlaceOrder = async () => {
-  try {
-    const payload = {
-      items: cartItems,
-      shippingAddress,
-      buyer: user._id,
-      seller: selectedSellerId, // if applicable
-      size: selectedSize,
-      color: selectedColor,
-      totalAmount: totalPrice,
-      isPaid: false, // since no payment yet
-      paymentMethod: 'Pending', // or 'UPI' / 'COD' based on selection
-    };
-
-    const response = await axios.post('/api/order/create-order', payload);
-
-    if (response.data.success) {
-      navigate(`/order/success/${response.data.order._id}`);
-    }
-  } catch (error) {
-    console.error('Order creation failed:', error);
-  }
-};
-
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const name = couponCode;
@@ -160,10 +134,10 @@ const handlePlaceOrder = async () => {
           />
         </div>
       </div>
-     <Button onClick={handlePlaceOrder}>
-  Place Order
-</Button>
-
+      <div
+        className={`${styles.button} w-[150px] 800px:w-[280px] mt-10`}
+        onClick={paymentSubmit}
+      >
         <h5 className="text-white">Go to Payment</h5>
       </div>
     </div>
@@ -338,26 +312,23 @@ const CartData = ({
   setCouponCode,
   discountPercentenge,
 }) => {
-  const { cart } = useSelector((state) => state.cart);
-
   return (
     <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
-      {/* Cart Summary */}
-      <h3 className="text-[18px] font-[600] mb-3">Your Order</h3>
-      <div className="max-h-[200px] overflow-y-scroll">
-        {cart.map((item, index) => (
-          <div key={index} className="mb-3 border-b pb-2">
-            <h4 className="font-[500]">{item.name}</h4>
-            <p className="text-sm text-gray-600">
-              Qty: {item.qty}
-              {item.selectedSize && ` | Size: ${item.selectedSize}`}
-              {item.selectedColor && ` | Color: ${item.selectedColor}`}
-            </p>
-            <p className="text-sm text-gray-800">
-              Price: ${(item.discountPrice * item.qty).toFixed(2)}
-            </p>
-          </div>
-        ))}
+      <div className="flex justify-between">
+        <h3 className="text-[16px] font-[400] text-[#000000a4]">subtotal:</h3>
+        <h5 className="text-[18px] font-[600]">${subTotalPrice}</h5>
+      </div>
+      <br />
+      <div className="flex justify-between">
+        <h3 className="text-[16px] font-[400] text-[#000000a4]">shipping:</h3>
+        <h5 className="text-[18px] font-[600]">${shipping.toFixed(2)}</h5>
+      </div>
+      <br />
+      <div className="flex justify-between border-b pb-3">
+        <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
+        <h5 className="text-[18px] font-[600]">
+          - {discountPercentenge ? "$" + discountPercentenge.toString() : null}
+        </h5>
       </div>
       <h5 className="text-[18px] font-[600] text-end pt-3">${totalPrice}</h5>
       <br />
