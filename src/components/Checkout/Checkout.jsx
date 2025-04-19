@@ -62,6 +62,32 @@ const Checkout = () => {
   // this is shipping cost variable
   const shipping = subTotalPrice * 0.1;
 
+const handlePlaceOrder = async () => {
+  try {
+    const payload = {
+      items: cartItems,
+      shippingAddress,
+      buyer: user._id,
+      seller: selectedSellerId, // if applicable
+      size: selectedSize,
+      color: selectedColor,
+      totalAmount: totalPrice,
+      isPaid: false, // since no payment yet
+      paymentMethod: 'Pending', // or 'UPI' / 'COD' based on selection
+    };
+
+    const response = await axios.post('/api/order/create-order', payload);
+
+    if (response.data.success) {
+      navigate(`/order/success/${response.data.order._id}`);
+    }
+  } catch (error) {
+    console.error('Order creation failed:', error);
+  }
+};
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const name = couponCode;
@@ -134,10 +160,10 @@ const Checkout = () => {
           />
         </div>
       </div>
-      <div
-        className={`${styles.button} w-[150px] 800px:w-[280px] mt-10`}
-        onClick={paymentSubmit}
-      >
+     <Button onClick={handlePlaceOrder}>
+  Place Order
+</Button>
+
         <h5 className="text-white">Go to Payment</h5>
       </div>
     </div>
