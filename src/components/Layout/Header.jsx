@@ -49,33 +49,6 @@ const Header = ({ activeHeading }) => {
     setSearchData(filteredProducts);
   };
 
-  const handleVoiceSearch = () => {
-    if (!('webkitSpeechRecognition' in window)) {
-      alert("Your browser does not support voice recognition.");
-      return;
-    }
-
-    const recognition = new webkitSpeechRecognition();
-    recognition.lang = "en-US";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-
-    recognition.onresult = (event) => {
-      const voiceText = event.results[0][0].transcript;
-      setSearchTerm(voiceText);
-
-      const filteredProducts =
-        allProducts &&
-        allProducts.filter((product) =>
-          product.name.toLowerCase().includes(voiceText.toLowerCase())
-        );
-
-      setSearchData(filteredProducts);
-    };
-
-    recognition.start();
-  };
-
   useEffect(() => {
     const handleScroll = () => {
       setActive(window.scrollY > 70);
@@ -91,7 +64,7 @@ const Header = ({ activeHeading }) => {
     <>
       {/* ...Desktop content remains unchanged... */}
 
-      {/* Mobile Header with Voice Search */}
+      {/* Mobile Header */}
       <div className={`${active ? "shadow-sm fixed top-0 left-0 z-10" : ""} w-full bg-white z-50 800px:hidden flex flex-col`}>
         <div className="flex items-center justify-between px-4 h-[60px]">
           <BiMenuAltLeft size={30} className="cursor-pointer" onClick={() => setOpen(true)} />
@@ -116,13 +89,9 @@ const Header = ({ activeHeading }) => {
             />
             <AiOutlineSearch
               size={25}
-              className="absolute right-8 top-[8px] text-gray-500 cursor-pointer"
+              className="absolute right-2 top-[8px] text-gray-500 cursor-pointer"
               onClick={() => handleSearchChange({ target: { value: searchTerm } })}
             />
-            <button
-              onClick={handleVoiceSearch}
-              className="absolute right-1 top-[5px] bg-blue-500 text-white text-xs px-2 py-[2px] rounded"
-            >🎤</button>
           </div>
           {searchData && searchData.length > 0 && searchTerm.trim() !== "" && (
             <div className="absolute bg-white z-10 shadow w-full left-0 p-3">
