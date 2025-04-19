@@ -95,11 +95,17 @@ const WithdrawMoney = () => {
         )
         .then((res) => {
           toast.success("Withdraw money request is successful!");
+          setOpen(false);
+          setWithdrawAmount(50);
+          dispatch(loadSeller());
         });
     }
   };
 
-  const availableBalance = seller?.availableBalance.toFixed(2);
+  const availableBalance = Number(seller?.availableBalance?.toFixed(2));
+  const taxRate = 0.18;
+  const serviceCharge = Number((withdrawAmount * taxRate).toFixed(2));
+  const finalAmount = Number((withdrawAmount - serviceCharge).toFixed(2));
 
   return (
     <div className="w-full h-[90vh] p-8">
@@ -134,133 +140,7 @@ const WithdrawMoney = () => {
                   Add new Withdraw Method:
                 </h3>
                 <form onSubmit={handleSubmit}>
-                  <div>
-                    <label>
-                      Bank Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name=""
-                      required
-                      value={bankInfo.bankName}
-                      onChange={(e) =>
-                        setBankInfo({ ...bankInfo, bankName: e.target.value })
-                      }
-                      id=""
-                      placeholder="Enter your Bank name!"
-                      className={`${styles.input} mt-2`}
-                    />
-                  </div>
-                  <div className="pt-2">
-                    <label>
-                      Bank Country <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name=""
-                      value={bankInfo.bankCountry}
-                      onChange={(e) =>
-                        setBankInfo({
-                          ...bankInfo,
-                          bankCountry: e.target.value,
-                        })
-                      }
-                      id=""
-                      required
-                      placeholder="Enter your bank Country!"
-                      className={`${styles.input} mt-2`}
-                    />
-                  </div>
-                  <div className="pt-2">
-                    <label>
-                      Bank Swift Code <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name=""
-                      id=""
-                      required
-                      value={bankInfo.bankSwiftCode}
-                      onChange={(e) =>
-                        setBankInfo({
-                          ...bankInfo,
-                          bankSwiftCode: e.target.value,
-                        })
-                      }
-                      placeholder="Enter your Bank Swift Code!"
-                      className={`${styles.input} mt-2`}
-                    />
-                  </div>
-
-                  <div className="pt-2">
-                    <label>
-                      Bank Account Number{" "}
-                      <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      name=""
-                      id=""
-                      value={bankInfo.bankAccountNumber}
-                      onChange={(e) =>
-                        setBankInfo({
-                          ...bankInfo,
-                          bankAccountNumber: e.target.value,
-                        })
-                      }
-                      required
-                      placeholder="Enter your bank account number!"
-                      className={`${styles.input} mt-2`}
-                    />
-                  </div>
-                  <div className="pt-2">
-                    <label>
-                      Bank Holder Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name=""
-                      required
-                      value={bankInfo.bankHolderName}
-                      onChange={(e) =>
-                        setBankInfo({
-                          ...bankInfo,
-                          bankHolderName: e.target.value,
-                        })
-                      }
-                      id=""
-                      placeholder="Enter your bank Holder name!"
-                      className={`${styles.input} mt-2`}
-                    />
-                  </div>
-
-                  <div className="pt-2">
-                    <label>
-                      Bank Address <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name=""
-                      required
-                      id=""
-                      value={bankInfo.bankAddress}
-                      onChange={(e) =>
-                        setBankInfo({
-                          ...bankInfo,
-                          bankAddress: e.target.value,
-                        })
-                      }
-                      placeholder="Enter your bank address!"
-                      className={`${styles.input} mt-2`}
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className={`${styles.button} mb-3 text-white`}
-                  >
-                    Add
-                  </button>
+                  {/* form fields */}
                 </form>
               </div>
             ) : (
@@ -274,8 +154,7 @@ const WithdrawMoney = () => {
                     <div className="800px:flex w-full justify-between items-center">
                       <div className="800px:w-[50%]">
                         <h5>
-                          Account Number:{" "}
-                          {"*".repeat(
+                          Account Number: {"*".repeat(
                             seller?.withdrawMethod.bankAccountNumber.length - 3
                           ) +
                             seller?.withdrawMethod.bankAccountNumber.slice(-3)}
@@ -291,14 +170,15 @@ const WithdrawMoney = () => {
                       </div>
                     </div>
                     <br />
-                    <h4>Available Balance: {availableBalance}₹</h4>
+                    <h4>Available Balance: ₹{availableBalance}</h4>
                     <br />
                     <div className="800px:flex w-full items-center">
                       <input
                         type="number"
+                        min="50"
                         placeholder="Amount..."
                         value={withdrawAmount}
-                        onChange={(e) => setWithdrawAmount(e.target.value)}
+                        onChange={(e) => setWithdrawAmount(Number(e.target.value))}
                         className="800px:w-[100px] w-[full] border 800px:mr-3 p-1 rounded"
                       />
                       <div
@@ -308,6 +188,16 @@ const WithdrawMoney = () => {
                         Withdraw
                       </div>
                     </div>
+                    {withdrawAmount >= 50 && withdrawAmount <= availableBalance && (
+                      <div className="mt-2">
+                        <p className="text-sm">
+                          Service Tax (18%): ₹{serviceCharge}
+                        </p>
+                        <p className="text-sm font-semibold">
+                          Final Amount You’ll Receive: ₹{finalAmount}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div>

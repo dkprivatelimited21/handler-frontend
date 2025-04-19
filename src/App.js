@@ -21,7 +21,6 @@ import {
   OrderDetailsPage,
   TrackOrderPage,
   PrivacyPolicy
-  
 } from "./routes/Routes.js";
 import {
   ShopDashboardPage,
@@ -83,7 +82,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
- <ScrollToTop />
+      <ScrollToTop />
       {stripeApikey && (
         <Elements stripe={loadStripe(stripeApikey)}>
           <Routes>
@@ -102,215 +101,111 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignupPage />} />
-        <Route
-          path="/activation/:activation_token"
-          element={<ActivationPage />}
-        />
-        <Route
-          path="/seller/activation/:activation_token"
-          element={<SellerActivationPage />}
-        />
+        <Route path="/activation/:activation_token" element={<ActivationPage />} />
+        <Route path="/seller/activation/:activation_token" element={<SellerActivationPage />} />
         <Route path="/products" element={<ProductsPage />} />
         <Route path="/product/:id" element={<ProductDetailsPage />} />
         <Route path="/best-selling" element={<BestSellingPage />} />
-	<Route path="/events" element={<EventsPage />} />
+        <Route path="/events" element={<EventsPage />} />
         <Route path="/faq" element={<FAQPage />} />
         <Route
           path="/checkout"
-          element={
-            <ProtectedRoute>
-              <CheckoutPage />
-            </ProtectedRoute>
-          }
+          element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>}
         />
         <Route path="/order/success" element={<OrderSuccessPage />} />
         <Route
           path="/profile"
-          element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
+          element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
         />
         <Route
           path="/user/order/:id"
-          element={
-            <ProtectedRoute>
-              <OrderDetailsPage />
-            </ProtectedRoute>
-          }
+          element={<ProtectedRoute><OrderDetailsPage /></ProtectedRoute>}
         />
         <Route
           path="/user/track/order/:id"
-          element={
-            <ProtectedRoute>
-              <TrackOrderPage />
-            </ProtectedRoute>
-          }
+          element={<ProtectedRoute><TrackOrderPage /></ProtectedRoute>}
         />
         <Route path="/shop/preview/:id" element={<ShopPreviewPage />} />
-        {/* shop Routes */}
         <Route path="/shop-create" element={<ShopCreatePage />} />
         <Route path="/shop-login" element={<ShopLoginPage />} />
-	<Route path="/shop-forgot-password" element={<ShopForgotPassword />} />
-<Route path="/shop/reset-password/:token" element={<ShopResetPassword />} />
-
-       <Route
+        <Route path="/shop-forgot-password" element={<ShopForgotPassword />} />
+        <Route path="/shop/reset-password/:token" element={<ShopResetPassword />} />
+        <Route
           path="/shop/:id"
-          element={
-            <SellerProtectedRoute>
-              <ShopHomePage />
-            </SellerProtectedRoute>
-          }
+          element={<SellerProtectedRoute><ShopHomePage /></SellerProtectedRoute>}
         />
         <Route
           path="/settings"
-          element={
-            <SellerProtectedRoute>
-              <ShopSettingsPage />
-            </SellerProtectedRoute>
-          }
+          element={<SellerProtectedRoute><ShopSettingsPage /></SellerProtectedRoute>}
         />
         <Route
           path="/dashboard"
-          element={
-            <SellerProtectedRoute>
-              <ShopDashboardPage />
-            </SellerProtectedRoute>
-          }
+          element={<SellerProtectedRoute><ShopDashboardPage /></SellerProtectedRoute>}
         />
         <Route
           path="/dashboard-create-product"
-          element={
-            <SellerProtectedRoute>
-              <ShopCreateProduct />
-            </SellerProtectedRoute>
-          }
+          element={<SellerProtectedRoute><ShopCreateProduct /></SellerProtectedRoute>}
         />
         <Route
           path="/dashboard-orders"
-          element={
-            <SellerProtectedRoute>
-              <ShopAllOrders />
-            </SellerProtectedRoute>
-          }
+          element={<SellerProtectedRoute><ShopAllOrders /></SellerProtectedRoute>}
         />
         <Route
           path="/dashboard-refunds"
-          element={
-            <SellerProtectedRoute>
-              <ShopAllRefunds />
-            </SellerProtectedRoute>
-          }
+          element={<SellerProtectedRoute><ShopAllRefunds /></SellerProtectedRoute>}
         />
-
         <Route
           path="/order/:id"
-          element={
-            <SellerProtectedRoute>
-              <ShopOrderDetails />
-            </SellerProtectedRoute>
-          }
+          element={<SellerProtectedRoute><ShopOrderDetails /></SellerProtectedRoute>}
         />
         <Route
           path="/dashboard-products"
-          element={
-            <SellerProtectedRoute>
-              <ShopAllProducts />
-            </SellerProtectedRoute>
-          }
+          element={<SellerProtectedRoute><ShopAllProducts /></SellerProtectedRoute>}
         />
         <Route
           path="/dashboard-create-event"
-          element={
-            <SellerProtectedRoute>
-              <ShopCreateEvents />
-            </SellerProtectedRoute>
-          }
+          element={<SellerProtectedRoute><ShopCreateEvents /></SellerProtectedRoute>}
         />
         <Route
           path="/dashboard-events"
-          element={
-            <SellerProtectedRoute>
-              <ShopAllEvents />
-            </SellerProtectedRoute>
-          }
+          element={<SellerProtectedRoute><ShopAllEvents /></SellerProtectedRoute>}
         />
         <Route
           path="/dashboard-coupouns"
-          element={
-            <SellerProtectedRoute>
-              <ShopAllCoupouns />
-            </SellerProtectedRoute>
-          }
+          element={<SellerProtectedRoute><ShopAllCoupouns /></SellerProtectedRoute>}
         />
         <Route
           path="/dashboard-withdraw-money"
-          element={
-            <SellerProtectedRoute>
-              <ShopWithDrawMoneyPage />
-            </SellerProtectedRoute>
-          }
-
-          
+          element={<SellerProtectedRoute><ShopWithDrawMoneyPage /></SellerProtectedRoute>}
         />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        {/* Admin Routes */}
         <Route
           path="/admin/dashboard"
-          element={
-            <ProtectedAdminRoute>
-              <AdminDashboardPage />
-            </ProtectedAdminRoute>
-          }
+          element={<ProtectedAdminRoute><AdminDashboardPage /></ProtectedAdminRoute>}
         />
         <Route
           path="/admin-users"
-          element={
-            <ProtectedAdminRoute>
-              <AdminDashboardUsers />
-            </ProtectedAdminRoute>
-          }
+          element={<ProtectedAdminRoute><AdminDashboardUsers /></ProtectedAdminRoute>}
         />
         <Route
           path="/admin-sellers"
-          element={
-            <ProtectedAdminRoute>
-              <AdminDashboardSellers />
-            </ProtectedAdminRoute>
-          }
+          element={<ProtectedAdminRoute><AdminDashboardSellers /></ProtectedAdminRoute>}
         />
         <Route
           path="/admin-orders"
-          element={
-            <ProtectedAdminRoute>
-              <AdminDashboardOrders />
-            </ProtectedAdminRoute>
-          }
+          element={<ProtectedAdminRoute><AdminDashboardOrders /></ProtectedAdminRoute>}
         />
-         <Route
+        <Route
           path="/admin-products"
-          element={
-            <ProtectedAdminRoute>
-              <AdminDashboardProducts />
-            </ProtectedAdminRoute>
-          }
+          element={<ProtectedAdminRoute><AdminDashboardProducts /></ProtectedAdminRoute>}
         />
-         <Route
+        <Route
           path="/admin-events"
-          element={
-            <ProtectedAdminRoute>
-              <AdminDashboardEvents />
-            </ProtectedAdminRoute>
-          }
+          element={<ProtectedAdminRoute><AdminDashboardEvents /></ProtectedAdminRoute>}
         />
-         <Route
+        <Route
           path="/admin-withdraw-request"
-          element={
-            <ProtectedAdminRoute>
-              <AdminDashboardWithdraw />
-            </ProtectedAdminRoute>
-          }
+          element={<ProtectedAdminRoute><AdminDashboardWithdraw /></ProtectedAdminRoute>}
         />
       </Routes>
       <ToastContainer
