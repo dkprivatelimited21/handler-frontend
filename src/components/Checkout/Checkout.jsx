@@ -1,76 +1,283 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Country, State } from "country-state-city";
+import { toast } from "react-toastify";
 
-const Checkout = ({ cartItems, user, selectedSize, selectedColor, totalPrice, shippingAddress, selectedSellerId }) => {
-  const [loading, setLoading] = useState(false);
-  const [payNowLoading, setPayNowLoading] = useState(false);
+const Checkout = () => {
+  const { cart } = useSelector((state) => state.cart);
+  const { user } = useSelector((state) => state.user);
   const navigate = useNavigate();
 
-  const createOrder = async (isPaid = false, paymentMethod = 'Pending') => {
-    try {
-      const payload = {
-        items: cartItems,
-        shippingAddress,
-        buyer: user?._id,
-        seller: selectedSellerId,
-        size: selectedSize,
-        color: selectedColor,
-        totalAmount: totalPrice,
-        isPaid,
-        paymentMethod,
-      };
+  const [loading, setLoading] = useState(false);
+  const [country, setCountry] = useState("");
+  const [state, setState] = useState("");
+  const [zipCode, setZipCode] = useState("");
+  const [address1, setAddress1] = useState("");
+  const [address2, setAddress2] = useState("");
 
-      const { data } = await axios.post('/api/order/create-order', payload);
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v2/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
 
-      if (data.success) {
-        toast.success('Order placed successfully!');
-        navigate(`/order/success/${data.order._id}`);
-      } else {
-        toast.error('Failed to place order.');
-      }
-    } catch (error) {
-      console.error('Order creation error:', error);
-      toast.error('Something went wrong while placing the order.');
-    }
-  };
+  const subTotalPrice = cart.reduce(
+    (acc, item) => acc + item.qty * item.discountPrice,
+    0
+  );
 
-  const handlePlaceOrder = async () => {
-    setLoading(true);
-    await createOrder(false, 'Pending');
+  const shipping = subTotalPrice > 1000 ? 0 : 100;
+  const discountPercentage = 0;
+  const discountPrice = (subTotalPrice * discountPercentage) / 100;
+  const totalPrice = subTotalPrice + shipping - discountPrice;
+
+ const paymentSubmit = async () => {
+  if (address1 === "" || zipCode === "" || country === "" || state === "") {
+    toast.error("Please choose your delivery address!");
+    return;
+  }
+
+  setLoading(true); // start spinner
+
+  try {
+    const res = await fetch("https://handler-backend.vercel.app/api/v2/payment/razorpay-checkout", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: totalPrice * 100,
+        userId: user._id,
+      }),
+    });
+
+    const data = await res.json();
+
+    const options = {
+      key: "YOUR_RAZORPAY_KEY_ID",
+      amount: data.amount,
+      currency: "INR",
+      name: "Local Handler",
+      description: "Order Payment",
+      image: "/logo.png",
+      order_id: data.id,
+      handler: function (response) {
+        toast.success("Payment Successful!");
+        navigate("/order/success");
+      },
+      prefill: {
+        name: user.name,
+        email: user.email,
+      },
+      notes: {
+        address: `${address1}, ${address2}, ${state}, ${country} - ${zipCode}`,
+      },
+      theme: {
+        color: "#22c55e",
+      },
+    };
+
+    const razor = new window.Razorpay(options);
+    razor.open();
+
+    razor.on('payment.failed', function () {
+      setLoading(false);
+      toast.error("Payment failed.");
+    });
+
+  } catch (error) {
+    toast.error("Payment Failed");
+    console.error(error);
     setLoading(false);
-  };
+  }
+};
 
-  const handlePayNow = async () => {
-    setPayNowLoading(true);
-    await createOrder(false, 'Pay Now (No Actual Payment)');
-    setPayNowLoading(false);
+
+  const autofillFromLocation = async () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+        );
+        const data = await res.json();
+        setZipCode(data.address.postcode || "");
+        setAddress1(
+          `${data.address.road || ""} ${data.address.suburb || ""}`.trim()
+        );
+        setCountry(data.address.country || "");
+        setState(data.address.state || "");
+        toast.success("Location autofilled successfully!");
+      } catch (error) {
+        toast.error("Failed to fetch location.");
+      }
+    });
   };
 
   return (
-    <div className="checkout-container p-4">
-      <h2 className="text-2xl font-bold mb-4">Checkout</h2>
+    <div className="w-full flex flex-col-reverse 800px:flex-row py-10">
+      <div className="w-full 800px:w-[65%]">
+        <ShippingInfo
+          user={user}
+          country={country}
+          setCountry={setCountry}
+          state={state}
+          setState={setState}
+          address1={address1}
+          setAddress1={setAddress1}
+          address2={address2}
+          setAddress2={setAddress2}
+          zipCode={zipCode}
+          setZipCode={setZipCode}
+          autofillFromLocation={autofillFromLocation}
+        />
+      </div>
+      <div className="w-full 800px:w-[35%]">
+        <CartData
+  totalPrice={totalPrice}
+  subTotalPrice={subTotalPrice}
+  shipping={shipping}
+  discountPrice={discountPrice}
+  paymentSubmit={paymentSubmit}
+  loading={loading}
+/>
+      </div>
+    </div>
+  );
+};
 
-      {/* Add your cart summary and shipping address UI here */}
-
-      <div className="flex gap-4">
+const ShippingInfo = ({
+  user,
+  country,
+  setCountry,
+  state,
+  setState,
+  address1,
+  setAddress1,
+  address2,
+  setAddress2,
+  zipCode,
+  setZipCode,
+  autofillFromLocation,
+}) => {
+  return (
+    <div className="w-full">
+      <div className="mb-4">
         <button
-          onClick={handlePlaceOrder}
-          disabled={loading}
-          className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded disabled:opacity-50"
+          onClick={autofillFromLocation}
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          {loading ? 'Placing Order...' : 'Place Order Without Payment'}
-        </button>
-
-        <button
-          onClick={handlePayNow}
-          disabled={payNowLoading}
-          className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded disabled:opacity-50"
-        >
-          {payNowLoading ? 'Confirming...' : 'Pay Now (Fake)'}
+          📍 Use My Location
         </button>
       </div>
+      <form className="w-full">
+        <div className="w-full flex pb-3">
+          <input
+            type="text"
+            className="input"
+            placeholder="Address 1"
+            value={address1}
+            onChange={(e) => setAddress1(e.target.value)}
+            required
+          />
+          <input
+            type="text"
+            className="input ml-2"
+            placeholder="Address 2"
+            value={address2}
+            onChange={(e) => setAddress2(e.target.value)}
+          />
+        </div>
+        <div className="w-full flex pb-3">
+          <input
+            type="text"
+            className="input"
+            placeholder="Zip Code"
+            value={zipCode}
+            onChange={(e) => setZipCode(e.target.value)}
+            required
+          />
+        </div>
+        <div className="w-full flex pb-3">
+          <select
+            className="input"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            required
+          >
+            <option value="">Choose Country</option>
+            {Country &&
+              Country.getAllCountries().map((item) => (
+                <option key={item.isoCode} value={item.name}>
+                  {item.name}
+                </option>
+              ))}
+          </select>
+          <select
+            className="input ml-2"
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+            required
+          >
+            <option value="">Choose State</option>
+            {State &&
+              State.getStatesOfCountry("IN").map((item) => (
+                <option key={item.isoCode} value={item.name}>
+                  {item.name}
+                </option>
+              ))}
+          </select>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+const CartData = ({
+  totalPrice,
+  subTotalPrice,
+  shipping,
+  discountPrice,
+  paymentSubmit,
+  loading,
+}) => {
+  return (
+    <div className="w-full bg-[#fff] rounded-md p-5 shadow-sm">
+      <h2 className="text-[20px] font-[600] pb-3">Cart Summary</h2>
+      <div className="flex justify-between py-2">
+        <h5 className="text-[18px]">Subtotal:</h5>
+        <h5 className="text-[18px] font-[600]">₹{subTotalPrice}</h5>
+      </div>
+      <div className="flex justify-between py-2">
+        <h5 className="text-[18px]">Shipping:</h5>
+        <h5 className="text-[18px] font-[600]">₹{shipping}</h5>
+      </div>
+      <div className="flex justify-between py-2">
+        <h5 className="text-[18px]">Discount:</h5>
+        <h5 className="text-[18px] font-[600]">- ₹{discountPrice}</h5>
+      </div>
+      <div className="flex justify-between border-t pt-3 mt-3">
+        <h5 className="text-[20px] font-[700]">Total:</h5>
+        <h5 className="text-[20px] font-[700] text-green-600">₹{totalPrice}</h5>
+      </div>
+      <button
+  onClick={paymentSubmit}
+  className="mt-6 w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 flex justify-center items-center gap-2"
+  disabled={loading}
+>
+  {loading && (
+    <span className="loader inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+  )}
+  {loading ? "Processing..." : "Proceed to Payment"}
+</button>
     </div>
   );
 };

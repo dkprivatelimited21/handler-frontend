@@ -5,8 +5,8 @@ const PrivacyPolicy = () => {
     <div className="max-w-4xl mx-auto p-6">
       <h1 className="text-3xl font-bold mb-4">Privacy Policy</h1>
       <p className="mb-4">
-        Effective Date: [Insert Date] <br />
-        Local Handler (“we,” “our,” or “us”) values your privacy. This Privacy Policy describes how we collect, use, disclose, and protect your personal information when you use our multivendor eCommerce platform.
+        Effective Date:15 April 2025 <br />
+        "Local Handler" we values your privacy. This Privacy Policy describes how we collect, use, disclose, and protect your personal information when you use our multivendor eCommerce platform.
       </p>
 
       <h2 className="text-xl font-semibold mt-6 mb-2">1. Information We Collect</h2>
@@ -46,8 +46,8 @@ const PrivacyPolicy = () => {
 
       <h2 className="text-xl font-semibold mt-6 mb-2">10. Contact Us</h2>
       <p>
-        Email: [Your email] <br />
-        Address: [Your business address]
+        Email: everythingfree4200@gmail.com<br />
+        Address: Uttarpradesh , Gorakhpur-273401
       </p>
     </div>
   );

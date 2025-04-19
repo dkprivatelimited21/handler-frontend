@@ -7,32 +7,78 @@ const Payment = ({ cartItems, user, selectedSize, selectedColor, totalPrice, shi
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleFakePayNow = async () => {
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const handleRazorpayPayment = async () => {
     setLoading(true);
+    const res = await loadRazorpayScript();
+
+    if (!res) {
+      toast.error("Razorpay SDK failed to load. Are you online?");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const payload = {
-        items: cartItems,
-        shippingAddress,
-        buyer: user._id,
-        seller: selectedSellerId,
-        size: selectedSize,
-        color: selectedColor,
-        totalAmount: totalPrice,
-        isPaid: false,
-        paymentMethod: 'Pay Now (No Actual Payment)',
+      const orderPayload = { amount: totalPrice * 100 }; // amount in paise
+      const { data } = await axios.post("/api/payment/create-order", orderPayload);
+
+      const options = {
+        key: "YOUR_RAZORPAY_KEY_ID", // replace with your Razorpay public key
+        amount: data.order.amount,
+        currency: data.order.currency,
+        name: "Local Handler",
+        description: "Order Payment",
+        order_id: data.order.id,
+        handler: async function (response) {
+          // Payment was successful, now create the order
+          const payload = {
+            items: cartItems,
+            shippingAddress,
+            buyer: user._id,
+            seller: selectedSellerId,
+            size: selectedSize,
+            color: selectedColor,
+            totalAmount: totalPrice,
+            isPaid: true,
+            paymentMethod: 'Razorpay',
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpayOrderId: response.razorpay_order_id,
+            razorpaySignature: response.razorpay_signature,
+          };
+
+          const confirm = await axios.post('/api/order/create-order', payload);
+
+          if (confirm.data.success) {
+            toast.success("Payment successful and order placed!");
+            navigate(`/order/success/${confirm.data.order._id}`);
+          } else {
+            toast.error("Order creation failed after payment.");
+          }
+        },
+        prefill: {
+          name: user.name,
+          email: user.email,
+          contact: user.phone || user.contact || "", // use actual user contact
+        },
+        theme: {
+          color: "#3399cc"
+        }
       };
 
-      const { data } = await axios.post('/api/order/create-order', payload);
-
-      if (data.success) {
-        toast.success('Order placed successfully without real payment!');
-        navigate(`/order/success/${data.order._id}`);
-      } else {
-        toast.error('Failed to place fake paid order.');
-      }
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error) {
-      console.error('Payment simulation error:', error);
-      toast.error('Something went wrong during fake payment.');
+      console.error("Razorpay error:", error);
+      toast.error("Something went wrong during Razorpay payment.");
     } finally {
       setLoading(false);
     }
@@ -42,14 +88,12 @@ const Payment = ({ cartItems, user, selectedSize, selectedColor, totalPrice, shi
     <div className="payment-container p-4">
       <h2 className="text-2xl font-bold mb-4">Payment</h2>
 
-      {/* Optional real payment logic can be added here */}
-
       <button
-        onClick={handleFakePayNow}
+        onClick={handleRazorpayPayment}
         disabled={loading}
-        className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded disabled:opacity-50"
+        className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded disabled:opacity-50"
       >
-        {loading ? 'Processing...' : 'Pay Now (Fake)'}
+        {loading ? 'Processing...' : 'Pay Now with Razorpay'}
       </button>
     </div>
   );
