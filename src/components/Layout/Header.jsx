@@ -230,19 +230,38 @@ const Header = ({ activeHeading }) => {
               >
                 Become Seller
               </Link>
-{!isAuthenticated && (
-          <Link
-            to="/login"
-            className="bg-green-600 text-white px-4 py-2 rounded-md inline-block"
-            onClick={() => setOpen(false)}
-          >
-            Login / Signup
-          </Link>
-        )}
-            </div>
-          </div>
-        </div>
-      )}
+<br />
+              <br />
+              <br />
+
+              <div className="flex w-full justify-center">
+                {isAuthenticated ? (
+                  <div>
+                    <Link to="/profile">
+                      <img
+                        src={`${user.avatar?.url}`}
+                        alt=""
+                        className="w-[60px] h-[60px] rounded-full border-[3px] border-[#0eae88]"
+                      />
+                    </Link>
+                  </div>
+  ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      className="text-[18px] pr-[10px] text-[#000000b7]"
+                    >
+                      Login /
+                    </Link>
+                    <Link
+                      to="/sign-up"
+                      className="text-[18px] text-[#000000b7]"
+                    >
+                      Sign up
+                    </Link>
+                  </>
+                )}
+              </div>
 
       {/* Mobile Search Bar */}
       <div className="w-full px-3 mt-2 800px:hidden">
