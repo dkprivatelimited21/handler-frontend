@@ -13,7 +13,7 @@ const Checkout = ({ cartItems, user, selectedSize, selectedColor, totalPrice, sh
       const payload = {
         items: cartItems,
         shippingAddress,
-        buyer: user._id,
+        buyer: user?._id,
         seller: selectedSellerId,
         size: selectedSize,
         color: selectedColor,
