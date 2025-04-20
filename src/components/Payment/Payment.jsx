@@ -82,7 +82,7 @@ const Payment = () => {
   cart: cartItems,
   shippingAddress,
   user,
-  totalPrice,
+  totalPrice: Number(totalPrice),
   paymentInfo: {
     id: response.razorpay_payment_id,
     orderId: response.razorpay_order_id,
