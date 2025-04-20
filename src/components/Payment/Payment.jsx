@@ -54,19 +54,26 @@ const Payment = () => {
             },
           };
 
-          const confirm = await axios.post(`${server}/order/create-order`, payload, {
-            headers: { "Content-Type": "application/json" },
-          });
+          try {
+  const confirm = await axios.post(`${server}/order/create-order`, payload, {
+    headers: { "Content-Type": "application/json" },
+  });
 
-          if (confirm.data.success) {
-            toast.success("Payment successful and order placed!");
-            localStorage.removeItem("cartItems");
-            localStorage.removeItem("latestOrder");
-            navigate(`/order/success/${confirm.data.order._id}`);
-          } else {
-            toast.error("Order creation failed after payment.");
-          }
-        },
+  if (confirm.data.success) {
+    toast.success("Payment successful and order placed!");
+    localStorage.removeItem("cartItems");
+    localStorage.removeItem("latestOrder");
+    navigate(`/order/success/${confirm.data.orders[0]._id}`);
+  } else {
+    toast.error("Order creation failed after payment.");
+  }
+} catch (error) {
+  console.error("🔥 Order creation error:", error);
+  toast.error(
+    error?.response?.data?.message || "Order creation failed due to server error."
+  );
+}
+
         prefill: {
           name: orderData.user?.name || "",
           email: orderData.user?.email || "",
