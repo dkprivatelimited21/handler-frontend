@@ -79,19 +79,19 @@ const Payment = () => {
         order_id: data.id,
         handler: async function (response) {
           const payload = {
-            items: cartItems,
-            shippingAddress,
-            buyer: user._id,
-            seller: selectedSellerId,
-            size: selectedSize,
-            color: selectedColor,
-            totalAmount: totalPrice,
-            isPaid: true,
-            paymentMethod: 'Razorpay',
-            razorpayPaymentId: response.razorpay_payment_id,
-            razorpayOrderId: response.razorpay_order_id,
-            razorpaySignature: response.razorpay_signature,
-          };
+  cart: cartItems,
+  shippingAddress,
+  user,
+  totalPrice,
+  paymentInfo: {
+    id: response.razorpay_payment_id,
+    orderId: response.razorpay_order_id,
+    signature: response.razorpay_signature,
+    status: "Paid",
+    method: "Razorpay",
+  },
+};
+
 
          const confirm = await axios.post(`${server}/order/create-order`, payload, {
   withCredentials: true
