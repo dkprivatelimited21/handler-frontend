@@ -92,6 +92,8 @@ const Payment = () => {
   },
 };
 
+console.log("totalPrice type:", typeof totalPrice); // should be 'number'
+
 
          const confirm = await axios.post(`${server}/order/create-order`, payload, {
   withCredentials: true
