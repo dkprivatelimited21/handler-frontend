@@ -16,22 +16,29 @@ const Payment = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const orderData = JSON.parse(localStorage.getItem("latestOrder"));
-    if (!orderData) {
-      toast.error("No order data found!");
+    try {
+      const orderData = JSON.parse(localStorage.getItem("latestOrder"));
+
+      if (!orderData || !orderData.cart || !orderData.user) {
+        toast.error("No valid order data found!");
+        navigate("/checkout");
+        return;
+      }
+
+      setCartItems(orderData.cart);
+      setUser(orderData.user);
+      setTotalPrice(Number(orderData.totalPrice) || 0);
+      setShippingAddress(orderData.shippingAddress || {});
+      setSelectedSellerId(orderData.cart[0]?.shopId || null);
+      setSelectedSize(orderData.cart[0]?.selectedSize || null);
+      setSelectedColor(orderData.cart[0]?.selectedColor || null);
+
+      console.log("Loaded order data:", orderData);
+    } catch (err) {
+      console.error("Error loading order data:", err);
+      toast.error("Order data corrupted. Redirecting...");
       navigate("/checkout");
-      return;
     }
-
-    setCartItems(orderData.cart);
-    setUser(orderData.user);
-    setTotalPrice(orderData.totalPrice);
-    setShippingAddress(orderData.shippingAddress);
-
-    // Optional: if your app supports these
-    setSelectedSellerId(orderData.cart[0]?.shopId || null);
-    setSelectedSize(orderData.cart[0]?.selectedSize || null);
-    setSelectedColor(orderData.cart[0]?.selectedColor || null);
   }, [navigate]);
 
   const loadRazorpayScript = () => {
@@ -111,6 +118,10 @@ const Payment = () => {
       setLoading(false);
     }
   };
+
+  if (!user || cartItems.length === 0) {
+    return <div className="p-4 text-center text-gray-600">Loading payment data...</div>;
+  }
 
   return (
     <div className="payment-container p-4">
