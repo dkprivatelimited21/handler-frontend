@@ -103,7 +103,8 @@ console.log("totalPrice type:", typeof totalPrice); // should be 'number'
           if (confirm.data.success) {
             toast.success("Payment successful and order placed!");
             localStorage.removeItem("latestOrder");
-            navigate(`/order/success/${confirm.data.order._id}`);
+           navigate(`/order/success/${confirm.data.orders[0]._id}`);
+
           } else {
             toast.error("Order creation failed after payment.");
           }
