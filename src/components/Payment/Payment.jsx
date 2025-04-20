@@ -29,11 +29,11 @@ const Payment = ({ cartItems, user, selectedSize, selectedColor, totalPrice, shi
 
   try {
     // ✅ Step 1: Fetch Razorpay key from backend
-    const { data: keyData } = await axios.get("/api/payment/razorpay-key");
+    const { data: keyData } = await axios.get("/api/v2/payment/razorpay-key");
 
     // ✅ Step 2: Create Razorpay order
     const orderPayload = { amount: totalPrice * 100 }; // amount in paise
-    const { data } = await axios.post("/api/payment/razorpay-checkout", orderPayload);
+    const { data } = await axios.post("/api/v2/payment/razorpay-checkout", orderPayload);
 
     const options = {
       key: keyData.key, // ✅ securely injected from backend
