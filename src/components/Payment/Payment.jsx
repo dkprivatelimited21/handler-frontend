@@ -63,7 +63,8 @@ const Payment = () => {
     }
 
     try {
-      const { data: keyData } = await axios.get(`${server}/payment/razorpay-key`);
+      const { data: keyData } = await axios.get(`${server}/payment/razorpay-key`, { withCredentials: true });
+
 
       const orderPayload = { amount: totalPrice * 100 };
       const { data } = await axios.post(`${server}/payment/razorpay-checkout`, orderPayload)
@@ -92,7 +93,10 @@ const Payment = () => {
             razorpaySignature: response.razorpay_signature,
           };
 
-          const confirm = await axios.post(`${server}/order/create-order`, payload);
+         const confirm = await axios.post(`${server}/order/create-order`, payload, {
+  withCredentials: true
+});
+
 
           if (confirm.data.success) {
             toast.success("Payment successful and order placed!");
