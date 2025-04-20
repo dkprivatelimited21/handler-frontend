@@ -72,7 +72,7 @@ const Payment = () => {
   toast.error(
     error?.response?.data?.message || "Order creation failed due to server error."
   );
-}
+};
 
         prefill: {
           name: orderData.user?.name || "",
