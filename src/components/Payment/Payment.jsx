@@ -17,72 +17,76 @@ const Payment = ({ cartItems, user, selectedSize, selectedColor, totalPrice, shi
     });
   };
 
-  const handleRazorpayPayment = async () => {
-    setLoading(true);
-    const res = await loadRazorpayScript();
+ const handleRazorpayPayment = async () => {
+  setLoading(true);
+  const res = await loadRazorpayScript();
 
-    if (!res) {
-      toast.error("Razorpay SDK failed to load. Are you online?");
-      setLoading(false);
-      return;
-    }
+  if (!res) {
+    toast.error("Razorpay SDK failed to load. Are you online?");
+    setLoading(false);
+    return;
+  }
 
-    try {
-      const orderPayload = { amount: totalPrice * 100 }; // amount in paise
-      const { data } = await axios.post("/api/payment/create-order", orderPayload);
+  try {
+    // ✅ Step 1: Fetch Razorpay key from backend
+    const { data: keyData } = await axios.get("/api/payment/razorpay-key");
 
-      const options = {
-        key: "YOUR_RAZORPAY_KEY_ID", // replace with your Razorpay public key
-        amount: data.order.amount,
-        currency: data.order.currency,
-        name: "Local Handler",
-        description: "Order Payment",
-        order_id: data.order.id,
-        handler: async function (response) {
-          // Payment was successful, now create the order
-          const payload = {
-            items: cartItems,
-            shippingAddress,
-            buyer: user._id,
-            seller: selectedSellerId,
-            size: selectedSize,
-            color: selectedColor,
-            totalAmount: totalPrice,
-            isPaid: true,
-            paymentMethod: 'Razorpay',
-            razorpayPaymentId: response.razorpay_payment_id,
-            razorpayOrderId: response.razorpay_order_id,
-            razorpaySignature: response.razorpay_signature,
-          };
+    // ✅ Step 2: Create Razorpay order
+    const orderPayload = { amount: totalPrice * 100 }; // amount in paise
+    const { data } = await axios.post("/api/payment/razorpay-checkout", orderPayload);
 
-          const confirm = await axios.post('/api/order/create-order', payload);
+    const options = {
+      key: keyData.key, // ✅ securely injected from backend
+      amount: data.amount,
+      currency: data.currency,
+      name: "Local Handler",
+      description: "Order Payment",
+      order_id: data.id,
+      handler: async function (response) {
+        const payload = {
+          items: cartItems,
+          shippingAddress,
+          buyer: user._id,
+          seller: selectedSellerId,
+          size: selectedSize,
+          color: selectedColor,
+          totalAmount: totalPrice,
+          isPaid: true,
+          paymentMethod: 'Razorpay',
+          razorpayPaymentId: response.razorpay_payment_id,
+          razorpayOrderId: response.razorpay_order_id,
+          razorpaySignature: response.razorpay_signature,
+        };
 
-          if (confirm.data.success) {
-            toast.success("Payment successful and order placed!");
-            navigate(`/order/success/${confirm.data.order._id}`);
-          } else {
-            toast.error("Order creation failed after payment.");
-          }
-        },
-        prefill: {
-          name: user.name,
-          email: user.email,
-          contact: user.phone || user.contact || "", // use actual user contact
-        },
-        theme: {
-          color: "#3399cc"
+        const confirm = await axios.post('/api/order/create-order', payload);
+
+        if (confirm.data.success) {
+          toast.success("Payment successful and order placed!");
+          navigate(`/order/success/${confirm.data.order._id}`);
+        } else {
+          toast.error("Order creation failed after payment.");
         }
-      };
+      },
+      prefill: {
+        name: user.name,
+        email: user.email,
+        contact: user.phone || user.contact || "",
+      },
+      theme: {
+        color: "#3399cc"
+      }
+    };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (error) {
-      console.error("Razorpay error:", error);
-      toast.error("Something went wrong during Razorpay payment.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const rzp = new window.Razorpay(options);
+    rzp.open();
+  } catch (error) {
+    console.error("Razorpay error:", error);
+    toast.error("Something went wrong during Razorpay payment.");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="payment-container p-4">
