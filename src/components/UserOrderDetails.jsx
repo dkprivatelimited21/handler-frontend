@@ -284,6 +284,26 @@ const UserOrderDetails = () => {
             </div>
           )}
         </div>
+
+<div className="bg-white p-4 rounded shadow">
+{data?.trackingId && data?.courier && (
+  <div className="w-full mt-6">
+    <h4 className="text-[20px] font-[600] mb-2">Tracking Info</h4>
+    <p className="text-[16px]">Courier: {data.courier}</p>
+    <p className="text-[16px]">Tracking ID: {data.trackingId}</p>
+    <a
+      href={`https://${data.courier}.com/track?tracking_id=${data.trackingId}`}
+      target="_blank"
+      rel="noreferrer"
+      className="text-blue-600 underline mt-2 inline-block"
+    >
+      Track Shipment
+    </a>
+  </div>
+)}
+</div>
+
+
       </div>
       <br />
       <button

@@ -14,6 +14,7 @@ const OrderDetails = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
+  const [courier, setCourier] = useState("");
 
   const [status, setStatus] = useState("");
   const [trackingId, setTrackingId] = useState("");
@@ -28,79 +29,62 @@ const OrderDetails = () => {
 
 
 useEffect(() => {
-  if (status === "Shipping" && trackingId) {
-    const courier = getCourierName(trackingId.trim());
-    if (!courier) {
-      toast.error("Invalid tracking ID. Try a valid one from major couriers.");
-    } else {
-      toast.success(`Tracking ID matched with ${courier}`);
-    }
-  }
-}, [trackingId, status]);
+  {status === "Shipping" && (
+  <>
+    <div className="mt-2">
+      <label className="text-[16px] font-medium">Select Courier:</label>
+      <select
+        className="border p-2 rounded w-[300px] mt-1"
+        value={courier}
+        onChange={(e) => setCourier(e.target.value)}
+      >
+        <option value="">Select Courier</option>
+        <option value="delhivery">Delhivery</option>
+        <option value="bluedart">Blue Dart</option>
+        <option value="ekart">Ekart</option>
+        <option value="ecomExpress">Ecom Express</option>
+        <option value="xpressbees">Xpressbees</option>
+        <option value="shadowfax">Shadowfax</option>
+      </select>
+    </div>
 
+    <input
+      type="text"
+      placeholder="Enter Tracking ID"
+      className="border p-2 rounded w-[300px] mt-2"
+      value={trackingId}
+      onChange={(e) => setTrackingId(e.target.value)}
+    />
+  </>
+)}
 
-
-  // Set default status on load
-  useEffect(() => {
-    if (order?.status) {
-      setStatus(order.status);
-    } else {
-      setStatus("Not Shipped");
-    }
-  }, [order]);
-
-  const isValidTrackingId = (id) => {
-    const patterns = {
-      delhivery: /^[0-9]{9,14}$/,
-      bluedart: /^[A-Z0-9]{8,12}$/,
-      ekart: /^FMPC[0-9A-Z]{8,12}$/,
-      ecomExpress: /^[A-Z]{2}[0-9]{9}$/,
-      xpressbees: /^XB[0-9]{9}$/,
-      shadowfax: /^[A-Z0-9]{10,15}$/,
-    };
-    return Object.values(patterns).some((p) => p.test(id));
-  };
-
-  const getCourierName = (id) => {
-    const patterns = {
-      Delhivery: /^[0-9]{9,14}$/,
-      "Blue Dart": /^[A-Z0-9]{8,12}$/,
-      Ekart: /^FMPC[0-9A-Z]{8,12}$/,
-      "Ecom Express": /^[A-Z]{2}[0-9]{9}$/,
-      Xpressbees: /^XB[0-9]{9}$/,
-      Shadowfax: /^[A-Z0-9]{10,15}$/,
-    };
-
-    for (const [name, pattern] of Object.entries(patterns)) {
-      if (pattern.test(id)) return name;
-    }
-    return null;
-  };
 
 const orderUpdateHandler = async () => {
   if (status === "Shipping") {
-    const trimmedId = trackingId.trim();
-
-    if (!trimmedId) {
-      toast.error("Tracking ID is required when shipping.");
-      return;
-    }
-
-    if (!isValidTrackingId(trimmedId)) {
-      toast.error("Invalid tracking ID. Please use one from a known courier.");
-      return;
-    }
+  const trimmedId = trackingId.trim();
+  if (!courier || !trimmedId) {
+    toast.error("Courier and tracking ID are required");
+    return;
   }
 
-  try {
-    await axios.put(
-      `${server}/order/update-order-status/${id}`,
-      {
-        status,
-        ...(status === "Shipping" && { trackingId: trackingId.trim() }),
-      },
-      { withCredentials: true }
-    );
+  if (!isValidTrackingId(trimmedId)) {
+    toast.error("Invalid tracking ID format.");
+    return;
+  }
+}
+
+await axios.put(
+  `${server}/order/update-order-status/${id}`,
+  {
+    status,
+    ...(status === "Shipping" && {
+      trackingId: trackingId.trim(),
+      courier,
+    }),
+  },
+  { withCredentials: true }
+);
+
     toast.success("Order updated!");
     navigate("/dashboard-orders");
   } catch (error) {
