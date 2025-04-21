@@ -27,22 +27,27 @@ const Payment = () => {
         .then((res) => res.data);
 
       // ✅ Fix: Inject shopId before creating order
-      const cartWithShopId = orderData?.cart?.map((item) => ({
-        ...item,
-        shopId: item.shop?._id || item.shopId || item.shop_id || "",
-      }));
+      const cartWithRequiredFields = orderData?.cart?.map((item) => ({
+  productId: item._id,
+  quantity: item.qty || 1,
+  selectedSize: item.selectedSize || "",
+  selectedColor: item.selectedColor || "",
+  shopId: item.shop?._id || item.shopId || item.shop_id || "",
+}));
+
 
       const order = {
-        cart: cartWithShopId,
-        shippingAddress: orderData?.shippingAddress,
-        user: user && user,
-        totalPrice: orderData?.totalPrice,
-        paymentInfo: {
-          id: razorpayOrder.id,
-          status: "succeeded",
-          type: "Razorpay",
-        },
-      };
+  cart: cartWithRequiredFields,
+  shippingAddress: orderData?.shippingAddress,
+  user: user && user,
+  totalPrice: orderData?.totalPrice,
+  paymentInfo: {
+    id: razorpayOrder.id,
+    status: "succeeded",
+    type: "Razorpay",
+  },
+};
+
 
       const options = {
         key: keyData.key,
