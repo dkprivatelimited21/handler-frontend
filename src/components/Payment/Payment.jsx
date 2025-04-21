@@ -53,7 +53,7 @@ const Payment = () => {
         order_id: razorpayOrder.id,
         handler: async function (response) {
           order.paymentInfo.id = response.razorpay_payment_id;
-
+console.log("ORDER SENDING TO BACKEND:", JSON.stringify(order, null, 2));
           await axios.post(`${server}/order/create-order`, order, {
             headers: {
               "Content-Type": "application/json",
