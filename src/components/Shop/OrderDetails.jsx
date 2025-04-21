@@ -24,92 +24,87 @@ const OrderDetails = () => {
 
   const data = orders && orders.find((item) => item._id === id);
 
- const isValidTrackingId = (id) => {
-  const courierPatterns = {
-    delhivery: /^[0-9]{9,14}$/,                   // Numeric, 9–14 digits
-    bluedart: /^[A-Z0-9]{8,12}$/,                 // Alphanumeric, 8–12 chars
-    ekart: /^FMPC[0-9A-Z]{8,12}$/,                // Starts with FMPC, used by Flipkart
-    ecomExpress: /^[A-Z]{2}[0-9]{9}$/,            // Like EX123456789
-    xpressbees: /^XB[0-9]{9}$/,                   // Starts with XB and 9 digits
-    shadowfax: /^[A-Z0-9]{10,15}$/                // Alphanumeric, 10–15 chars
-  
- };
+  const isValidTrackingId = (id) => {
+    const courierPatterns = {
+      delhivery: /^[0-9]{9,14}$/,
+      bluedart: /^[A-Z0-9]{8,12}$/,
+      ekart: /^FMPC[0-9A-Z]{8,12}$/,
+      ecomExpress: /^[A-Z]{2}[0-9]{9}$/,
+      xpressbees: /^XB[0-9]{9}$/,
+      shadowfax: /^[A-Z0-9]{10,15}$/,
+    };
 
-  return Object.values(courierPatterns).some((pattern) => pattern.test(id));
-};
-
-
-const getCourierName = (id) => {
-  const courierPatterns = {
-    Delhivery: /^[0-9]{9,14}$/,
-    "Blue Dart": /^[A-Z0-9]{8,12}$/,
-    Ekart: /^FMPC[0-9A-Z]{8,12}$/,
-    "Ecom Express": /^[A-Z]{2}[0-9]{9}$/,
-    Xpressbees: /^XB[0-9]{9}$/,
-    Shadowfax: /^[A-Z0-9]{10,15}$/,
+    return Object.values(courierPatterns).some((pattern) => pattern.test(id));
   };
 
-  for (const [name, pattern] of Object.entries(courierPatterns)) {
-    if (pattern.test(id)) return name;
-  }
-  return null;
-};
+  const getCourierName = (id) => {
+    const courierPatterns = {
+      Delhivery: /^[0-9]{9,14}$/,
+      "Blue Dart": /^[A-Z0-9]{8,12}$/,
+      Ekart: /^FMPC[0-9A-Z]{8,12}$/,
+      "Ecom Express": /^[A-Z]{2}[0-9]{9}$/,
+      Xpressbees: /^XB[0-9]{9}$/,
+      Shadowfax: /^[A-Z0-9]{10,15}$/,
+    };
 
-
-const orderUpdateHandler = async (e) => {
-  if (status === "Shipping" && !isValidTrackingId(trackingId)) {
-    toast.error("Invalid tracking ID. Please enter a valid one from known couriers.");
-    return;
-  }
-
-  try {
-    await axios.put(
-      `${server}/order/update-order-status/${id}`,
-      {
-        status,
-        ...(status === "Shipping" && { trackingId }),
-      },
-      { withCredentials: true }
-    );
-    toast.success("Order updated!");
-    navigate("/dashboard-orders");
-  } catch (error) {
-    toast.error(error.response?.data?.message || "Failed to update status.");
-  }
-};
-
-useEffect(() => {
-  if (status === "Shipping" && trackingId) {
-    const courier = getCourierName(trackingId);
-    if (!courier) {
-      toast.error("Invalid tracking ID. Try a valid one from major couriers.");
-    } else {
-      toast.success(`Tracking ID matched with ${courier}`);
+    for (const [name, pattern] of Object.entries(courierPatterns)) {
+      if (pattern.test(id)) return name;
     }
-  }
-}, [trackingId, status]);
+    return null;
+  };
 
+  const orderUpdateHandler = async (e) => {
+    if (status === "Shipping" && !isValidTrackingId(trackingId)) {
+      toast.error("Invalid tracking ID. Please enter a valid one from known couriers.");
+      return;
+    }
+
+    try {
+      await axios.put(
+        `${server}/order/update-order-status/${id}`,
+        {
+          status,
+          ...(status === "Shipping" && { trackingId }),
+        },
+        { withCredentials: true }
+      );
+      toast.success("Order updated!");
+      navigate("/dashboard-orders");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update status.");
+    }
+  };
+
+  useEffect(() => {
+    if (status === "Shipping" && trackingId) {
+      const courier = getCourierName(trackingId);
+      if (!courier) {
+        toast.error("Invalid tracking ID. Try a valid one from major couriers.");
+      } else {
+        toast.success(`Tracking ID matched with ${courier}`);
+      }
+    }
+  }, [trackingId, status]);
 
   const refundOrderUpdateHandler = async (e) => {
     await axios
-    .put(
-      `${server}/order/order-refund-success/${id}`,
-      {
-        status,
-      },
-      { withCredentials: true }
-    )
-    .then((res) => {
-      toast.success("Order updated!");
-      dispatch(getAllOrdersOfShop(seller._id));
-    })
-    .catch((error) => {
-      toast.error(error.response.data.message);
-    });
-  }
+      .put(
+        `${server}/order/order-refund-success/${id}`,
+        {
+          status,
+        },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        toast.success("Order updated!");
+        dispatch(getAllOrdersOfShop(seller._id));
+      })
+      .catch((error) => {
+        toast.error(error.response.data.message);
+      });
+  };
 
   console.log(data?.status);
-
 
   return (
     <div className={`py-4 min-h-screen ${styles.section}`}>
@@ -141,16 +136,16 @@ useEffect(() => {
       <br />
       {data &&
         data?.cart.map((item, index) => (
-          <div className="w-full flex items-start mb-5">
+          <div className="w-full flex items-start mb-5" key={index}>
             <img
-              src={`${item?.images[0]?.url}`}
+              src={`${item?.images?.[0]?.url || ""}`}
               alt=""
               className="w-[80x] h-[80px]"
             />
             <div className="w-full">
               <h5 className="pl-3 text-[20px]">{item.name}</h5>
               <h5 className="pl-3 text-[20px] text-[#00000091]">
-                US${item.discountPrice} x {item.qty}
+                US${item.discountPrice} x {item.quantity || 0}
               </h5>
             </div>
           </div>
@@ -167,12 +162,12 @@ useEffect(() => {
         <div className="w-full 800px:w-[60%]">
           <h4 className="pt-3 text-[20px] font-[600]">Shipping Address:</h4>
           <h4 className="pt-3 text-[20px]">
-            {data?.shippingAddress.address1 +
+            {data?.shippingAddress?.address1 +
               " " +
-              data?.shippingAddress.address2}
+              data?.shippingAddress?.address2}
           </h4>
-          <h4 className=" text-[20px]">{data?.shippingAddress.country}</h4>
-          <h4 className=" text-[20px]">{data?.shippingAddress.city}</h4>
+          <h4 className=" text-[20px]">{data?.shippingAddress?.country}</h4>
+          <h4 className=" text-[20px]">{data?.shippingAddress?.city}</h4>
           <h4 className=" text-[20px]">{data?.user?.phoneNumber}</h4>
         </div>
         <div className="w-full 800px:w-[40%]">
@@ -216,46 +211,43 @@ useEffect(() => {
               </option>
             ))}
         </select>
-      )},
-      {status === "Shipping" && (
-  <div className="mt-2">
-    <input
-      type="text"
-      placeholder="Enter Tracking ID"
-      className="border p-2 rounded w-[300px]"
-      value={trackingId}
-      onChange={(e) => setTrackingId(e.target.value)}
-    />
-  </div>
       )}
-      {
-        data?.status === "Processing refund" || data?.status === "Refund Success" ? (
-          <select value={status} 
-       onChange={(e) => setStatus(e.target.value)}
-       className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
-      >
-        {[
-            "Processing refund",
-            "Refund Success",
-          ]
+      {status === "Shipping" && (
+        <div className="mt-2">
+          <input
+            type="text"
+            placeholder="Enter Tracking ID"
+            className="border p-2 rounded w-[300px]"
+            value={trackingId}
+            onChange={(e) => setTrackingId(e.target.value)}
+          />
+        </div>
+      )}
+      {data?.status === "Processing refund" || data?.status === "Refund Success" ? (
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
+        >
+          {["Processing refund", "Refund Success"]
             .slice(
-              [
-                "Processing refund",
-                "Refund Success",
-              ].indexOf(data?.status)
+              ["Processing refund", "Refund Success"].indexOf(data?.status)
             )
             .map((option, index) => (
               <option value={option} key={index}>
                 {option}
               </option>
             ))}
-      </select>
-        ) : null
-      }
+        </select>
+      ) : null}
 
       <div
         className={`${styles.button} mt-5 !bg-[#FCE1E6] !rounded-[4px] text-[#E94560] font-[600] !h-[45px] text-[18px]`}
-        onClick={data?.status !== "Processing refund" ? orderUpdateHandler : refundOrderUpdateHandler}
+        onClick={
+          data?.status !== "Processing refund"
+            ? orderUpdateHandler
+            : refundOrderUpdateHandler
+        }
       >
         Update Status
       </div>
