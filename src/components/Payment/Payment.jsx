@@ -32,7 +32,7 @@ const Payment = () => {
       .then((res) => res.data);
 
     const options = {
-      key: process.env.REACT_APP_RAZORPAY_KEY,
+      key: process.env.RAZORPAY_KEY_ID,
       amount: razorpayOrder.amount,
       currency: "INR",
       name: "Local Handler",
