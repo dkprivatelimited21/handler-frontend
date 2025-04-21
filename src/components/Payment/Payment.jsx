@@ -24,52 +24,54 @@ const Payment = () => {
   };
 
   const razorpayPaymentHandler = async () => {
-    try {
-      const { data: { order: razorpayOrder } } = await axios.post(
-        `${server}/payment/razorpay-checkout`,
-        { amount: Math.round(orderData?.totalPrice * 100) }
-      );
+  try {
+    const razorpayOrder = await axios
+      .post(`${server}/payment/razorpay-checkout`, {
+        amount: Math.round(orderData?.totalPrice * 100),
+      })
+      .then((res) => res.data);
 
-      const options = {
-        key: process.env.REACT_APP_RAZORPAY_KEY,
-        amount: razorpayOrder.amount,
-        currency: "INR",
-        name: "Local Handler",
-        description: "Test Transaction",
-        order_id: razorpayOrder.id,
-        handler: async function (response) {
-          order.paymentInfo = {
-            id: response.razorpay_payment_id,
-            status: "succeeded",
-            type: "Razorpay",
-          };
+    const options = {
+      key: process.env.REACT_APP_RAZORPAY_KEY,
+      amount: razorpayOrder.amount,
+      currency: "INR",
+      name: "Local Handler",
+      description: "Test Transaction",
+      order_id: razorpayOrder.id,
+      handler: async function (response) {
+        order.paymentInfo = {
+          id: response.razorpay_payment_id,
+          status: "succeeded",
+          type: "Razorpay",
+        };
 
-          await axios.post(`${server}/order/create-order`, order, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          });
+        await axios.post(`${server}/order/create-order`, order, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-          toast.success("Order successful!");
-          localStorage.setItem("cartItems", JSON.stringify([]));
-          localStorage.setItem("latestOrder", JSON.stringify([]));
-          navigate("/order/success");
-        },
-        prefill: {
-          name: user?.name,
-          email: user?.email,
-        },
-        theme: {
-          color: "#f63b60",
-        },
-      };
+        toast.success("Order successful!");
+        localStorage.setItem("cartItems", JSON.stringify([]));
+        localStorage.setItem("latestOrder", JSON.stringify([]));
+        navigate("/order/success");
+      },
+      prefill: {
+        name: user?.name,
+        email: user?.email,
+      },
+      theme: {
+        color: "#f63b60",
+      },
+    };
 
-      const razor = new window.Razorpay(options);
-      razor.open();
-    } catch (error) {
-      toast.error("Payment failed");
-    }
-  };
+    const razor = new window.Razorpay(options);
+    razor.open();
+  } catch (error) {
+    toast.error("Payment failed");
+  }
+};
+
 
   return (
     <div className="w-full flex flex-col items-center py-8">
