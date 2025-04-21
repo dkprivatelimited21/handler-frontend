@@ -73,7 +73,7 @@ const Payment = () => {
   }
 };
 
-
+console.log("Sending order:", order);
 
   return (
     <div className="w-full flex flex-col items-center py-8">
@@ -98,6 +98,7 @@ const Payment = () => {
     </div>
   );
 };
+
 
 const CartData = ({ orderData }) => {
   const shipping = (orderData?.shipping ?? 0).toFixed(2);
