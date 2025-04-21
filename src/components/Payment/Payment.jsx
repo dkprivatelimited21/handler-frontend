@@ -25,6 +25,7 @@ const Payment = () => {
 
   const razorpayPaymentHandler = async () => {
   try {
+    const { data: keyData } = await axios.get(`${server}/payment/get-razorpay-key`);
     const razorpayOrder = await axios
       .post(`${server}/payment/razorpay-checkout`, {
         amount: Math.round(orderData?.totalPrice * 100),
@@ -32,7 +33,7 @@ const Payment = () => {
       .then((res) => res.data);
 
     const options = {
-      key: process.env.RAZORPAY_KEY_ID,
+      key: keyData.key, // ✅ Loaded from backend
       amount: razorpayOrder.amount,
       currency: "INR",
       name: "Local Handler",
@@ -71,6 +72,7 @@ const Payment = () => {
     toast.error("Payment failed");
   }
 };
+
 
 
   return (
