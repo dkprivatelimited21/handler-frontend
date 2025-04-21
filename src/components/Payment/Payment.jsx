@@ -16,64 +16,71 @@ const Payment = () => {
     setOrderData(localOrderData);
   }, []);
 
-  const order = {
-    cart: orderData?.cart,
-    shippingAddress: orderData?.shippingAddress,
-    user: user && user,
-    totalPrice: orderData?.totalPrice,
-  };
-
   const razorpayPaymentHandler = async () => {
-  try {
-    const { data: keyData } = await axios.get(`${server}/payment/get-razorpay-key`);
-    const razorpayOrder = await axios
-      .post(`${server}/payment/razorpay-checkout`, {
-        amount: Math.round(orderData?.totalPrice * 100),
-      })
-      .then((res) => res.data);
+    try {
+      const { data: keyData } = await axios.get(`${server}/payment/get-razorpay-key`);
 
-    const options = {
-      key: keyData.key, // ✅ Loaded from backend
-      amount: razorpayOrder.amount,
-      currency: "INR",
-      name: "Local Handler",
-      description: "Test Transaction",
-      order_id: razorpayOrder.id,
-      handler: async function (response) {
-        order.paymentInfo = {
-          id: response.razorpay_payment_id,
+      const razorpayOrder = await axios
+        .post(`${server}/payment/razorpay-checkout`, {
+          amount: Math.round(orderData?.totalPrice * 100),
+        })
+        .then((res) => res.data);
+
+      // ✅ Fix: Inject shopId before creating order
+      const cartWithShopId = orderData?.cart?.map((item) => ({
+        ...item,
+        shopId: item.shop?._id || item.shopId || item.shop_id || "",
+      }));
+
+      const order = {
+        cart: cartWithShopId,
+        shippingAddress: orderData?.shippingAddress,
+        user: user && user,
+        totalPrice: orderData?.totalPrice,
+        paymentInfo: {
+          id: razorpayOrder.id,
           status: "succeeded",
           type: "Razorpay",
-        };
+        },
+      };
 
-        await axios.post(`${server}/order/create-order`, order, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+      const options = {
+        key: keyData.key,
+        amount: razorpayOrder.amount,
+        currency: "INR",
+        name: "Local Handler",
+        description: "Test Transaction",
+        order_id: razorpayOrder.id,
+        handler: async function (response) {
+          order.paymentInfo.id = response.razorpay_payment_id;
 
-        toast.success("Order successful!");
-        localStorage.setItem("cartItems", JSON.stringify([]));
-        localStorage.setItem("latestOrder", JSON.stringify([]));
-        navigate("/order/success");
-      },
-      prefill: {
-        name: user?.name,
-        email: user?.email,
-      },
-      theme: {
-        color: "#f63b60",
-      },
-    };
+          await axios.post(`${server}/order/create-order`, order, {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
 
-    const razor = new window.Razorpay(options);
-    razor.open();
-  } catch (error) {
-    toast.error("Payment failed");
-  }
-};
+          toast.success("Order successful!");
+          localStorage.setItem("cartItems", JSON.stringify([]));
+          localStorage.setItem("latestOrder", JSON.stringify([]));
+          navigate("/order/success");
+        },
+        prefill: {
+          name: user?.name,
+          email: user?.email,
+        },
+        theme: {
+          color: "#f63b60",
+        },
+      };
 
-console.log("Sending order:", order);
+      const razor = new window.Razorpay(options);
+      razor.open();
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Payment failed");
+    }
+  };
 
   return (
     <div className="w-full flex flex-col items-center py-8">
@@ -99,7 +106,6 @@ console.log("Sending order:", order);
   );
 };
 
-
 const CartData = ({ orderData }) => {
   const shipping = (orderData?.shipping ?? 0).toFixed(2);
   return (
@@ -116,7 +122,9 @@ const CartData = ({ orderData }) => {
       <br />
       <div className="flex justify-between border-b pb-3">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
-        <h5 className="text-[18px] font-[600]">{orderData?.discountPrice ? "$" + orderData.discountPrice : "-"}</h5>
+        <h5 className="text-[18px] font-[600]">
+          {orderData?.discountPrice ? "$" + orderData.discountPrice : "-"}
+        </h5>
       </div>
       <h5 className="text-[18px] font-[600] text-end pt-3">
         ${orderData?.totalPrice}
