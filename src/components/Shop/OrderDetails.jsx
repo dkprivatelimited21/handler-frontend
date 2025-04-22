@@ -8,12 +8,24 @@ import { server } from "../../server";
 import axios from "axios";
 import { toast } from "react-toastify";
 
+const courierOptions = [
+  { value: "delhivery", label: "Delhivery" },
+  { value: "bluedart", label: "Blue Dart" },
+  { value: "ekart", label: "Ekart" },
+  { value: "ecomExpress", label: "Ecom Express" },
+  { value: "xpressbees", label: "Xpressbees" },
+  { value: "shadowfax", label: "Shadowfax" },
+];
+
+const refundOptions = ["Processing refund", "Refund Success"];
+
 const OrderDetails = () => {
   const { orders } = useSelector((state) => state.order);
   const { seller } = useSelector((state) => state.seller);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { id } = useParams();
+
   const [courier, setCourier] = useState("");
   const [status, setStatus] = useState("");
   const [trackingId, setTrackingId] = useState("");
@@ -161,14 +173,14 @@ const OrderDetails = () => {
       <br /><br />
       <h4 className="text-[20px] font-[600]">Order Status:</h4>
 
-      {["Processing refund", "Refund Success"].includes(order?.status) ? (
+      {refundOptions.includes(order?.status) ? (
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
           className="w-[200px] mt-2 border h-[35px] rounded-[5px]"
         >
-          {["Processing refund", "Refund Success"]
-            .slice(["Processing refund", "Refund Success"].indexOf(order?.status))
+          {refundOptions
+            .slice(refundOptions.indexOf(order?.status))
             .map((option, i) => (
               <option value={option} key={i}>
                 {option}
@@ -176,11 +188,11 @@ const OrderDetails = () => {
             ))}
         </select>
       ) : (
-<h5 className="text-[18px] text-gray-800 mt-2">
-  Current Status: <strong>{order?.status || "Not Shipped"}</strong>
-</h5>
-
         <>
+          <h5 className="text-[18px] text-gray-800 mt-2">
+            Current Status: <strong>{order?.status || "Not Shipped"}</strong>
+          </h5>
+
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
@@ -204,24 +216,25 @@ const OrderDetails = () => {
           {status === "Shipping" && (
             <>
               <div className="mt-2">
-                <label className="text-[16px] font-medium">Select Courier:</label>
+                <label htmlFor="courier" className="text-[16px] font-medium">Select Courier:</label>
                 <select
+                  id="courier"
                   className="border p-2 rounded w-[300px] mt-1"
                   value={courier}
                   onChange={(e) => setCourier(e.target.value)}
                 >
                   <option value="">Select Courier</option>
-                  <option value="delhivery">Delhivery</option>
-                  <option value="bluedart">Blue Dart</option>
-                  <option value="ekart">Ekart</option>
-                  <option value="ecomExpress">Ecom Express</option>
-                  <option value="xpressbees">Xpressbees</option>
-                  <option value="shadowfax">Shadowfax</option>
+                  {courierOptions.map((c, i) => (
+                    <option key={i} value={c.value}>
+                      {c.label}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <input
                 type="text"
+                name="trackingId"
                 placeholder="Enter Tracking ID"
                 className="border p-2 rounded w-[300px] mt-2"
                 value={trackingId}
