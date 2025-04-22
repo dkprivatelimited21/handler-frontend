@@ -22,32 +22,32 @@ const WithdrawMoney = () => {
   }, [dispatch]);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault(); // Prevent default form submission behavior
 
+  if (!upiId) {
+    toast.error("Please enter a valid UPI ID.");
+    return;
+  }
     const withdrawMethod = {
-      upiId: upiId, // Store only UPI ID
-    };
-
-    setPaymentMethod(false);
-
-    await axios
-      .put(
-        `${server}/shop/update-payment-methods`,
-        {
-          withdrawMethod,
-        },
-        { withCredentials: true }
-      )
-      .then((res) => {
-        toast.success("Withdraw method added successfully!");
-        dispatch(loadSeller());
-        setUpiId(""); // Reset the UPI ID field
-      })
-      .catch((error) => {
-        console.log(error.response.data.message);
-      });
+    upiId: upiId, // Store only UPI ID
   };
 
+  setPaymentMethod(false); // Close the payment method section after submitting
+
+  try {
+    const response = await axios.put(
+      `${server}/shop/update-payment-methods`,
+      { withdrawMethod },
+      { withCredentials: true }
+    );
+    toast.success("Withdraw method added successfully!");
+    dispatch(loadSeller());
+    setUpiId(""); // Reset the UPI ID field after successful submission
+  } catch (error) {
+    console.log(error.response?.data?.message || error.message);
+    toast.error("Failed to add UPI method. Please try again.");
+  }
+};
   const deleteHandler = async () => {
     await axios
       .delete(`${server}/shop/delete-withdraw-method`, {
@@ -88,62 +88,41 @@ const WithdrawMoney = () => {
   const serviceCharge = Number((withdrawAmount * taxRate).toFixed(2));
   const finalAmount = Number((withdrawAmount - serviceCharge).toFixed(2));
 
-  return (
-    <div className="w-full h-[90vh] p-8">
-      <div className="w-full bg-white h-full rounded flex items-center justify-center flex-col">
-        <h5 className="text-[20px] pb-4">
-          Available Balance: ₹{availableBalance}
-        </h5>
-        <div
-          className={`${styles.button} text-white !h-[42px] !rounded`}
-          onClick={() => (availableBalance < 50 ? error() : setOpen(true))}
-        >
-          Withdraw
-        </div>
+ 
+return (
+  <div>
+    {paymentMethod ? (
+      <div>
+        <h3 className="text-[22px] font-Poppins text-center font-[600]">
+          Add new Withdraw Method:
+        </h3>
+        <form onSubmit={handleSubmit}> {/* Ensure form submission triggers handleSubmit */}
+          {/* UPI ID form input */}
+          <input
+            type="text"
+            placeholder="Enter UPI ID (e.g., user@upi)"
+            value={upiId || ""}
+            onChange={(e) => setUpiId(e.target.value)}
+            className="w-full border p-2 mt-4 rounded"
+          />
+          <div className="w-full flex items-center">
+            <button
+              type="submit"  // Ensure this button triggers the form submission
+              className={`${styles.button} text-[#fff] text-[18px] mt-4`}
+            >
+              Add UPI Method
+            </button>
+          </div>
+        </form>
       </div>
-      {open && (
-        <div className="w-full h-screen z-[9999] fixed top-0 left-0 flex items-center justify-center bg-[#0000004e]">
-          <div
-            className={`w-[95%] 800px:w-[50%] bg-white shadow rounded ${
-              paymentMethod ? "h-[80vh] overflow-y-scroll" : "h-[unset]"
-            } min-h-[40vh] p-3`}
-          >
-            <div className="w-full flex justify-end">
-              <RxCross1
-                size={25}
-                onClick={() => setOpen(false) || setPaymentMethod(false)}
-                className="cursor-pointer"
-              />
-            </div>
-            {paymentMethod ? (
-              <div>
-                <h3 className="text-[22px] font-Poppins text-center font-[600]">
-                  Add new Withdraw Method:
-                </h3>
-                <form onSubmit={handleSubmit}>
-                  {/* UPI ID form input */}
-                  <input
-                    type="text"
-                    placeholder="Enter UPI ID (e.g., user@upi)"
-                    value={upiId || ""}
-                    onChange={(e) => setUpiId(e.target.value)}
-                    className="w-full border p-2 mt-4 rounded"
-                  />
-                  <div className="w-full flex items-center">
-                    <div
-                      className={`${styles.button} text-[#fff] text-[18px] mt-4`}
-                      type="submit"
-                    >
-                      Add UPI Method
-                    </div>
-                  </div>
-                </form>
-              </div>
-            ) : (
-              <>
-                <h3 className="text-[22px] font-Poppins">
-                  Available Withdraw Methods:
-                </h3>
+    ) : (
+      <>
+        <h3 className="text-[22px] font-Poppins">Available Withdraw Methods:</h3>
+        {/* Your existing UI for displaying current withdraw methods */}
+      </>
+    )}
+  </div>
+);
 
                 {seller && seller?.withdrawMethod ? (
                   <div>
