@@ -15,7 +15,6 @@ const OrderDetails = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [courier, setCourier] = useState("");
-
   const [status, setStatus] = useState("");
   const [trackingId, setTrackingId] = useState("");
 
@@ -27,71 +26,58 @@ const OrderDetails = () => {
 
   const order = orders?.find((item) => item._id === id);
 
+  useEffect(() => {
+    if (order?.status) {
+      setStatus(order.status);
+    } else {
+      setStatus("Not Shipped");
+    }
+  }, [order]);
 
-useEffect(() => {
-  {status === "Shipping" && (
-  <>
-    <div className="mt-2">
-      <label className="text-[16px] font-medium">Select Courier:</label>
-      <select
-        className="border p-2 rounded w-[300px] mt-1"
-        value={courier}
-        onChange={(e) => setCourier(e.target.value)}
-      >
-        <option value="">Select Courier</option>
-        <option value="delhivery">Delhivery</option>
-        <option value="bluedart">Blue Dart</option>
-        <option value="ekart">Ekart</option>
-        <option value="ecomExpress">Ecom Express</option>
-        <option value="xpressbees">Xpressbees</option>
-        <option value="shadowfax">Shadowfax</option>
-      </select>
-    </div>
+  const isValidTrackingId = (id) => {
+    const patterns = {
+      delhivery: /^[0-9]{9,14}$/,
+      bluedart: /^[A-Z0-9]{8,12}$/,
+      ekart: /^FMPC[0-9A-Z]{8,12}$/,
+      ecomExpress: /^[A-Z]{2}[0-9]{9}$/,
+      xpressbees: /^XB[0-9]{9}$/,
+      shadowfax: /^[A-Z0-9]{10,15}$/,
+    };
+    return Object.values(patterns).some((p) => p.test(id));
+  };
 
-    <input
-      type="text"
-      placeholder="Enter Tracking ID"
-      className="border p-2 rounded w-[300px] mt-2"
-      value={trackingId}
-      onChange={(e) => setTrackingId(e.target.value)}
-    />
-  </>
-)}
+  const orderUpdateHandler = async () => {
+    try {
+      if (status === "Shipping") {
+        const trimmedId = trackingId.trim();
+        if (!courier || !trimmedId) {
+          toast.error("Courier and tracking ID are required");
+          return;
+        }
+        if (!isValidTrackingId(trimmedId)) {
+          toast.error("Invalid tracking ID format.");
+          return;
+        }
+      }
 
+      await axios.put(
+        `${server}/order/update-order-status/${id}`,
+        {
+          status,
+          ...(status === "Shipping" && {
+            trackingId: trackingId.trim(),
+            courier,
+          }),
+        },
+        { withCredentials: true }
+      );
 
-const orderUpdateHandler = async () => {
-  if (status === "Shipping") {
-  const trimmedId = trackingId.trim();
-  if (!courier || !trimmedId) {
-    toast.error("Courier and tracking ID are required");
-    return;
-  }
-
-  if (!isValidTrackingId(trimmedId)) {
-    toast.error("Invalid tracking ID format.");
-    return;
-  }
-}
-
-await axios.put(
-  `${server}/order/update-order-status/${id}`,
-  {
-    status,
-    ...(status === "Shipping" && {
-      trackingId: trackingId.trim(),
-      courier,
-    }),
-  },
-  { withCredentials: true }
-);
-
-    toast.success("Order updated!");
-    navigate("/dashboard-orders");
-  } catch (error) {
-    toast.error(error.response?.data?.message || "Update failed");
-  }
-};
-
+      toast.success("Order updated!");
+      navigate("/dashboard-orders");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Update failed");
+    }
+  };
 
   const refundOrderUpdateHandler = async () => {
     try {
@@ -212,15 +198,32 @@ await axios.put(
           </select>
 
           {status === "Shipping" && (
-            <div className="mt-2">
+            <>
+              <div className="mt-2">
+                <label className="text-[16px] font-medium">Select Courier:</label>
+                <select
+                  className="border p-2 rounded w-[300px] mt-1"
+                  value={courier}
+                  onChange={(e) => setCourier(e.target.value)}
+                >
+                  <option value="">Select Courier</option>
+                  <option value="delhivery">Delhivery</option>
+                  <option value="bluedart">Blue Dart</option>
+                  <option value="ekart">Ekart</option>
+                  <option value="ecomExpress">Ecom Express</option>
+                  <option value="xpressbees">Xpressbees</option>
+                  <option value="shadowfax">Shadowfax</option>
+                </select>
+              </div>
+
               <input
                 type="text"
                 placeholder="Enter Tracking ID"
-                className="border p-2 rounded w-[300px]"
+                className="border p-2 rounded w-[300px] mt-2"
                 value={trackingId}
                 onChange={(e) => setTrackingId(e.target.value)}
               />
-            </div>
+            </>
           )}
         </>
       )}
