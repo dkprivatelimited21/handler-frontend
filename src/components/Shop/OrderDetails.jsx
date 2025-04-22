@@ -176,6 +176,10 @@ const OrderDetails = () => {
             ))}
         </select>
       ) : (
+<h5 className="text-[18px] text-gray-800 mt-2">
+  Current Status: <strong>{order?.status || "Not Shipped"}</strong>
+</h5>
+
         <>
           <select
             value={status}
