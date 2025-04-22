@@ -13,18 +13,8 @@ const WithdrawMoney = () => {
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
   const { seller } = useSelector((state) => state.seller);
-  const [paymentMethod, setPaymentMethod] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState(50);
-  const [bankInfo, setBankInfo] = useState({
-  bankName: "",
-  bankCountry: "",
-  bankSwiftCode: "",
-  bankAccountNumber: "",
-  bankHolderName: "",
-  bankAddress: "",
-  upiId: "",
-});
-
+  const [upiId, setUpiId] = useState(""); // Only UPI ID for withdraw method
 
   useEffect(() => {
     dispatch(getAllOrdersOfShop(seller?._id));
@@ -33,16 +23,9 @@ const WithdrawMoney = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-   const withdrawMethod = {
-  bankName: bankInfo.bankName,
-  bankCountry: bankInfo.bankCountry,
-  bankSwiftCode: bankInfo.bankSwiftCode,
-  bankAccountNumber: bankInfo.bankAccountNumber,
-  bankHolderName: bankInfo.bankHolderName,
-  bankAddress: bankInfo.bankAddress,
-  upiId: bankInfo.upiId,
-};
-
+    const withdrawMethod = {
+      upiId: upiId, // Store only UPI ID
+    };
 
     setPaymentMethod(false);
 
@@ -57,14 +40,7 @@ const WithdrawMoney = () => {
       .then((res) => {
         toast.success("Withdraw method added successfully!");
         dispatch(loadSeller());
-        setBankInfo({
-          bankName: "",
-          bankCountry: "",
-          bankSwiftCode: null,
-          bankAccountNumber: null,
-          bankHolderName: "",
-          bankAddress: "",
-        });
+        setUpiId(""); // Reset the UPI ID field
       })
       .catch((error) => {
         console.log(error.response.data.message);
@@ -83,7 +59,7 @@ const WithdrawMoney = () => {
   };
 
   const error = () => {
-    toast.error("You not have enough balance to withdraw!");
+    toast.error("You do not have enough balance to withdraw!");
   };
 
   const withdrawHandler = async () => {
@@ -144,7 +120,22 @@ const WithdrawMoney = () => {
                   Add new Withdraw Method:
                 </h3>
                 <form onSubmit={handleSubmit}>
-                  {/* form fields */}
+                  {/* UPI ID form input */}
+                  <input
+                    type="text"
+                    placeholder="Enter UPI ID (e.g., user@upi)"
+                    value={upiId || ""}
+                    onChange={(e) => setUpiId(e.target.value)}
+                    className="w-full border p-2 mt-4 rounded"
+                  />
+                  <div className="w-full flex items-center">
+                    <div
+                      className={`${styles.button} text-[#fff] text-[18px] mt-4`}
+                      type="submit"
+                    >
+                      Add UPI Method
+                    </div>
+                  </div>
                 </form>
               </div>
             ) : (
@@ -157,13 +148,7 @@ const WithdrawMoney = () => {
                   <div>
                     <div className="800px:flex w-full justify-between items-center">
                       <div className="800px:w-[50%]">
-                        <h5>
-                          Account Number: {"*".repeat(
-                            seller?.withdrawMethod.bankAccountNumber.length - 3
-                          ) +
-                            seller?.withdrawMethod.bankAccountNumber.slice(-3)}
-                        </h5>
-                        <h5>Bank Name: {seller?.withdrawMethod.bankName}</h5>
+                        <h5>UPI ID: {seller?.withdrawMethod.upiId}</h5>
                       </div>
                       <div className="800px:w-[50%]">
                         <AiOutlineDelete
@@ -205,20 +190,12 @@ const WithdrawMoney = () => {
                   </div>
                 ) : (
                   <div>
-                    <input
-  type="text"
-  placeholder="Enter UPI ID (e.g., user@upi)"
-  value={bankInfo.upiId || ""}
-  onChange={(e) => setBankInfo({ ...bankInfo, upiId: e.target.value })}
-  className="w-full border p-2 mt-4 rounded"
-/>
-
                     <div className="w-full flex items-center">
                       <div
                         className={`${styles.button} text-[#fff] text-[18px] mt-4`}
                         onClick={() => setPaymentMethod(true)}
                       >
-                        Add new
+                        Add UPI Method
                       </div>
                     </div>
                   </div>
