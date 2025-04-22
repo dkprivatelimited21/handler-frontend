@@ -5,11 +5,15 @@ import { useNavigate } from "react-router-dom";
 import { createProduct } from "../../redux/actions/product";
 import { categoriesData } from "../../static/data";
 import { toast } from "react-toastify";
+import imageCompression from "browser-image-compression"; // Import the compression library
 
 const categorySizeMap = {
   "Shirts - Men": ["S", "M", "L", "XL", "XXL"],
   "Pants - Men": ["28", "30", "32", "34", "36", "38"],
   "Shoes - Men": ["6", "7", "8", "9", "10", "11"],
+  "Shirts - Women": ["S", "M", "L", "XL", "XXL"],
+  "Pants - Women": ["28", "30", "32", "34", "36", "38"],
+  "Shoes - Women": ["6", "7", "8", "9", "10", "11"],
   "Sarees": [],
 };
 
@@ -47,56 +51,70 @@ const CreateProduct = () => {
     }
   }, [dispatch, error, success]);
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const files = Array.from(e.target.files);
-    setImages([]);
+    setImages([]); // Clear existing images in the state
 
-    files.forEach((file) => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (reader.readyState === 2) {
-          setImages((old) => [...old, reader.result]);
-        }
-      };
-      reader.readAsDataURL(file);
-    });
+    // Set up the options for the compression (you can adjust the maxSizeMB and maxWidthOrHeight based on your needs)
+    const options = {
+      maxSizeMB: 1, // Max file size in MB
+      maxWidthOrHeight: 800, // Max width or height of the image
+      useWebWorker: true, // Enable web worker for compression
+    };
+
+    // Loop through each file and compress it
+    for (const file of files) {
+      try {
+        const compressedFile = await imageCompression(file, options);
+
+        // Create a FileReader to preview the compressed image
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (reader.readyState === 2) {
+            setImages((old) => [...old, reader.result]); // Add compressed image to state
+          }
+        };
+        reader.readAsDataURL(compressedFile); // Read the compressed file
+      } catch (error) {
+        console.error("Error compressing the image", error);
+      }
+    }
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!seller?._id) {
-    toast.error("Seller information not loaded.");
-    return;
-  }
+    if (!seller?._id) {
+      toast.error("Seller information not loaded.");
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    await dispatch(
-      createProduct({
-        name,
-        description,
-        category,
-        tags,
-        originalPrice,
-        discountPrice,
-        stock,
-        shopId: seller._id,
-        images,
-        ...(hasSizeOptions && {
-          sizes: selectedSizes,
-          colors: selectedColors,
-        }),
-      })
-    );
-  } catch (err) {
-    toast.error("Failed to create product");
-  } finally {
-    setLoading(false);
-  }
-};
-
+    try {
+      await dispatch(
+        createProduct({
+          name,
+          description,
+          category,
+          tags,
+          originalPrice,
+          discountPrice,
+          stock,
+          shopId: seller._id,
+          images,
+          ...(hasSizeOptions && {
+            sizes: selectedSizes,
+            colors: selectedColors,
+          }),
+        })
+      );
+    } catch (err) {
+      toast.error("Failed to create product");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="w-[90%] 800px:w-[50%] bg-white shadow h-[80vh] rounded-[4px] p-3 overflow-y-scroll">
@@ -265,40 +283,38 @@ const handleSubmit = async (e) => {
               ))}
           </div>
           <br />
-         <button
-  type="submit"
-  disabled={loading}
-  className={`mt-2 text-center block w-full h-[40px] px-3 border border-gray-300 rounded-[3px] text-white font-medium ${
-    loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-  }`}
->
-  {loading ? (
-    <svg
-      className="animate-spin h-5 w-5 mx-auto text-white"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-      />
-    </svg>
-  ) : (
-    "Create"
-  )}
-</button>
-
-
+          <button
+            type="submit"
+            disabled={loading}
+            className={`mt-2 text-center block w-full h-[40px] px-3 border border-gray-300 rounded-[3px] text-white font-medium ${
+              loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+            }`}
+          >
+            {loading ? (
+              <svg
+                className="animate-spin h-5 w-5 mx-auto text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                />
+              </svg>
+            ) : (
+              "Create"
+            )}
+          </button>
         </div>
       </form>
     </div>

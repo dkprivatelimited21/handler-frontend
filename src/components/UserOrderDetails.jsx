@@ -5,8 +5,6 @@ import { useDispatch, useSelector } from "react-redux";
 import styles from "../styles/styles";
 import { getAllOrdersOfUser } from "../redux/actions/order";
 import { server } from "../server";
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import { toast } from "react-toastify";
 
 const UserOrderDetails = () => {
@@ -27,18 +25,6 @@ const UserOrderDetails = () => {
       setData(found);
     }
   }, [orders, id]);
-
-  const downloadInvoice = async () => {
-    const invoice = document.getElementById("invoice-section");
-    const canvas = await html2canvas(invoice, { scale: 2 });
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF("p", "mm", "a4");
-    const imgProps = pdf.getImageProperties(imgData);
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-    pdf.save(`invoice_${data?._id}.pdf`);
-  };
 
   const getTrackingLink = (courier, trackingId) => {
     const links = {
@@ -74,12 +60,16 @@ const UserOrderDetails = () => {
         <br />
         <br />
 
-        {data &&
-          data?.cart?.map((item, index) => (
+        {Array.isArray(data?.cart) &&
+          data.cart.map((item, index) => (
             <div className="w-full flex items-start mb-5" key={index}>
               <img
-                src={item.image || item.images?.[0]?.url}
-                alt=""
+                src={item.image || item.images?.[0]?.url || "/default-product.png"}
+                alt={item.name || "Product"}
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/default-product.png";
+                }}
                 className="w-[80px] h-[80px] object-cover"
               />
               <div className="w-full">
@@ -146,19 +136,13 @@ const UserOrderDetails = () => {
               target="_blank"
               rel="noreferrer"
               className="text-blue-600 underline mt-2 inline-block"
+              title="Click to track your shipment"
             >
               Track Your Order
             </a>
           </div>
         )}
       </div>
-
-      <button
-        onClick={downloadInvoice}
-        className="mt-6 px-6 py-2 rounded bg-green-600 text-white hover:bg-green-700"
-      >
-        Download PDF Invoice
-      </button>
     </div>
   );
 };

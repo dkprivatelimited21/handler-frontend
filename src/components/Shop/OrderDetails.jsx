@@ -46,17 +46,30 @@ const OrderDetails = () => {
     }
   }, [order]);
 
-  const isValidTrackingId = (id) => {
-    const patterns = {
-      delhivery: /^[0-9]{9,14}$/,
-      bluedart: /^[A-Z0-9]{8,12}$/,
-      ekart: /^FMPC[0-9A-Z]{8,12}$/,
-      ecomExpress: /^[A-Z]{2}[0-9]{9}$/,
-      xpressbees: /^XB[0-9]{9}$/,
-      shadowfax: /^[A-Z0-9]{10,15}$/,
-    };
-    return Object.values(patterns).some((p) => p.test(id));
+ const isValidTrackingId = (id) => {
+  const patterns = {
+    delhivery: /^[0-9]{9,14}$/,
+    bluedart: /^[A-Z0-9]{8,12}$/,
+    ekart: /^FMPC[0-9A-Z]{8,12}$/,
+    ecomExpress: /^[A-Z]{2}[0-9]{9}$/,
+    xpressbees: /^XB[0-9]{9}$/,
+    shadowfax: /^[A-Z0-9]{10,15}$/,
   };
+
+  const isMatchingPattern = Object.values(patterns).some((pattern) => pattern.test(id));
+
+  const isRepeated = /^([A-Za-z0-9])\1+$/.test(id); // all characters same
+
+  const sequentialPatterns = [
+    "123456789", "987654321",
+    "0123456789", "9876543210",
+  ];
+
+  const isSequential = sequentialPatterns.includes(id);
+
+  return isMatchingPattern && !isRepeated && !isSequential;
+};
+
 
   const orderUpdateHandler = async () => {
     try {
@@ -132,8 +145,9 @@ const OrderDetails = () => {
       {order?.cart?.map((item, idx) => (
         <div className="w-full flex items-start mb-5" key={idx}>
           <img
-            src={item?.image || item?.images?.[0]?.url || ""}
-            alt=""
+            src={item?.image || item?.images?.[0]?.url || "/default-product.png"}
+            alt={item?.name || "Product"}
+            onError={(e) => (e.target.src = "/default-product.png")}
             className="w-[80px] h-[80px] object-cover"
           />
           <div className="w-full">
@@ -189,16 +203,11 @@ const OrderDetails = () => {
         </select>
       ) : (
         <>
-          <h5 className="text-[18px] text-gray-800 mt-2">
-            Current Status: <strong>{order?.status || "Not Shipped"}</strong>
-          </h5>
-
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="w-[250px] mt-2 border h-[35px] rounded-[5px]"
-          >
-            {[
+          {(() => {
+            const orderDate = new Date(order?.updatedAt || order?.createdAt);
+            const now = new Date();
+            const daysSinceShipping = Math.floor((now - orderDate) / (1000 * 60 * 60 * 24));
+            let allowedStatusOptions = [
               "Not Shipped",
               "Processing",
               "Transferred to delivery partner",
@@ -206,12 +215,32 @@ const OrderDetails = () => {
               "Received",
               "On the way",
               "Delivered",
-            ].map((option, i) => (
-              <option key={i} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
+            ];
+
+            if (order?.status === "Shipping" && daysSinceShipping < 7) {
+              allowedStatusOptions = ["Delivered"];
+            }
+
+            return (
+              <>
+                <h5 className="text-[18px] text-gray-800 mt-2">
+                  Current Status: <strong>{order?.status || "Not Shipped"}</strong>
+                </h5>
+
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="w-[250px] mt-2 border h-[35px] rounded-[5px]"
+                >
+                  {allowedStatusOptions.map((option, i) => (
+                    <option key={i} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </>
+            );
+          })()}
 
           {status === "Shipping" && (
             <>
@@ -255,6 +284,14 @@ const OrderDetails = () => {
       >
         Update Status
       </div>
+
+      <a
+        href={`${server}/order/invoice/${order?._id}`}
+        className={`${styles.button} mt-5 bg-green-500 text-white font-[600] h-[45px] text-[18px] flex items-center justify-center`}
+        download
+      >
+        Download Invoice PDF
+      </a>
     </div>
   );
 };

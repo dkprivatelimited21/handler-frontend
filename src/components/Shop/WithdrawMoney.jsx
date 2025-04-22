@@ -16,13 +16,15 @@ const WithdrawMoney = () => {
   const [paymentMethod, setPaymentMethod] = useState(false);
   const [withdrawAmount, setWithdrawAmount] = useState(50);
   const [bankInfo, setBankInfo] = useState({
-    bankName: "",
-    bankCountry: "",
-    bankSwiftCode: null,
-    bankAccountNumber: null,
-    bankHolderName: "",
-    bankAddress: "",
-  });
+  bankName: "",
+  bankCountry: "",
+  bankSwiftCode: "",
+  bankAccountNumber: "",
+  bankHolderName: "",
+  bankAddress: "",
+  upiId: "",
+});
+
 
   useEffect(() => {
     dispatch(getAllOrdersOfShop(seller?._id));
@@ -31,14 +33,16 @@ const WithdrawMoney = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const withdrawMethod = {
-      bankName: bankInfo.bankName,
-      bankCountry: bankInfo.bankCountry,
-      bankSwiftCode: bankInfo.bankSwiftCode,
-      bankAccountNumber: bankInfo.bankAccountNumber,
-      bankHolderName: bankInfo.bankHolderName,
-      bankAddress: bankInfo.bankAddress,
-    };
+   const withdrawMethod = {
+  bankName: bankInfo.bankName,
+  bankCountry: bankInfo.bankCountry,
+  bankSwiftCode: bankInfo.bankSwiftCode,
+  bankAccountNumber: bankInfo.bankAccountNumber,
+  bankHolderName: bankInfo.bankHolderName,
+  bankAddress: bankInfo.bankAddress,
+  upiId: bankInfo.upiId,
+};
+
 
     setPaymentMethod(false);
 
@@ -201,9 +205,14 @@ const WithdrawMoney = () => {
                   </div>
                 ) : (
                   <div>
-                    <p className="text-[18px] pt-2">
-                      No Withdraw Methods available!
-                    </p>
+                    <input
+  type="text"
+  placeholder="Enter UPI ID (e.g., user@upi)"
+  value={bankInfo.upiId || ""}
+  onChange={(e) => setBankInfo({ ...bankInfo, upiId: e.target.value })}
+  className="w-full border p-2 mt-4 rounded"
+/>
+
                     <div className="w-full flex items-center">
                       <div
                         className={`${styles.button} text-[#fff] text-[18px] mt-4`}

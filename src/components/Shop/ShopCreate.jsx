@@ -13,54 +13,39 @@ const ShopCreate = () => {
   const [phoneNumber, setPhoneNumber] = useState();
   const [address, setAddress] = useState("");
   const [zipCode, setZipCode] = useState();
-  const [avatar, setAvatar] = useState();
+  const [avatar, setAvatar] = useState("https://example.com/default-avatar.png"); // Default avatar image
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true); // show spinner
+    e.preventDefault();
+    setLoading(true); // show spinner
 
-  axios
-    .post(`${server}/shop/create-shop`, {
-      name,
-      email,
-      password,
-      avatar,
-      zipCode,
-      address,
-      phoneNumber,
-    })
-    .then((res) => {
-      toast.success(res.data.message);
-      setName("");
-      setEmail("");
-      setPassword("");
-      setAvatar();
-      setZipCode();
-      setAddress("");
-      setPhoneNumber();
-    })
-    .catch((error) => {
-      toast.error(error.response?.data?.message || "Something went wrong");
-    })
-    .finally(() => setLoading(false)); // hide spinner
-};
-
-
-
-
-  const handleFileInputChange = (e) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      if (reader.readyState === 2) {
-        setAvatar(reader.result);
-      }
-    };
-
-    reader.readAsDataURL(e.target.files[0]);
+    axios
+      .post(`${server}/shop/create-shop`, {
+        name,
+        email,
+        password,
+        avatar,
+        zipCode,
+        address,
+        phoneNumber,
+      })
+      .then((res) => {
+        toast.success(res.data.message);
+        setName("");
+        setEmail("");
+        setPassword("");
+        setAvatar("https://example.com/default-avatar.png"); // Reset to default avatar
+        setZipCode();
+        setAddress("");
+        setPhoneNumber();
+      })
+      .catch((error) => {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      })
+      .finally(() => setLoading(false)); // hide spinner
   };
 
   return (
@@ -209,66 +194,48 @@ const ShopCreate = () => {
               ></label>
               <div className="mt-2 flex items-center">
                 <span className="inline-block h-8 w-8 rounded-full overflow-hidden">
-                  {avatar ? (
-                    <img
-                      src={avatar}
-                      alt="avatar"
-                      className="h-full w-full object-cover rounded-full"
-                    />
-                  ) : (
-                    <RxAvatar className="h-8 w-8" />
-                  )}
-                </span>
-                <label
-                  htmlFor="file-input"
-                  className="ml-5 flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  <span>Upload a file</span>
-                  <input
-                    type="file"
-                    name="avatar"
-                    id="file-input"
-                    onChange={handleFileInputChange}
-                    className="sr-only"
+                  <img
+                    src={avatar}
+                    alt="avatar"
+                    className="h-full w-full object-cover rounded-full"
                   />
-                </label>
+                </span>
               </div>
             </div>
 
             <div>
-             <button
-  type="submit"
-  disabled={loading}
-  className={`group relative w-full h-[40px] flex justify-center items-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
-    loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-  }`}
->
-  {loading ? (
-    <svg
-      className="animate-spin h-5 w-5 text-white"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-    >
-      <circle
-        className="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        strokeWidth="4"
-      />
-      <path
-        className="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-      />
-    </svg>
-  ) : (
-    "Submit"
-  )}
-</button>
-
+              <button
+                type="submit"
+                disabled={loading}
+                className={`group relative w-full h-[40px] flex justify-center items-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white ${
+                  loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+                }`}
+              >
+                {loading ? (
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                ) : (
+                  "Submit"
+                )}
+              </button>
             </div>
             <div className={`${styles.noramlFlex} w-full`}>
               <h4>Already have an account?</h4>

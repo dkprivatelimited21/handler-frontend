@@ -11,8 +11,8 @@ import { toast } from "react-toastify";
 const AllWithdraw = () => {
   const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
-  const [withdrawData, setWithdrawData] = useState();
-  const [withdrawStatus,setWithdrawStatus] = useState('Processing');
+  const [withdrawData, setWithdrawData] = useState(null);
+  const [withdrawStatus, setWithdrawStatus] = useState("Processing");
 
   useEffect(() => {
     axios
@@ -49,14 +49,14 @@ const AllWithdraw = () => {
     },
     {
       field: "status",
-      headerName: "status",
+      headerName: "Status",
       type: "text",
       minWidth: 80,
       flex: 0.5,
     },
     {
       field: "createdAt",
-      headerName: "Request given at",
+      headerName: "Request Given At",
       type: "number",
       minWidth: 130,
       flex: 0.6,
@@ -68,12 +68,17 @@ const AllWithdraw = () => {
       minWidth: 130,
       flex: 0.6,
       renderCell: (params) => {
-
         return (
           <BsPencil
             size={20}
-            className={`${params.row.status !== "Processing" ? 'hidden' : '' } mr-5 cursor-pointer`}
-            onClick={() => setOpen(true) || setWithdrawData(params.row)}
+            className={`${
+              params.row.status !== "Processing" ? "hidden" : ""
+            } mr-5 cursor-pointer`}
+            onClick={() => {
+              setWithdrawData(params.row);
+              setWithdrawStatus(params.row.status); // Set status when modal opens
+              setOpen(true);
+            }}
           />
         );
       },
@@ -81,15 +86,41 @@ const AllWithdraw = () => {
   ];
 
   const handleSubmit = async () => {
-    await axios
-      .put(`${server}/withdraw/update-withdraw-request/${withdrawData.id}`,{
-        sellerId: withdrawData.shopId,
-      },{withCredentials: true})
-      .then((res) => {
-        toast.success("Withdraw request updated successfully!");
-        setData(res.data.withdraws);
-        setOpen(false);
-      });
+    try {
+      const response = await axios.put(
+        `${server}/withdraw/update-withdraw-request/${withdrawData.id}`,
+        {
+          sellerId: withdrawData.shopId,
+          status: withdrawStatus, // Pass updated status
+        },
+        { withCredentials: true }
+      );
+
+      toast.success("Withdraw request updated successfully!");
+
+      // Optimistically update the state
+      setData((prevData) =>
+        prevData.map((item) =>
+          item._id === withdrawData.id
+            ? { ...item, status: withdrawStatus }
+            : item
+        )
+      );
+
+      // If the status is 'Succeed', automatically generate and open the UPI payout link
+      if (withdrawStatus === "Succeed" && withdrawData?.withdrawMethod?.upiId) {
+        const upiLink = `upi://pay?pa=${withdrawData.withdrawMethod.upiId}&pn=${withdrawData.seller.name}&cu=INR&am=${withdrawData.amount}`;
+        // Optionally, you can auto-open the UPI payment link
+        window.open(upiLink, "_blank");
+
+        toast.success("UPI Payment Link generated successfully!");
+      }
+
+      setOpen(false);
+    } catch (error) {
+      console.log(error.response.data.message);
+      toast.error("Failed to update withdraw request");
+    }
   };
 
   const row = [];
@@ -105,6 +136,7 @@ const AllWithdraw = () => {
         createdAt: item.createdAt.slice(0, 10),
       });
     });
+
   return (
     <div className="w-full flex items-center pt-5 justify-center">
       <div className="w-[95%] bg-white">
@@ -116,6 +148,7 @@ const AllWithdraw = () => {
           autoHeight
         />
       </div>
+
       {open && (
         <div className="w-full fixed h-screen top-0 left-0 bg-[#00000031] z-[9999] flex items-center justify-center">
           <div className="w-[50%] min-h-[40vh] bg-white rounded shadow p-4">
@@ -123,17 +156,18 @@ const AllWithdraw = () => {
               <RxCross1 size={25} onClick={() => setOpen(false)} />
             </div>
             <h1 className="text-[25px] text-center font-Poppins">
-              Update Withdraw status
+              Update Withdraw Status
             </h1>
             <br />
             <select
               name=""
               id=""
+              value={withdrawStatus}
               onChange={(e) => setWithdrawStatus(e.target.value)}
               className="w-[200px] h-[35px] border rounded"
             >
-              <option value={withdrawStatus}>{withdrawData.status}</option>
-              <option value={withdrawStatus}>Succeed</option>
+              <option value="Processing">Processing</option>
+              <option value="Succeed">Succeed</option>
             </select>
             <button
               type="submit"
