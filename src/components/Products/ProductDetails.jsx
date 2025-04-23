@@ -1,222 +1,230 @@
-// ProductDetails.jsx - Reviews restricted to buyers only
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { addTocart } from "../../redux/actions/cart";
-import { server } from '../../server';
-import { toast } from 'react-toastify';
-import Loader from '../Layout/Loader';
-import Ratings from '../Products/Ratings';
+import React, { useEffect, useState } from "react";
 import {
   AiFillHeart,
-  AiOutlineHeart,} from "react-icons/ai";
+  AiOutlineHeart,
+  AiOutlineShoppingCart,
+} from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { getAllProductsShop } from "../../redux/actions/product";
+import { server } from "../../server";
 import styles from "../../styles/styles";
+import {
+  addToWishlist,
+  removeFromWishlist,
+} from "../../redux/actions/wishlist";
+import { addTocart } from "../../redux/actions/cart";
+import { toast } from "react-toastify";
+import Ratings from "./Ratings";
+import axios from "axios";
 
-
-const ProductDetails = () => {
-  const { id } = useParams();
-  const [data, setData] = useState(null);
-  const [selectedSize, setSelectedSize] = useState(null);
-  const [selectedColor, setSelectedColor] = useState(null);
-  const [quantity, setQuantity] = useState(1);
-  const [reviews, setReviews] = useState([]);
-  const [newReview, setNewReview] = useState('');
-  const [canReview, setCanReview] = useState(false);
-  const { cart, user } = useSelector((state) => ({
-    cart: state.cart.cart,
-    user: state.user.user,
-  }));
+const ProductDetails = ({ data }) => {
+  const [count, setCount] = useState(1);
+  const { wishlist } = useSelector((state) => state.wishlist);
+  const { cart } = useSelector((state) => state.cart);
+  const { user, isAuthenticated } = useSelector((state) => state.user);
+  const { products } = useSelector((state) => state.products);
+  const [count, setCount] = useState(1);
+  const [click, setClick] = useState(false);
+  const [select, setSelect] = useState(0);
+  const [selectedColor, setSelectedColor] = useState(""); // Added for color
+  const [selectedSize, setSelectedSize] = useState(""); // Added for size
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    axios.get(`${server}/product/${id}`).then((res) => {
-      setData(res.data.product);
-      setReviews(res.data.product.reviews || []);
-    });
-
-    // Check if user has bought the product
-    if (user?._id) {
-      axios
-        .get(`${server}/order/user/${user._id}`)
-        .then((res) => {
-          const hasBought = res.data.orders.some((order) =>
-            order.cart.some((item) => item._id === id)
-          );
-          setCanReview(hasBought);
-        })
-        .catch(() => setCanReview(false));
+    dispatch(getAllProductsShop(data && data?.shop._id));
+    if (wishlist && wishlist.find((i) => i._id === data?._id)) {
+      setClick(true);
+    } else {
+      setClick(false);
     }
-  }, [id, user]);
+  }, [data, wishlist]);
 
-  const handleAddToCart = () => {
+  const incrementCount = () => {
+    setCount(count + 1);
+  };
+
+  const decrementCount = () => {
+    if (count > 1) {
+      setCount(count - 1);
+    }
+  };
+
+  const removeFromWishlistHandler = (data) => {
+    setClick(!click);
+    dispatch(removeFromWishlist(data));
+  };
+
+  const addToWishlistHandler = (data) => {
+    setClick(!click);
+    dispatch(addToWishlist(data));
+  };
+
+  const addToCartHandler = (id) => {
     if (!selectedSize || !selectedColor) {
-      toast.error('Please select size and color');
+      toast.error("Please select both size and color.");
       return;
     }
-
     const isItemExists = cart && cart.find((i) => i._id === id);
     if (isItemExists) {
-      toast.error('Item already in cart');
+      toast.error("Item already in cart!");
     } else {
-      const cartData = {
-        ...data,
-        qty: quantity,
-        selectedSize,
-        selectedColor,
-      };
-      dispatch(addToCart(cartData));
-      toast.success('Item added to cart');
+      if (data.stock < 1) {
+        toast.error("Product stock limited!");
+      } else {
+        const cartData = {
+          ...data,
+          qty: count,
+          selectedSize,
+          selectedColor,
+          shopId: data.shop?._id || "", 
+        };
+        dispatch(addTocart(cartData));
+        toast.success("Item added to cart successfully!");
+      }
     }
   };
 
-  const handleAddToWishlist = () => {
-    toast.success('Added to wishlist');
-  };
-
-  const handleReviewSubmit = () => {
-    if (!newReview) return;
-    setReviews((prev) => [...prev, { comment: newReview, date: new Date().toDateString() }]);
-    setNewReview('');
-    toast.success('Review submitted');
-  };
-
-  const incrementQuantity = () => {
-    if (data.stock <= quantity) {
-      toast.error('Product stock limited!');
-    } else {
-      setQuantity(quantity + 1);
+  const buyNowHandler = (id) => {
+    if (!selectedSize || !selectedColor) {
+      toast.error("Please select both size and color.");
+      return;
     }
+    // Navigate to checkout or directly proceed with the purchase
+    navigate("/checkout"); // Example: Redirect to checkout page
   };
 
-  const decrementQuantity = () => {
-    if (quantity > 1) {
-      setQuantity(quantity - 1);
-    }
-  };
+  const totalReviewsLength =
+    products &&
+    products.reduce((acc, product) => acc + product.reviews.length, 0);
 
-  const getEstimatedDeliveryDate = () => {
+  const totalRatings =
+    products &&
+    products.reduce(
+      (acc, product) =>
+        acc + product.reviews.reduce((sum, review) => sum + review.rating, 0),
+      0
+    );
+
+  const avg = totalRatings / totalReviewsLength || 0;
+
+  const averageRating = avg.toFixed(2);
+
+
+const calculateDeliveryDate = () => {
     const today = new Date();
-    const estimatedDate = new Date(today.setDate(today.getDate() + 7));
-    return estimatedDate.toDateString();
+    const minDays = 7;
+    const maxDays = 9;
+    const deliveryDate = new Date(
+      today.setDate(today.getDate() + Math.floor(Math.random() * (maxDays - minDays + 1)) + minDays)
+    );
+    return deliveryDate.toLocaleDateString(); // Format the date
   };
+
+  const estimatedDeliveryDate = calculateDeliveryDate();
+
+
 
   return (
-    <div className="w-full py-5">
+    <div className="bg-white">
       {data ? (
-        <div className="w-[90%] md:w-[80%] m-auto block md:flex">
-          <div className="w-full md:w-[50%]">
-            <img
-              src={`${server}${data.images && data.images[0]}`}
-              alt=""
-              className="w-[100%]"
-            />
-            <div className="flex items-center gap-2 mt-4">
-              {data.sizes?.map((size, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedSize(size)}
-                  className={`border px-3 py-1 rounded ${
-                    selectedSize === size ? 'bg-black text-white' : 'bg-white'
-                  }`}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-            <div className="flex items-center gap-2 mt-2">
-              {data.colors?.map((color, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedColor(color)}
-                  className={`border px-3 py-1 rounded ${
-                    selectedColor === color ? 'bg-black text-white' : 'bg-white'
-                  }`}
-                >
-                  {color}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="w-full md:w-[50%] md:pl-10">
-            <h1 className="text-2xl font-semibold flex items-center justify-between">
-              {data.name}
-              <button onClick={handleAddToWishlist} title="Add to Wishlist">
-                <Heart className="w-6 h-6 text-gray-600 hover:text-red-500" />
-              </button>
-            </h1>
-            <p className="mt-2 text-gray-700">{data.description}</p>
-            <div className="mt-3">
-              <Ratings rating={data.ratings} />
-            </div>
-            <h4 className="mt-4 text-xl font-bold text-red-600">
-              ₹{data.discountPrice}
-            </h4>
-            <h5 className="line-through text-gray-500">
-              ₹{data.originalPrice}
-            </h5>
-
-            <div className="flex items-center mt-4">
-              <button onClick={decrementQuantity} className="border px-3 py-1">-</button>
-              <span className="mx-4">{quantity}</span>
-              <button onClick={incrementQuantity} className="border px-3 py-1">+</button>
-            </div>
-
-            <button
-              onClick={handleAddToCart}
-              className="mt-6 px-6 py-2 bg-black text-white rounded"
-            >
-              Add to Cart
-            </button>
-
-            <div className="mt-4">
-              <p className="text-sm text-gray-500">
-                Category: <span className="text-black">{data.category}</span>
-              </p>
-              <p className="text-sm text-gray-500">
-                Stock: <span className="text-black">{data.stock}</span>
-              </p>
-              <p className="text-sm text-green-700 mt-2">
-                Estimated Delivery: <span className="font-semibold">{getEstimatedDeliveryDate()}</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <Loader />
-      )}
-
-      {/* Reviews Section */}
-      {data && (
-        <div className="w-[90%] md:w-[80%] m-auto mt-10">
-          <h2 className="text-xl font-semibold mb-4">Customer Reviews</h2>
-          <div className="space-y-3">
-            {reviews.length === 0 && <p className="text-gray-500">No reviews yet.</p>}
-            {reviews.map((review, index) => (
-              <div key={index} className="border p-3 rounded">
-                <p>{review.comment}</p>
-                <span className="text-xs text-gray-400">{review.date}</span>
+        <div className={`${styles.section} w-[90%] 800px:w-[80%]`}>
+          <div className="w-full py-5">
+            <div className="block w-full 800px:flex">
+              <div className="w-full 800px:w-[50%]">
+                <img
+                  src={`${data && data.images[select]?.url}`}
+                  alt=""
+                  className="w-[80%]"
+                />
+                <div className="w-full flex">
+                  {data &&
+                    data.images.map((i, index) => (
+                      <div
+                        className={`${
+                          select === 0 ? "border" : "null"
+                        } cursor-pointer`}
+                      >
+                        <img
+                          src={`${i?.url}`}
+                          alt=""
+                          className="h-[200px] overflow-hidden mr-3 mt-3"
+                          onClick={() => setSelect(index)}
+                        />
+                      </div>
+                    ))}
+                </div>
               </div>
-            ))}
-          </div>
+              <div className="w-full 800px:w-[50%] pt-5">
+                <h1 className={`${styles.productTitle}`}>{data.name}</h1>
+                <p>{data.description}</p>
+                <div className="flex pt-3">
+                  <h4 className={`${styles.productDiscountPrice}`}>
+                    {data.discountPrice}$
+                  </h4>
+                  <h3 className={`${styles.price}`}>
+                    {data.originalPrice ? data.originalPrice + "$" : null}
+                  </h3>
+                </div>
 
-          {canReview && (
-            <div className="mt-4">
-              <textarea
-                value={newReview}
-                onChange={(e) => setNewReview(e.target.value)}
-                className="w-full p-2 border rounded"
-                placeholder="Write your review here..."
-              ></textarea>
-              <button
-                onClick={handleReviewSubmit}
-                className="mt-2 px-4 py-1 bg-black text-white rounded"
-              >
-                Submit Review
-              </button>
+                <div className="flex items-center mt-12 justify-between pr-3">
+                  <div>
+                    <button
+                      className="bg-gradient-to-r from-teal-400 to-teal-500 text-white font-bold rounded-l px-4 py-2 shadow-lg hover:opacity-75 transition duration-300 ease-in-out"
+                      onClick={decrementCount}
+                    >
+                      -
+                    </button>
+                    <span className="bg-gray-200 text-gray-800 font-medium px-4 py-[11px]">
+                      {count}
+                    </span>
+                    <button
+                      className="bg-gradient-to-r from-teal-400 to-teal-500 text-white font-bold rounded-l px-4 py-2 shadow-lg hover:opacity-75 transition duration-300 ease-in-out"
+                      onClick={incrementCount}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div>
+                    {click ? (
+                      <AiFillHeart
+                        size={30}
+                        className="cursor-pointer"
+                        onClick={() => removeFromWishlistHandler(data)}
+                        color={click ? "red" : "#333"}
+                        title="Remove from wishlist"
+                      />
+                    ) : (
+                      <AiOutlineHeart
+                        size={30}
+                        className="cursor-pointer"
+                        onClick={() => addToWishlistHandler(data)}
+                        color={click ? "red" : "#333"}
+                        title="Add to wishlist"
+                      />
+                    )}
+                  </div>
+                </div>
+                <div
+                  className={`${styles.button} !mt-6 !rounded !h-11 flex items-center`}
+                  onClick={() => addToCartHandler(data._id)}
+                >
+                  <span className="text-white flex items-center">
+                    Add to cart <AiOutlineShoppingCart className="ml-1" />
+                  </span>
+                </div>
+                <div
+                  className={`${styles.button} !mt-6 !rounded !h-11 flex items-center bg-blue-600`}
+                  onClick={() => buyNowHandler(data._id)}
+                >
+                  <span className="text-white flex items-center">
+                    Buy Now <AiOutlineShoppingCart className="ml-1" />
+                  </span>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
         </div>
       )}
     </div>
