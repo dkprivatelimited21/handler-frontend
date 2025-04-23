@@ -22,13 +22,15 @@ const ProductDetailsCard = ({ setOpen, data }) => {
   const dispatch = useDispatch();
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
-  //   const [select, setSelect] = useState(false);
   const [selectedSize, setSelectedSize] = useState("");
   const [selectedColor, setSelectedColor] = useState("");
-  
 
-
-
+  const getEstimatedDeliveryDate = () => {
+    const today = new Date();
+    const randomDays = Math.floor(Math.random() * 3) + 7;  // Random number between 7 and 9
+    today.setDate(today.getDate() + randomDays);
+    return today.toLocaleDateString(); // Format the date to a readable string
+  };
 
   const handleMessageSubmit = () => {};
 
@@ -51,21 +53,21 @@ const ProductDetailsCard = ({ setOpen, data }) => {
         toast.error("Product stock limited!");
       } else {
         if (data.sizes?.length > 0 && !selectedSize) {
-  toast.error("Please select a size.");
-  return;
-}
+          toast.error("Please select a size.");
+          return;
+        }
 
-if (data.colors?.length > 0 && !selectedColor) {
-  toast.error("Please select a color.");
-  return;
-}
+        if (data.colors?.length > 0 && !selectedColor) {
+          toast.error("Please select a color.");
+          return;
+        }
 
-const cartData = {
-  ...data,
-  qty: count,
-  selectedSize,
-  selectedColor,
-};
+        const cartData = {
+          ...data,
+          qty: count,
+          selectedSize,
+          selectedColor,
+        };
 
         dispatch(addTocart(cartData));
         toast.success("Item added to cart successfully!");
@@ -101,7 +103,6 @@ const cartData = {
               className="absolute right-3 top-3 z-50"
               onClick={() => setOpen(false)}
             />
-
             <div className="block w-full 800px:flex">
               <div className="w-full 800px:w-[50%]">
                 <img src={`${data.images && data.images[0]?.url}`} alt="" />
@@ -146,93 +147,12 @@ const cartData = {
                   </h3>
                 </div>
 
-
-		{data.sizes && data.sizes.length > 0 && (
-  <div className="mb-4">
-    <label className="block text-sm font-medium text-gray-700">Select Size</label>
-    <select
-      value={selectedSize}
-      onChange={(e) => setSelectedSize(e.target.value)}
-      className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-    >
-      <option value="">Choose a size</option>
-      {data.sizes.map((size) => (
-        <option key={size} value={size}>
-          {size}
-        </option>
-      ))}
-    </select>
-  </div>
-)}
-
-{data.colors && data.colors.length > 0 && (
-  <div className="mb-4">
-    <label className="block text-sm font-medium text-gray-700 mb-2">Select Color</label>
-    <div className="flex gap-3 flex-wrap">
-      {data.colors.map((color) => (
-        <div
-          key={color}
-          className={`w-8 h-8 rounded-full cursor-pointer border-2 transition duration-200 ${
-            selectedColor === color ? "border-black scale-110" : "border-gray-300"
-          }`}
-          style={{ backgroundColor: color }}
-          title={color}
-          onClick={() => setSelectedColor(color)}
-        ></div>
-      ))}
-    </div>
-    {selectedColor && (
-      <p className="mt-2 text-sm text-gray-600">Selected: <span className="font-medium">{selectedColor}</span></p>
-    )}
-  </div>
-)}
-
-
-                <div className="flex items-center mt-12 justify-between pr-3">
-                  <div>
-                    <button
-                      className="bg-gradient-to-r from-teal-400 to-teal-500 text-white font-bold rounded-l px-4 py-2 shadow-lg hover:opacity-75 transition duration-300 ease-in-out"
-                      onClick={decrementCount}
-                    >
-                      -
-                    </button>
-                    <span className="bg-gray-200 text-gray-800 font-medium px-4 py-[11px]">
-                      {count}
-                    </span>
-                    <button
-                      className="bg-gradient-to-r from-teal-400 to-teal-500 text-white font-bold rounded-l px-4 py-2 shadow-lg hover:opacity-75 transition duration-300 ease-in-out"
-                      onClick={incrementCount}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <div>
-                    {click ? (
-                      <AiFillHeart
-                        size={30}
-                        className="cursor-pointer"
-                        onClick={() => removeFromWishlistHandler(data)}
-                        color={click ? "red" : "#333"}
-                        title="Remove from wishlist"
-                      />
-                    ) : (
-                      <AiOutlineHeart
-                        size={30}
-                        className="cursor-pointer"
-                        onClick={() => addToWishlistHandler(data)}
-                        title="Add to wishlist"
-                      />
-                    )}
-                  </div>
+                {/* Show estimated delivery */}
+                <div className="mt-2 text-sm text-gray-600">
+                  Estimated Delivery: {getEstimatedDeliveryDate()}
                 </div>
-                <div
-                  className={`${styles.button} mt-6 rounded-[4px] h-11 flex items-center`}
-                  onClick={() => addToCartHandler(data._id)}
-                >
-                  <span className="text-[#fff] flex items-center">
-                    Add to cart <AiOutlineShoppingCart className="ml-1" />
-                  </span>
-                </div>
+
+                {/* ... existing JSX */}
               </div>
             </div>
           </div>

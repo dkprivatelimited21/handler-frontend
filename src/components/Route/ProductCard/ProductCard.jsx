@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AiFillHeart,
   AiFillStar,
@@ -20,7 +20,7 @@ import { addTocart } from "../../../redux/actions/cart";
 import { toast } from "react-toastify";
 import Ratings from "../../Products/Ratings";
 
-const ProductCard = ({ data,isEvent }) => {
+const ProductCard = ({ data, isEvent }) => {
   const { wishlist } = useSelector((state) => state.wishlist);
   const { cart } = useSelector((state) => state.cart);
   const [click, setClick] = useState(false);
@@ -60,6 +60,13 @@ const ProductCard = ({ data,isEvent }) => {
     }
   };
 
+  const getEstimatedDeliveryDate = () => {
+    const today = new Date();
+    const randomDays = Math.floor(Math.random() * 3) + 7;  // Random number between 7 and 9
+    today.setDate(today.getDate() + randomDays);
+    return today.toLocaleDateString(); // Format the date to a readable string
+  };
+
   return (
     <>
       <div className="w-full h-[370px] bg-white rounded-lg shadow-sm p-3 relative cursor-pointer">
@@ -80,7 +87,7 @@ const ProductCard = ({ data,isEvent }) => {
           </h4>
 
           <div className="flex">
-          <Ratings rating={data?.ratings} />
+            <Ratings rating={data?.ratings} />
           </div>
 
           <div className="py-2 flex items-center justify-between">
@@ -88,8 +95,7 @@ const ProductCard = ({ data,isEvent }) => {
               <h5 className={`${styles.productDiscountPrice}`}>
                 {data.originalPrice === 0
                   ? data.originalPrice
-                  : data.discountPrice}
-                ₹
+                  : data.discountPrice} ₹
               </h5>
               <h4 className={`${styles.price}`}>
                 {data.originalPrice ? data.originalPrice + " ₹" : null}
@@ -98,6 +104,9 @@ const ProductCard = ({ data,isEvent }) => {
             <span className="font-[400] text-[17px] text-[#68d284]">
               {data?.sold_out} sold
             </span>
+          </div>
+          <div className="mt-2 text-sm text-gray-600">
+            Estimated Delivery: {getEstimatedDeliveryDate()}
           </div>
         </Link>
 
