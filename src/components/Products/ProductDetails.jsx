@@ -3,16 +3,71 @@ import { AiOutlineShoppingCart, AiFillHeart , AiOutlineHeart} from "react-icons/
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { addTocart } from "../../../redux/actions/cart";
-import styles from "../../../styles/styles";
+import { getAllProductsShop } from "../../redux/actions/product";
+import styles from "../../styles/styles";
+import Ratings from "./Ratings";
+import axios from "axios";
+import {
+  addToWishlist,
+  removeFromWishlist,
+} from "../../redux/actions/wishlist";
+import { server } from "../../server";
 
 const ProductDetails = ({ data }) => {
-  const { cart } = useSelector((state) => state);
+  const { wishlist } = useSelector((state) => state.wishlist);
+  const { cart } = useSelector((state) => state.cart);
+  const { user, isAuthenticated } = useSelector((state) => state.user);
+  const { products } = useSelector((state) => state.products);
   const [count, setCount] = useState(1);
-  const [selectedSize, setSelectedSize] = useState("");
-  const [selectedColor, setSelectedColor] = useState("");
-  const dispatch = useDispatch();
+  const [click, setClick] = useState(false);
+  const [select, setSelect] = useState(0);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getAllProductsShop(data && data?.shop._id));
+    if (wishlist && wishlist.find((i) => i._id === data?._id)) {
+      setClick(true);
+    } else {
+      setClick(false);
+    }
+  }, [data, wishlist]);
+
+  const incrementCount = () => {
+    setCount(count + 1);
+  };
+
+  const decrementCount = () => {
+    if (count > 1) {
+      setCount(count - 1);
+    }
+  };
+
+  const removeFromWishlistHandler = (data) => {
+    setClick(!click);
+    dispatch(removeFromWishlist(data));
+  };
+
+  const addToWishlistHandler = (data) => {
+    setClick(!click);
+    dispatch(addToWishlist(data));
+  };
+
+ const totalReviewsLength =
+    products &&
+    products.reduce((acc, product) => acc + product.reviews.length, 0);
+
+  const totalRatings =
+    products &&
+    products.reduce(
+      (acc, product) =>
+        acc + product.reviews.reduce((sum, review) => sum + review.rating, 0),
+      0
+    );
+
+  const avg =  totalRatings / totalReviewsLength || 0;
+
+  const averageRating = avg.toFixed(2);
+
 
   // Function to calculate the estimated delivery date (between 7 and 9 days)
   const getEstimatedDeliveryDate = () => {
@@ -54,27 +109,51 @@ const ProductDetails = ({ data }) => {
   };
 
   return (
-    <div className="w-full sm:w-[80%] mx-auto">
-      <div className="flex">
-        <div className="w-full sm:w-[50%] pr-4">
-          <img
-            src={data?.images[0]?.url}
-            alt={data?.name}
-            className="w-full h-[350px] object-cover"
-          />
-        </div>
-        <div className="w-full sm:w-[50%] pl-4">
-          <h1 className={`${styles.productTitle} text-[22px]`}>{data?.name}</h1>
-          <p className="py-2">{data?.description}</p>
-
-          <div className="flex">
-            <h4 className={`${styles.productDiscountPrice}`}>
-              {data.discountPrice}$
-            </h4>
-            <h3 className={`${styles.price}`}>
-              {data.originalPrice ? data.originalPrice + "₹" : null}
-            </h3>
-          </div>
+    <div className="bg-white">
+      {data ? (
+        <div className={`${styles.section} w-[90%] 800px:w-[80%]`}>
+          <div className="w-full py-5">
+            <div className="block w-full 800px:flex">
+              <div className="w-full 800px:w-[50%]">
+                <img
+                  src={`${data && data.images[select]?.url}`}
+                  alt=""
+                  className="w-[80%]"
+                />
+                <div className="w-full flex">
+                  {data &&
+                    data.images.map((i, index) => (
+                      <div
+                        className={`${
+                          select === 0 ? "border" : "null"
+                        } cursor-pointer`}
+                      >
+                        <img
+                          src={`${i?.url}`}
+                          alt=""
+                          className="h-[200px] overflow-hidden mr-3 mt-3"
+                          onClick={() => setSelect(index)}
+                        />
+                      </div>
+                    ))}
+                  <div
+                    className={`${
+                      select === 1 ? "border" : "null"
+                    } cursor-pointer`}
+                  ></div>
+                </div>
+              </div>
+              <div className="w-full 800px:w-[50%] pt-5">
+                <h1 className={`${styles.productTitle}`}>{data.name}</h1>
+                <p>{data.description}</p>
+                <div className="flex pt-3">
+                  <h4 className={`${styles.productDiscountPrice}`}>
+                    {data.discountPrice}$
+                  </h4>
+                  <h3 className={`${styles.price}`}>
+                    {data.originalPrice ? data.originalPrice + "$" : null}
+                  </h3>
+                </div>
 
           <div className="mt-2 text-sm text-gray-600">
             Estimated Delivery: {getEstimatedDeliveryDate()}
