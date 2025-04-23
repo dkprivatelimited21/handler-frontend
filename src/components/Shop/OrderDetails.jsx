@@ -143,7 +143,7 @@ const OrderDetails = () => {
       {order?.cart?.map((item, idx) => (
         <div className="w-full flex items-start mb-5" key={idx}>
           <img
-              src={`${item.images[0]?.url}`}
+              src={`${item?.images[0]?.url}`}
               alt=""
               className="w-[80x] h-[80px]"
             />
