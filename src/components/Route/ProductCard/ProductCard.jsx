@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
   AiFillHeart,
-  AiOutlineShoppingCart,
   AiOutlineHeart,
+  AiOutlineShoppingCart,
   AiOutlineEye,
 } from "react-icons/ai";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import styles from "../../../styles/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { addTocart } from "../../../redux/actions/cart";
@@ -19,7 +19,6 @@ const ProductCard = ({ data, isEvent }) => {
   const [click, setClick] = useState(false);
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (wishlist && wishlist.find((i) => i._id === data._id)) {
@@ -54,21 +53,11 @@ const ProductCard = ({ data, isEvent }) => {
     }
   };
 
-  const handleBuyNow = (id) => {
-    const isItemExists = cart && cart.find((i) => i._id === id);
-    if (isItemExists) {
-      toast.error("Item already in cart!");
-      navigate("/checkout"); // Navigate to checkout if item is already in the cart
-    } else {
-      if (data.stock < 1) {
-        toast.error("Product stock limited!");
-      } else {
-        const cartData = { ...data, qty: 1 };
-        dispatch(addTocart(cartData)); // Add item to cart
-        toast.success("Item added to cart successfully!");
-        navigate("/checkout"); // Navigate to checkout after adding the item
-      }
-    }
+  const getEstimatedDeliveryDate = () => {
+    const today = new Date();
+    const randomDays = Math.floor(Math.random() * 3) + 7; // Random number between 7 and 9
+    today.setDate(today.getDate() + randomDays);
+    return today.toLocaleDateString(); // Format the date to a readable string
   };
 
   return (
@@ -97,7 +86,9 @@ const ProductCard = ({ data, isEvent }) => {
           <div className="py-2 flex items-center justify-between">
             <div className="flex">
               <h5 className={`${styles.productDiscountPrice}`}>
-                {data.originalPrice === 0 ? data.originalPrice : data.discountPrice} ₹
+                {data.originalPrice === 0
+                  ? data.originalPrice
+                  : data.discountPrice} ₹
               </h5>
               <h4 className={`${styles.price}`}>
                 {data.originalPrice ? data.originalPrice + " ₹" : null}
@@ -112,14 +103,8 @@ const ProductCard = ({ data, isEvent }) => {
           </div>
         </Link>
 
-        {/* Buy Now Button */}
-        <div className="mt-4 flex justify-between items-center">
-          <button
-            className={`${styles.button} bg-blue-500 text-white`}
-            onClick={() => handleBuyNow(data._id)}
-          >
-            Buy Now
-          </button>
+        {/* side options */}
+        <div>
           {click ? (
             <AiFillHeart
               size={22}

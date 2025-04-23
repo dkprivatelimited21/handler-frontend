@@ -29,16 +29,16 @@ const Footer = () => {
             className="text-gray-800
                 sm:w-72 w-full sm:mr-5 mr-1 lg:mb-0 mb-4 py-2.5 rounded px-2 focus:outline-none"
           />
-          <button className="bg-[#56d879] hover:bg-teal-500 duration-300 px-5 py-2.5 rounded-md text-whie md:w-auto w-full">
+          <button className="bg-[#56d879] hover:bg-teal-500 duration-300 px-5 py-2.5 rounded-md text-white md:w-auto w-full">
             Submit
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-1 sm:gird-cols-3 lg:grid-cols-4 gap-6 sm:px-8 px-5 py-16 sm:text-center">
+      <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:px-8 px-5 py-16 sm:text-center">
         <ul className="px-5 text-center sm:text-start flex sm:block flex-col items-center">
           <h1>local-handler</h1>
           <br />
-          <p>The home and elements needeed to create beatiful products.</p>
+          <p>The home and elements needed to create beautiful products.</p>
           <div className="flex items-center mt-[15px]">
             <AiFillFacebook size={25} className="cursor-pointer" />
             <AiOutlineTwitter
@@ -58,7 +58,7 @@ const Footer = () => {
 
         <ul className="text-center sm:text-start">
           <h1 className="mb-1 font-semibold">Company</h1>
-          {footerProductLinks.map((link,index) => (
+          {footerProductLinks.map((link, index) => (
             <li key={index}>
               <Link
                 className="text-gray-400 hover:text-teal-400 duration-300
@@ -73,7 +73,7 @@ const Footer = () => {
 
         <ul className="text-center sm:text-start">
           <h1 className="mb-1 font-semibold">Shop</h1>
-          {footercompanyLinks.map((link,index) => (
+          {footercompanyLinks.map((link, index) => (
             <li key={index}>
               <Link
                 className="text-gray-400 hover:text-teal-400 duration-300
@@ -88,7 +88,7 @@ const Footer = () => {
 
         <ul className="text-center sm:text-start">
           <h1 className="mb-1 font-semibold">Support</h1>
-          {footerSupportLinks.map((link,index) => (
+          {footerSupportLinks.map((link, index) => (
             <li key={index}>
               <Link
                 className="text-gray-400 hover:text-teal-400 duration-300
@@ -107,11 +107,9 @@ const Footer = () => {
          text-center pt-2 text-gray-400 text-sm pb-8"
       >
         <span>© 2025 dkprivatelimited21. All rights reserved.</span>
-        <a href="/privacy-policy" className="text-sm text-gray-500 hover:underline">
-	  Privacy Policy
-	</a>
-     
-        </div>
+        <a href="/privacy-policy" className="text-sm text-gray-500 hover:underline ml-4">
+          Privacy Policy
+        </a>
       </div>
     </div>
   );
