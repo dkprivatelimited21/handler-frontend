@@ -256,7 +256,7 @@ const OrderDetails = () => {
       </div>
 
       <a
-        href={`${server}/order/invoice/${order?._id}`}
+        href={`${server}/invoice/download/${order?._id}`}
         className={`${styles.button} mt-5 bg-green-500 text-white font-[600] h-[45px] text-[18px] flex items-center justify-center`}
         target="_blank"
         rel="noopener noreferrer"
