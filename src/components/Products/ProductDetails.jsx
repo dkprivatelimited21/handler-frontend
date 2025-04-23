@@ -163,6 +163,42 @@ const ProductDetails = ({ data }) => {
                   </h3>
                 </div>
 
+
+<div className="inline-block bg-gray-100 rounded px-2 py-1 mr-2 text-sm">
+{data.sizes && data.sizes.length > 0 && (
+  <div className="mt-4">
+    <label className="font-semibold">Select Size:</label>
+    <select
+      className="ml-2 border rounded p-1"
+      value={selectedSize}
+      onChange={(e) => setSelectedSize(e.target.value)}
+    >
+      <option value="">Choose</option>
+      {data.sizes.map((size) => (
+        <option key={size} value={size}>{size}</option>
+      ))}
+    </select>
+  </div>
+)}
+
+{data.colors && data.colors.length > 0 && (
+  <div className="mt-2">
+    <label className="font-semibold">Select Color:</label>
+    <select
+      className="ml-2 border rounded p-1"
+      value={selectedColor}
+      onChange={(e) => setSelectedColor(e.target.value)}
+    >
+      <option value="">Choose</option>
+      {data.colors.map((color) => (
+        <option key={color} value={color}>{color}</option>
+      ))}
+    </select>
+  </div>
+)}
+
+</div>
+
                 <div className="flex items-center mt-12 justify-between pr-3">
                   <div>
                     <button
