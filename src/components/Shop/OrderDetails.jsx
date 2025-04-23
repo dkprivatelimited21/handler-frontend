@@ -143,11 +143,10 @@ const OrderDetails = () => {
       {order?.cart?.map((item, idx) => (
         <div className="w-full flex items-start mb-5" key={idx}>
           <img
-            src={item?.image || item?.images?.[0]?.url || "/default-product.png"}
-            alt={item?.name || "Product"}
-            onError={(e) => (e.target.src = "/default-product.png")}
-            className="w-[80px] h-[80px] object-cover"
-          />
+              src={`${item.images[0]?.url}`}
+              alt=""
+              className="w-[80x] h-[80px]"
+            />
           <div className="w-full">
             <h5 className="pl-3 text-[18px]">{item.name}</h5>
             <h5 className="pl-3 text-[15px] text-[#00000091] leading-6">
