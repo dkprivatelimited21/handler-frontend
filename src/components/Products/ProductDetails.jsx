@@ -119,7 +119,7 @@ const ProductDetails = ({ data }) => {
 
   const averageRating = avg.toFixed(2);
 
-  return (
+    return (
     <div className="bg-white">
       {data ? (
         <div className={`${styles.section} w-[90%] 800px:w-[80%]`}>
@@ -132,23 +132,25 @@ const ProductDetails = ({ data }) => {
                   className="w-[80%]"
                 />
                 <div className="w-full flex">
-                 {data &&
-  data.images.map((i, index) => (
-    <div
-      key={index}
-      className={`${select === index ? "border" : ""} cursor-pointer`}
-      onClick={() => setSelect(index)}
-    >
-      <img
-        src={i?.url}
-        alt=""
-        className="h-[200px] overflow-hidden mr-3 mt-3"
-      />
-    </div>
-  ))}
-
+                  {data &&
+                    data.images.map((i, index) => (
+                      <div
+                        key={index}
+                        className={`${
+                          select === index ? "border" : ""
+                        } cursor-pointer`}
+                        onClick={() => setSelect(index)}
+                      >
+                        <img
+                          src={i?.url}
+                          alt=""
+                          className="h-[200px] overflow-hidden mr-3 mt-3"
+                        />
+                      </div>
+                    ))}
                 </div>
               </div>
+
               <div className="w-full 800px:w-[50%] pt-5">
                 <h1 className={`${styles.productTitle}`}>{data.name}</h1>
                 <p>{data.description}</p>
@@ -208,6 +210,7 @@ const ProductDetails = ({ data }) => {
                     Add to cart <AiOutlineShoppingCart className="ml-1" />
                   </span>
                 </div>
+
                 <div
                   className={`${styles.button} !mt-6 !rounded !h-11 flex items-center bg-blue-600`}
                   onClick={() => buyNowHandler(data._id)}
@@ -220,13 +223,16 @@ const ProductDetails = ({ data }) => {
             </div>
 
             <div className="mt-4">
-              <h5 className="text-lg font-medium">Estimated Delivery Date: {estimatedDeliveryDate}</h5>
+              <h5 className="text-lg font-medium">
+                Estimated Delivery Date: {estimatedDeliveryDate}
+              </h5>
             </div>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };
+
 
 export default ProductDetails;
