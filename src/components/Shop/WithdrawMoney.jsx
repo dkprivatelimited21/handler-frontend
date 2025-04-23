@@ -12,10 +12,12 @@ import { AiOutlineDelete } from "react-icons/ai";
 const WithdrawMoney = () => {
   const [open, setOpen] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(false);
-  const dispatch = useDispatch();
-  const { seller } = useSelector((state) => state.seller);
   const [withdrawAmount, setWithdrawAmount] = useState(50);
   const [upiId, setUpiId] = useState("");
+  const [loading, setLoading] = useState(false); // State for loading spinner
+
+  const dispatch = useDispatch();
+  const { seller } = useSelector((state) => state.seller);
 
   useEffect(() => {
     dispatch(getAllOrdersOfShop(seller?._id));
@@ -35,6 +37,7 @@ const WithdrawMoney = () => {
     };
 
     setPaymentMethod(false); // Close the payment method section
+    setLoading(true); // Show spinner while waiting for backend response
 
     try {
       const response = await axios.put(
@@ -48,6 +51,8 @@ const WithdrawMoney = () => {
     } catch (error) {
       console.log(error.response?.data?.message || error.message);
       toast.error("Failed to add UPI method. Please try again.");
+    } finally {
+      setLoading(false); // Hide spinner after response
     }
   };
 
@@ -72,6 +77,7 @@ const WithdrawMoney = () => {
       toast.error("You can't withdraw this amount!");
     } else {
       const amount = withdrawAmount;
+      setLoading(true); // Show spinner while waiting for backend response
       try {
         const response = await axios.post(
           `${server}/withdraw/create-withdraw-request`,
@@ -84,6 +90,8 @@ const WithdrawMoney = () => {
         dispatch(loadSeller());
       } catch (error) {
         toast.error("Failed to request withdraw. Please try again.");
+      } finally {
+        setLoading(false); // Hide spinner after response
       }
     }
   };
@@ -96,11 +104,11 @@ const WithdrawMoney = () => {
   return (
     <div className="w-full flex items-center">
       {paymentMethod ? (
-        <div>
-          <h3 className="text-[22px] font-Poppins text-center font-[600]">
+        <div className="w-full flex flex-col items-center p-4 bg-white shadow-lg rounded-lg">
+          <h3 className="text-[22px] font-Poppins text-center font-[600] mb-4">
             Add new Withdraw Method:
           </h3>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="w-full max-w-md">
             <input
               type="text"
               placeholder="Enter UPI ID (e.g., user@upi)"
@@ -108,74 +116,88 @@ const WithdrawMoney = () => {
               onChange={(e) => setUpiId(e.target.value)}
               className="w-full border p-2 mt-4 rounded"
             />
-            <div className="w-full flex items-center">
+            <div className="w-full flex justify-center mt-4">
               <button
                 type="submit"
-                className={`${styles.button} text-[#fff] text-[18px] mt-4`}
+                className={`${styles.button} text-[#fff] text-[18px] w-full max-w-[300px] h-[40px] mt-4 ${
+                  loading ? "cursor-not-allowed" : ""
+                }`}
+                disabled={loading} // Disable button during loading
               >
-                Add UPI Method
+                {loading ? (
+                  <div className="loader"></div> // Add a spinner when loading
+                ) : (
+                  "Add UPI Method"
+                )}
               </button>
             </div>
           </form>
         </div>
       ) : (
         <>
-          <h3 className="text-[22px] font-Poppins">Available Withdraw Methods:</h3>
+          <div className="w-full flex flex-col items-center">
+            <h3 className="text-[22px] font-Poppins mb-4">Available Withdraw Methods:</h3>
 
-          {seller && seller?.withdrawMethod ? (
-            <div>
-              <div className="800px:flex w-full justify-between items-center">
-                <div className="800px:w-[50%]">
-                  <h5>UPI ID: {seller?.withdrawMethod.upiId}</h5>
+            {seller && seller?.withdrawMethod ? (
+              <div className="w-full max-w-md bg-white shadow-lg p-4 rounded-lg">
+                <div className="w-full flex justify-between items-center">
+                  <div className="w-[80%]">
+                    <h5>UPI ID: {seller?.withdrawMethod.upiId}</h5>
+                  </div>
+                  <div className="w-[20%] flex justify-end">
+                    <AiOutlineDelete
+                      size={25}
+                      className="cursor-pointer"
+                      onClick={deleteHandler}
+                    />
+                  </div>
                 </div>
-                <div className="800px:w-[50%]">
-                  <AiOutlineDelete
-                    size={25}
-                    className="cursor-pointer"
-                    onClick={deleteHandler}
+                <br />
+                <h4>Available Balance: ₹{availableBalance}</h4>
+                <br />
+                <div className="w-full flex items-center justify-between mt-4">
+                  <input
+                    type="number"
+                    min="50"
+                    placeholder="Amount..."
+                    value={withdrawAmount}
+                    onChange={(e) => setWithdrawAmount(Number(e.target.value))}
+                    className="w-[70%] border p-2 rounded"
                   />
+                  <button
+                    className={`${styles.button} !h-[42px] text-white w-[28%]`}
+                    onClick={withdrawHandler}
+                    disabled={loading} // Disable button during loading
+                  >
+                    {loading ? (
+                      <div className="loader"></div> // Add a spinner when loading
+                    ) : (
+                      "Withdraw"
+                    )}
+                  </button>
+                </div>
+                {withdrawAmount >= 50 && withdrawAmount <= availableBalance && (
+                  <div className="mt-2">
+                    <p className="text-sm">Service Tax (18%): ₹{serviceCharge}</p>
+                    <p className="text-sm font-semibold">
+                      Final Amount You’ll Receive: ₹{finalAmount}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div>
+                <div className="w-full flex justify-center">
+                  <button
+                    className={`${styles.button} text-[#fff] text-[18px] mt-4`}
+                    onClick={() => setPaymentMethod(true)}
+                  >
+                    Add UPI Method
+                  </button>
                 </div>
               </div>
-              <br />
-              <h4>Available Balance: ₹{availableBalance}</h4>
-              <br />
-              <div className="800px:flex w-full items-center">
-                <input
-                  type="number"
-                  min="50"
-                  placeholder="Amount..."
-                  value={withdrawAmount}
-                  onChange={(e) => setWithdrawAmount(Number(e.target.value))}
-                  className="800px:w-[100px] w-[full] border 800px:mr-3 p-1 rounded"
-                />
-                <div
-                  className={`${styles.button} !h-[42px] text-white`}
-                  onClick={withdrawHandler}
-                >
-                  Withdraw
-                </div>
-              </div>
-              {withdrawAmount >= 50 && withdrawAmount <= availableBalance && (
-                <div className="mt-2">
-                  <p className="text-sm">Service Tax (18%): ₹{serviceCharge}</p>
-                  <p className="text-sm font-semibold">
-                    Final Amount You’ll Receive: ₹{finalAmount}
-                  </p>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div>
-              <div className="w-full flex items-center">
-                <div
-                  className={`${styles.button} text-[#fff] text-[18px] mt-4`}
-                  onClick={() => setPaymentMethod(true)}
-                >
-                  Add UPI Method
-                </div>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </>
       )}
     </div>
