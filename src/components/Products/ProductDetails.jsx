@@ -9,10 +9,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getAllProductsShop } from "../../redux/actions/product";
 import { server } from "../../server";
 import styles from "../../styles/styles";
-import {
-  addToWishlist,
-  removeFromWishlist,
-} from "../../redux/actions/wishlist";
+import { addToWishlist, removeFromWishlist } from "../../redux/actions/wishlist";
 import { addTocart } from "../../redux/actions/cart";
 import { toast } from "react-toastify";
 import Ratings from "./Ratings";
@@ -94,6 +91,18 @@ const ProductDetails = ({ data }) => {
     navigate("/checkout"); // Example: Redirect to checkout page
   };
 
+  const calculateDeliveryDate = () => {
+    const today = new Date();
+    const minDays = 7;
+    const maxDays = 9;
+    const deliveryDate = new Date(
+      today.setDate(today.getDate() + Math.floor(Math.random() * (maxDays - minDays + 1)) + minDays)
+    );
+    return deliveryDate.toLocaleDateString(); // Format the date
+  };
+
+  const estimatedDeliveryDate = calculateDeliveryDate();
+
   const totalReviewsLength =
     products &&
     products.reduce((acc, product) => acc + product.reviews.length, 0);
@@ -109,21 +118,6 @@ const ProductDetails = ({ data }) => {
   const avg = totalRatings / totalReviewsLength || 0;
 
   const averageRating = avg.toFixed(2);
-
-
-const calculateDeliveryDate = () => {
-    const today = new Date();
-    const minDays = 7;
-    const maxDays = 9;
-    const deliveryDate = new Date(
-      today.setDate(today.getDate() + Math.floor(Math.random() * (maxDays - minDays + 1)) + minDays)
-    );
-    return deliveryDate.toLocaleDateString(); // Format the date
-  };
-
-  const estimatedDeliveryDate = calculateDeliveryDate();
-
-
 
   return (
     <div className="bg-white">
@@ -205,6 +199,7 @@ const calculateDeliveryDate = () => {
                     )}
                   </div>
                 </div>
+
                 <div
                   className={`${styles.button} !mt-6 !rounded !h-11 flex items-center`}
                   onClick={() => addToCartHandler(data._id)}
@@ -222,6 +217,10 @@ const calculateDeliveryDate = () => {
                   </span>
                 </div>
               </div>
+            </div>
+
+            <div className="mt-4">
+              <h5 className="text-lg font-medium">Estimated Delivery Date: {estimatedDeliveryDate}</h5>
             </div>
           </div>
         </div>
