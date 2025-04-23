@@ -1,4 +1,4 @@
-// ProductDetails.jsx with wishlist and reviews - styled like the old version
+// ProductDetails.jsx - Reviews restricted to buyers only
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
@@ -8,8 +8,9 @@ import { server } from '../../server';
 import { toast } from 'react-toastify';
 import Loader from '../Layout/Loader';
 import Ratings from '../Products/Ratings';
-import { Heart } from 'lucide-react';
-
+import {
+  AiFillHeart,
+  AiOutlineHeart,} from "react-icons/ai";
 const ProductDetails = () => {
   const { id } = useParams();
   const [data, setData] = useState(null);
@@ -18,7 +19,11 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState('');
-  const { cart } = useSelector((state) => state.cart);
+  const [canReview, setCanReview] = useState(false);
+  const { cart, user } = useSelector((state) => ({
+    cart: state.cart.cart,
+    user: state.user.user,
+  }));
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -26,7 +31,20 @@ const ProductDetails = () => {
       setData(res.data.product);
       setReviews(res.data.product.reviews || []);
     });
-  }, [id]);
+
+    // Check if user has bought the product
+    if (user?._id) {
+      axios
+        .get(`${server}/order/user/${user._id}`)
+        .then((res) => {
+          const hasBought = res.data.orders.some((order) =>
+            order.cart.some((item) => item._id === id)
+          );
+          setCanReview(hasBought);
+        })
+        .catch(() => setCanReview(false));
+    }
+  }, [id, user]);
 
   const handleAddToCart = () => {
     if (!selectedSize || !selectedColor) {
@@ -179,20 +197,23 @@ const ProductDetails = () => {
               </div>
             ))}
           </div>
-          <div className="mt-4">
-            <textarea
-              value={newReview}
-              onChange={(e) => setNewReview(e.target.value)}
-              className="w-full p-2 border rounded"
-              placeholder="Write your review here..."
-            ></textarea>
-            <button
-              onClick={handleReviewSubmit}
-              className="mt-2 px-4 py-1 bg-black text-white rounded"
-            >
-              Submit Review
-            </button>
-          </div>
+
+          {canReview && (
+            <div className="mt-4">
+              <textarea
+                value={newReview}
+                onChange={(e) => setNewReview(e.target.value)}
+                className="w-full p-2 border rounded"
+                placeholder="Write your review here..."
+              ></textarea>
+              <button
+                onClick={handleReviewSubmit}
+                className="mt-2 px-4 py-1 bg-black text-white rounded"
+              >
+                Submit Review
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
