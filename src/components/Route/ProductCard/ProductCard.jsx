@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import styles from "../../../styles/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { addTocart } from "../../../redux/actions/cart";
+import { addToWishlist, removeFromWishlist } from "../../../redux/actions/wishlist"; // Added import
 import { toast } from "react-toastify";
 import ProductDetailsCard from "../ProductDetailsCard/ProductDetailsCard";
 import Ratings from "../../Products/Ratings";
@@ -30,12 +31,12 @@ const ProductCard = ({ data, isEvent }) => {
 
   const removeFromWishlistHandler = (data) => {
     setClick(!click);
-    dispatch(removeFromWishlist(data));
+    dispatch(removeFromWishlist(data));  // Action dispatched to remove from wishlist
   };
 
   const addToWishlistHandler = (data) => {
     setClick(!click);
-    dispatch(addToWishlist(data));
+    dispatch(addToWishlist(data));  // Action dispatched to add to wishlist
   };
 
   const addToCartHandler = (id) => {
