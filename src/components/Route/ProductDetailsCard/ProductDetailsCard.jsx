@@ -6,7 +6,7 @@ import {
   AiOutlineShoppingCart,
 } from "react-icons/ai";
 import { RxCross1 } from "react-icons/rx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "../../../styles/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -20,6 +20,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
   const { cart } = useSelector((state) => state.cart);
   const { wishlist } = useSelector((state) => state.wishlist);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [count, setCount] = useState(1);
   const [click, setClick] = useState(false);
   const [selectedSize, setSelectedSize] = useState("");
@@ -75,22 +76,21 @@ const ProductDetailsCard = ({ setOpen, data }) => {
     }
   };
 
-  useEffect(() => {
-    if (wishlist && wishlist.find((i) => i._id === data._id)) {
-      setClick(true);
+  const handleBuyNow = (id) => {
+    const isItemExists = cart && cart.find((i) => i._id === id);
+    if (isItemExists) {
+      toast.error("Item already in cart!");
+      navigate("/checkout"); // Navigate to checkout if item is already in the cart
     } else {
-      setClick(false);
+      if (data.stock < 1) {
+        toast.error("Product stock limited!");
+      } else {
+        const cartData = { ...data, qty: 1 };
+        dispatch(addTocart(cartData)); // Add item to cart
+        toast.success("Item added to cart successfully!");
+        navigate("/checkout"); // Navigate to checkout after adding the item
+      }
     }
-  }, [wishlist]);
-
-  const removeFromWishlistHandler = (data) => {
-    setClick(!click);
-    dispatch(removeFromWishlist(data));
-  };
-
-  const addToWishlistHandler = (data) => {
-    setClick(!click);
-    dispatch(addToWishlist(data));
   };
 
   return (
@@ -106,30 +106,7 @@ const ProductDetailsCard = ({ setOpen, data }) => {
             <div className="block w-full 800px:flex">
               <div className="w-full 800px:w-[50%]">
                 <img src={`${data.images && data.images[0]?.url}`} alt="" />
-                <div className="flex">
-                  <Link to={`/shop/preview/${data.shop._id}`} className="flex">
-                    <img
-                      src={`${data.images && data.images[0]?.url}`}
-                      alt=""
-                      className="w-[50px] h-[50px] rounded-full mr-2"
-                    />
-                    <div>
-                      <h3 className={`${styles.shop_name}`}>
-                        {data.shop.name}
-                      </h3>
-                      <h5 className="pb-3 text-[15px]">{data?.ratings} Ratings</h5>
-                    </div>
-                  </Link>
-                </div>
-                <div
-                  className={`${styles.button} bg-[#000] mt-4 rounded-[4px] h-11`}
-                  onClick={handleMessageSubmit}
-                >
-                  <span className="text-[#fff] flex items-center">
-                    Send Message <AiOutlineMessage className="ml-1" />
-                  </span>
-                </div>
-                <h5 className="text-[16px] text-[red] mt-5">(50) Sold out</h5>
+                {/* ... existing JSX */}
               </div>
 
               <div className="w-full 800px:w-[50%] pt-5 pl-[5px] pr-[5px]">
@@ -152,6 +129,15 @@ const ProductDetailsCard = ({ setOpen, data }) => {
                   Estimated Delivery: {getEstimatedDeliveryDate()}
                 </div>
 
+                {/* Buy Now Button */}
+                <div className="mt-6">
+                  <button
+                    className="bg-blue-500 text-white rounded-lg w-full py-3"
+                    onClick={() => handleBuyNow(data._id)}
+                  >
+                    Buy Now
+                  </button>
+                </div>
                 {/* ... existing JSX */}
               </div>
             </div>
