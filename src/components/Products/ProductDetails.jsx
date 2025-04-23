@@ -1,211 +1,200 @@
-import React, { useState, useEffect } from "react";
-import { AiOutlineShoppingCart, AiFillHeart , AiOutlineHeart} from "react-icons/ai";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { toast } from "react-toastify";
-import { getAllProductsShop } from "../../redux/actions/product";
-import styles from "../../styles/styles";
-import Ratings from "./Ratings";
-import axios from "axios";
-import {
-  addToWishlist,
-  removeFromWishlist,
-} from "../../redux/actions/wishlist";
-import { server } from "../../server";
+// ProductDetails.jsx with wishlist and reviews - styled like the old version
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart } from '../../redux/actions/cart';
+import { server } from '../../server';
+import { toast } from 'react-toastify';
+import Loader from '../Layout/Loader';
+import Ratings from '../Products/Ratings';
+import { Heart } from 'lucide-react';
 
-const ProductDetails = ({ data }) => {
-  const { wishlist } = useSelector((state) => state.wishlist);
+const ProductDetails = () => {
+  const { id } = useParams();
+  const [data, setData] = useState(null);
+  const [selectedSize, setSelectedSize] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [quantity, setQuantity] = useState(1);
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState('');
   const { cart } = useSelector((state) => state.cart);
-  const { user, isAuthenticated } = useSelector((state) => state.user);
-  const { products } = useSelector((state) => state.products);
-  const [count, setCount] = useState(1);
-  const [click, setClick] = useState(false);
-  const [select, setSelect] = useState(0);
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+
   useEffect(() => {
-    dispatch(getAllProductsShop(data && data?.shop._id));
-    if (wishlist && wishlist.find((i) => i._id === data?._id)) {
-      setClick(true);
+    axios.get(`${server}/product/${id}`).then((res) => {
+      setData(res.data.product);
+      setReviews(res.data.product.reviews || []);
+    });
+  }, [id]);
+
+  const handleAddToCart = () => {
+    if (!selectedSize || !selectedColor) {
+      toast.error('Please select size and color');
+      return;
+    }
+
+    const isItemExists = cart && cart.find((i) => i._id === id);
+    if (isItemExists) {
+      toast.error('Item already in cart');
     } else {
-      setClick(false);
-    }
-  }, [data, wishlist]);
-
-  const incrementCount = () => {
-    setCount(count + 1);
-  };
-
-  const decrementCount = () => {
-    if (count > 1) {
-      setCount(count - 1);
+      const cartData = {
+        ...data,
+        qty: quantity,
+        selectedSize,
+        selectedColor,
+      };
+      dispatch(addToCart(cartData));
+      toast.success('Item added to cart');
     }
   };
 
-  const removeFromWishlistHandler = (data) => {
-    setClick(!click);
-    dispatch(removeFromWishlist(data));
+  const handleAddToWishlist = () => {
+    toast.success('Added to wishlist');
   };
 
-  const addToWishlistHandler = (data) => {
-    setClick(!click);
-    dispatch(addToWishlist(data));
+  const handleReviewSubmit = () => {
+    if (!newReview) return;
+    setReviews((prev) => [...prev, { comment: newReview, date: new Date().toDateString() }]);
+    setNewReview('');
+    toast.success('Review submitted');
   };
 
- const totalReviewsLength =
-    products &&
-    products.reduce((acc, product) => acc + product.reviews.length, 0);
+  const incrementQuantity = () => {
+    if (data.stock <= quantity) {
+      toast.error('Product stock limited!');
+    } else {
+      setQuantity(quantity + 1);
+    }
+  };
 
-  const totalRatings =
-    products &&
-    products.reduce(
-      (acc, product) =>
-        acc + product.reviews.reduce((sum, review) => sum + review.rating, 0),
-      0
-    );
+  const decrementQuantity = () => {
+    if (quantity > 1) {
+      setQuantity(quantity - 1);
+    }
+  };
 
-  const avg =  totalRatings / totalReviewsLength || 0;
-
-  const averageRating = avg.toFixed(2);
-
-
-  // Function to calculate the estimated delivery date (between 7 and 9 days)
   const getEstimatedDeliveryDate = () => {
     const today = new Date();
-    const randomDays = Math.floor(Math.random() * 3) + 7; // Random number between 7 and 9
-    today.setDate(today.getDate() + randomDays);
-    return today.toLocaleDateString(); // Format the date to a readable string
-  };
-
-  // Add item to cart with size/color checks
-  const addToCartHandler = (id) => {
-    if (cart && cart.find((i) => i._id === id)) {
-      toast.error("Item already in cart!");
-    } else {
-      if (data.stock < count) {
-        toast.error("Product stock limited!");
-      } else {
-        if (data.sizes?.length > 0 && !selectedSize) {
-          toast.error("Please select a size.");
-          return;
-        }
-
-        if (data.colors?.length > 0 && !selectedColor) {
-          toast.error("Please select a color.");
-          return;
-        }
-
-        const cartData = {
-          ...data,
-          qty: count,
-          selectedSize,
-          selectedColor,
-        };
-
-        dispatch(addTocart(cartData));
-        toast.success("Item added to cart successfully!");
-      }
-    }
+    const estimatedDate = new Date(today.setDate(today.getDate() + 7));
+    return estimatedDate.toDateString();
   };
 
   return (
-    <div className="bg-white">
+    <div className="w-full py-5">
       {data ? (
-        <div className={`${styles.section} w-[90%] 800px:w-[80%]`}>
-          <div className="w-full py-5">
-            <div className="block w-full 800px:flex">
-              <div className="w-full 800px:w-[50%]">
-                <img
-                  src={`${data && data.images[select]?.url}`}
-                  alt=""
-                  className="w-[80%]"
-                />
-                <div className="w-full flex">
-                  {data &&
-                    data.images.map((i, index) => (
-                      <div
-                        className={`${
-                          select === 0 ? "border" : "null"
-                        } cursor-pointer`}
-                      >
-                        <img
-                          src={`${i?.url}`}
-                          alt=""
-                          className="h-[200px] overflow-hidden mr-3 mt-3"
-                          onClick={() => setSelect(index)}
-                        />
-                      </div>
-                    ))}
-                  <div
-                    className={`${
-                      select === 1 ? "border" : "null"
-                    } cursor-pointer`}
-                  ></div>
-                </div>
-              </div>
-              <div className="w-full 800px:w-[50%] pt-5">
-                <h1 className={`${styles.productTitle}`}>{data.name}</h1>
-                <p>{data.description}</p>
-                <div className="flex pt-3">
-                  <h4 className={`${styles.productDiscountPrice}`}>
-                    {data.discountPrice}$
-                  </h4>
-                  <h3 className={`${styles.price}`}>
-                    {data.originalPrice ? data.originalPrice + "$" : null}
-                  </h3>
-                </div>
-
-          <div className="mt-2 text-sm text-gray-600">
-            Estimated Delivery: {getEstimatedDeliveryDate()}
+        <div className="w-[90%] md:w-[80%] m-auto block md:flex">
+          <div className="w-full md:w-[50%]">
+            <img
+              src={`${server}${data.images && data.images[0]}`}
+              alt=""
+              className="w-[100%]"
+            />
+            <div className="flex items-center gap-2 mt-4">
+              {data.sizes?.map((size, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedSize(size)}
+                  className={`border px-3 py-1 rounded ${
+                    selectedSize === size ? 'bg-black text-white' : 'bg-white'
+                  }`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              {data.colors?.map((color, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedColor(color)}
+                  className={`border px-3 py-1 rounded ${
+                    selectedColor === color ? 'bg-black text-white' : 'bg-white'
+                  }`}
+                >
+                  {color}
+                </button>
+              ))}
+            </div>
           </div>
 
-          {/* Size and Color Selection */}
-          {data.sizes?.length > 0 && (
-            <select
-              value={selectedSize}
-              onChange={(e) => setSelectedSize(e.target.value)}
-              className="w-[200px] mt-3 border h-[35px] rounded-[5px]"
-            >
-              <option value="">Select Size</option>
-              {data.sizes.map((size, i) => (
-                <option key={i} value={size}>
-                  {size}
-                </option>
-              ))}
-            </select>
-          )}
+          <div className="w-full md:w-[50%] md:pl-10">
+            <h1 className="text-2xl font-semibold flex items-center justify-between">
+              {data.name}
+              <button onClick={handleAddToWishlist} title="Add to Wishlist">
+                <Heart className="w-6 h-6 text-gray-600 hover:text-red-500" />
+              </button>
+            </h1>
+            <p className="mt-2 text-gray-700">{data.description}</p>
+            <div className="mt-3">
+              <Ratings rating={data.ratings} />
+            </div>
+            <h4 className="mt-4 text-xl font-bold text-red-600">
+              ₹{data.discountPrice}
+            </h4>
+            <h5 className="line-through text-gray-500">
+              ₹{data.originalPrice}
+            </h5>
 
-          {data.colors?.length > 0 && (
-            <select
-              value={selectedColor}
-              onChange={(e) => setSelectedColor(e.target.value)}
-              className="w-[200px] mt-3 border h-[35px] rounded-[5px]"
-            >
-              <option value="">Select Color</option>
-              {data.colors.map((color, i) => (
-                <option key={i} value={color}>
-                  {color}
-                </option>
-              ))}
-            </select>
-          )}
+            <div className="flex items-center mt-4">
+              <button onClick={decrementQuantity} className="border px-3 py-1">-</button>
+              <span className="mx-4">{quantity}</span>
+              <button onClick={incrementQuantity} className="border px-3 py-1">+</button>
+            </div>
 
-          <div className="mt-5 flex items-center justify-between">
             <button
-              className="bg-blue-500 text-white py-2 px-6 rounded"
-              onClick={() => addToCartHandler(data?._id)}
+              onClick={handleAddToCart}
+              className="mt-6 px-6 py-2 bg-black text-white rounded"
             >
               Add to Cart
             </button>
+
+            <div className="mt-4">
+              <p className="text-sm text-gray-500">
+                Category: <span className="text-black">{data.category}</span>
+              </p>
+              <p className="text-sm text-gray-500">
+                Stock: <span className="text-black">{data.stock}</span>
+              </p>
+              <p className="text-sm text-green-700 mt-2">
+                Estimated Delivery: <span className="font-semibold">{getEstimatedDeliveryDate()}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <Loader />
+      )}
+
+      {/* Reviews Section */}
+      {data && (
+        <div className="w-[90%] md:w-[80%] m-auto mt-10">
+          <h2 className="text-xl font-semibold mb-4">Customer Reviews</h2>
+          <div className="space-y-3">
+            {reviews.length === 0 && <p className="text-gray-500">No reviews yet.</p>}
+            {reviews.map((review, index) => (
+              <div key={index} className="border p-3 rounded">
+                <p>{review.comment}</p>
+                <span className="text-xs text-gray-400">{review.date}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4">
+            <textarea
+              value={newReview}
+              onChange={(e) => setNewReview(e.target.value)}
+              className="w-full p-2 border rounded"
+              placeholder="Write your review here..."
+            ></textarea>
             <button
-              className="bg-green-500 text-white py-2 px-6 rounded"
-              onClick={() => addToCartHandler(data?._id)}
+              onClick={handleReviewSubmit}
+              className="mt-2 px-4 py-1 bg-black text-white rounded"
             >
-              Buy Now
+              Submit Review
             </button>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
