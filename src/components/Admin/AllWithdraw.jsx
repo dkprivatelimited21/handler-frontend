@@ -71,12 +71,12 @@ const AllWithdraw = () => {
         return (
           <BsPencil
             size={20}
-            className={`${
+            className={`$${
               params.row.status !== "Processing" ? "hidden" : ""
             } mr-5 cursor-pointer`}
             onClick={() => {
               setWithdrawData(params.row);
-              setWithdrawStatus(params.row.status); // Set status when modal opens
+              setWithdrawStatus(params.row.status);
               setOpen(true);
             }}
           />
@@ -91,14 +91,14 @@ const AllWithdraw = () => {
         `${server}/withdraw/update-withdraw-request/${withdrawData.id}`,
         {
           sellerId: withdrawData.shopId,
-          status: withdrawStatus, // Pass updated status
+          status: withdrawStatus,
+          amount: withdrawData.amount,
         },
         { withCredentials: true }
       );
 
       toast.success("Withdraw request updated successfully!");
 
-      // Optimistically update the state
       setData((prevData) =>
         prevData.map((item) =>
           item._id === withdrawData.id
@@ -107,12 +107,9 @@ const AllWithdraw = () => {
         )
       );
 
-      // If the status is 'Succeed', automatically generate and open the UPI payout link
       if (withdrawStatus === "Succeed" && withdrawData?.withdrawMethod?.upiId) {
         const upiLink = `upi://pay?pa=${withdrawData.withdrawMethod.upiId}&pn=${withdrawData.seller.name}&cu=INR&am=${withdrawData.amount}`;
-        // Optionally, you can auto-open the UPI payment link
         window.open(upiLink, "_blank");
-
         toast.success("UPI Payment Link generated successfully!");
       }
 
@@ -134,6 +131,8 @@ const AllWithdraw = () => {
         amount: "US$ " + item.amount,
         status: item.status,
         createdAt: item.createdAt.slice(0, 10),
+        withdrawMethod: item.withdrawMethod,
+        seller: item.seller,
       });
     });
 
@@ -149,7 +148,7 @@ const AllWithdraw = () => {
         />
       </div>
 
-      {open && (
+      {open && withdrawData && (
         <div className="w-full fixed h-screen top-0 left-0 bg-[#00000031] z-[9999] flex items-center justify-center">
           <div className="w-[50%] min-h-[40vh] bg-white rounded shadow p-4">
             <div className="flex justify-end w-full">
@@ -159,6 +158,9 @@ const AllWithdraw = () => {
               Update Withdraw Status
             </h1>
             <br />
+            <p className="text-center text-gray-700 mb-2">
+              UPI ID: <span className="font-semibold">{withdrawData.withdrawMethod?.upiId || "Not Provided"}</span>
+            </p>
             <select
               name=""
               id=""

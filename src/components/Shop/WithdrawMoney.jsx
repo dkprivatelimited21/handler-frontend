@@ -94,7 +94,7 @@ const WithdrawMoney = () => {
   const finalAmount = Number((withdrawAmount - serviceCharge).toFixed(2));
 
   return (
-    <div>
+    <div className="w-full flex items-center">
       {paymentMethod ? (
         <div>
           <h3 className="text-[22px] font-Poppins text-center font-[600]">
