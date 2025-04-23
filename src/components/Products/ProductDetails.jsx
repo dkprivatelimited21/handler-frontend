@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { addToCart } from '../../redux/actions/cart';
+import { addTocart } from "../../redux/actions/cart";
 import { server } from '../../server';
 import { toast } from 'react-toastify';
 import Loader from '../Layout/Loader';
@@ -11,6 +11,9 @@ import Ratings from '../Products/Ratings';
 import {
   AiFillHeart,
   AiOutlineHeart,} from "react-icons/ai";
+import styles from "../../styles/styles";
+
+
 const ProductDetails = () => {
   const { id } = useParams();
   const [data, setData] = useState(null);
