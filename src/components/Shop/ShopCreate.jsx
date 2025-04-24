@@ -102,7 +102,7 @@ const ShopCreate = () => {
 
             {/* Email */}
             <div>
-              label
+              <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700"
               >
