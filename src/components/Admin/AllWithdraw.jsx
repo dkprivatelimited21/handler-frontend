@@ -25,7 +25,7 @@ const AllWithdraw = () => {
       .catch((error) => {
         console.log(error.response.data.message);
       });
-  }, []);
+  }, []); // Empty dependency array to run only once on mount
 
   const columns = [
     { field: "id", headerName: "Withdraw Id", minWidth: 150, flex: 0.7 },
@@ -148,7 +148,7 @@ const AllWithdraw = () => {
         name: item.seller.name,
         amount: "US$ " + item.amount,
         serviceCharge: "US$ " + item.serviceCharge,
-        finalAmount = "US$ " + ((item.amount + item.serviceCharge) - 0.02 * (item.amount + item.serviceCharge)),
+        finalAmount: "US$ " + ((item.amount + item.serviceCharge) - 0.02 * (item.amount + item.serviceCharge)), // Corrected here
         upiId: item.withdrawMethod?.upiId || "Not Provided",
         status: item.status,
         createdAt: item.createdAt.slice(0, 10),
