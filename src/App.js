@@ -59,7 +59,6 @@ import { getAllProducts } from "./redux/actions/product";
 import { getAllEvents } from "./redux/actions/event";
 import axios from "axios";
 import { server } from "./server";
-import ScrollToTop from "./components/ScrollToTop";
 
 Store.dispatch(loadSeller());
 
