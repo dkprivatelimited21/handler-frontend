@@ -46,19 +46,6 @@ const AllOrders = () => {
       minWidth: 130,
       flex: 0.8,
     },
-    {
-      field: "print",
-      headerName: "Print",
-      minWidth: 120,
-      flex: 0.6,
-      sortable: false,
-      renderCell: (params) => (
-        <Link to={`/order/${params.id}?print=true`}>
-          <Button variant="outlined" size="small">Print</Button>
-        </Link>
-      ),
-    },
-    
 
 {
   field: "trackingId",
@@ -87,7 +74,7 @@ const AllOrders = () => {
       sortable: false,
       renderCell: (params) => {
         return (
-          <Link to={`/order/${params.id}?pdf=true`}>
+          <Link to={`/order/download-invoice/${params.id}?pdf=true`}>
             <Button variant="outlined" color="primary">
               Download Invoice
             </Button>
