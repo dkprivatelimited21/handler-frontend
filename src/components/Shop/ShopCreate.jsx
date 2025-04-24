@@ -31,12 +31,12 @@ const ShopCreate = () => {
         password,
         avatar,
         phoneNumber,
+        zipCode,
         address: {
           street,
           city,
           state,
           country,
-          zipCode,
         },
       })
       .then((res) => {
