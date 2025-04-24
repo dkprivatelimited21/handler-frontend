@@ -151,7 +151,7 @@ const OrderDetails = () => {
           <div className="w-full">
             <h5 className="pl-3 text-[18px]">{item.name}</h5>
             <h5 className="pl-3 text-[15px] text-[#00000091] leading-6">
-              US${item.discountPrice || item.price} × {item.quantity || 0}<br />
+              ₹{item.discountPrice || item.price} × {item.quantity || 0}<br />
               Size: {item.selectedSize || "-"} | Color: {item.selectedColor || "-"}
             </h5>
           </div>
@@ -159,7 +159,7 @@ const OrderDetails = () => {
       ))}
 
       <div className="border-t w-full text-right">
-        <h5 className="pt-3 text-[18px]">Total Price: <strong>US${order?.totalPrice}</strong></h5>
+        <h5 className="pt-3 text-[18px]">Total Price: <strong>₹{order?.totalPrice}</strong></h5>
       </div>
 
       <br /><br />

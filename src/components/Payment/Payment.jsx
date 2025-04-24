@@ -93,7 +93,7 @@ const Payment = () => {
         <div className="w-full 800px:w-[65%]">
           <div className="w-full 800px:w-[95%] bg-[#fff] rounded-md p-5 pb-8">
             <h4 className="text-[18px] font-[600] text-[#000000b1] pb-4">
-              Pay with Razorpay
+              Pay with any upi app.
             </h4>
             <button
               onClick={razorpayPaymentHandler}
@@ -124,18 +124,18 @@ const CartData = ({ orderData }) => {
     <div className="w-full bg-[#fff] rounded-md p-5 pb-8">
       <div className="flex justify-between">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">subtotal:</h3>
-        <h5 className="text-[18px] font-[600]">${orderData?.subTotalPrice}</h5>
+        <h5 className="text-[18px] font-[600]">₹{orderData?.subTotalPrice}</h5>
       </div>
       <br />
       <div className="flex justify-between">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">shipping:</h3>
-        <h5 className="text-[18px] font-[600]">${shipping}</h5>
+        <h5 className="text-[18px] font-[600]">₹{shipping}</h5>
       </div>
       <br />
       <div className="flex justify-between border-b pb-3">
         <h3 className="text-[16px] font-[400] text-[#000000a4]">Discount:</h3>
         <h5 className="text-[18px] font-[600]">
-          {orderData?.discountPrice ? "$" + orderData.discountPrice : "-"}
+          {orderData?.discountPrice ? "₹" + orderData.discountPrice : "-"}
         </h5>
       </div>
       <h5 className="text-[18px] font-[600] text-end pt-3">
