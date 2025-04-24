@@ -73,7 +73,6 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <ScrollToTop />
           <Routes>
             <Route
               path="/payment"
