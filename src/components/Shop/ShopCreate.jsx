@@ -9,9 +9,9 @@ import { toast } from "react-toastify";
 const ShopCreate = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState();
-  const [zipCode, setZipCode] = useState();
-  const [avatar, setAvatar] = useState("https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?ga=GA1.1.1182256531.1745483135&semt=ais_hybrid&w=740");
+ const [phoneNumber, setPhoneNumber] = useState("");
+const [zipCode, setZipCode] = useState("");
+const [avatar, setAvatar] = useState("https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?ga=GA1.1.1182256531.1745483135&semt=ais_hybrid&w=740");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -24,38 +24,38 @@ const ShopCreate = () => {
     e.preventDefault();
     setLoading(true);
 
-  axios.post(`${server}/shop/create-shop`, {
-  name,
-  email,
-  password,
-  phoneNumber,
-  zipCode,
-  address: {
-    street,
-    city,
-    state,
-    country,
-  },
-});
+axios
+  .post(`${server}/shop/create-shop`, {
+    name,
+    email,
+    password,
+    phoneNumber,
+    zipCode,
+    address: {
+      street,
+      city,
+      state,
+      country,
+    },
+  })
+  .then((res) => {
+    toast.success(res.data.message);
+    setName("");
+    setEmail("");
+    setPassword("");
+    setAvatar("https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg");
+    setZipCode();
+    setPhoneNumber();
+    setStreet("");
+    setCity("");
+    setState("");
+    setCountry("");
+  })
+  .catch((error) => {
+    toast.error(error.response?.data?.message || "Something went wrong");
+  })
+  .finally(() => setLoading(false));
 
-
-      .then((res) => {
-        toast.success(res.data.message);
-        setName("");
-        setEmail("");
-        setPassword("");
-        setAvatar("https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?ga=GA1.1.1182256531.1745483135&semt=ais_hybrid&w=740");
-        setZipCode();
-        setPhoneNumber();
-        setStreet("");
-        setCity("");
-        setState("");
-        setCountry("");
-      })
-      .catch((error) => {
-        toast.error(error.response?.data?.message || "Something went wrong");
-      })
-      .finally(() => setLoading(false));
   };
 
   return (
