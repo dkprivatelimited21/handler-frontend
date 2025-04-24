@@ -107,9 +107,10 @@ const Footer = () => {
          text-center pt-2 text-gray-400 text-sm pb-8"
       >
         <span>© 2025 dkprivatelimited21. All rights reserved.</span>
-        <a href="/privacy-policy" className="text-sm text-gray-500 hover:underline ml-4">
-          Privacy Policy
-        </a>
+        <p className="text-sm text-center mt-4">
+  By using this platform, you agree to our <a href="/privacy-policy" className="text-blue-500">Privacy Policy</a> and <a href="/terms-and-conditions" className="text-blue-500">Terms & Conditions</a>.
+</p>
+
       </div>
     </div>
   );
