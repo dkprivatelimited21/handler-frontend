@@ -85,7 +85,10 @@ const ShopCreate = () => {
 
             {/* Phone Number */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+             <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Phone Number
               </label>
               <input
@@ -99,7 +102,10 @@ const ShopCreate = () => {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email address
               </label>
               <input
@@ -114,7 +120,10 @@ const ShopCreate = () => {
 
             {/* Address Fields */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+             <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Address
               </label>
               <input
@@ -166,7 +175,10 @@ const ShopCreate = () => {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+               <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <div className="mt-1 relative">
