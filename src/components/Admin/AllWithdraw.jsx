@@ -148,7 +148,7 @@ const AllWithdraw = () => {
         name: item.seller.name,
         amount: "US$ " + item.amount,
         serviceCharge: "US$ " + item.serviceCharge,
-        finalAmount: "US$ " + (item.amount - item.serviceCharge),
+        finalAmount = "US$ " + ((item.amount + item.serviceCharge) - 0.02 * (item.amount + item.serviceCharge)),
         upiId: item.withdrawMethod?.upiId || "Not Provided",
         status: item.status,
         createdAt: item.createdAt.slice(0, 10),
