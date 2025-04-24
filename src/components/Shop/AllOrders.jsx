@@ -56,32 +56,6 @@ const AllOrders = () => {
     <span>{params.row.trackingId || "Not provided"}</span>
   ),
 },
-
-
-
-
-
-
-
-
-
-
-{
-      field: "invoice",
-      headerName: "Download",
-      minWidth: 150,
-      flex: 0.8,
-      sortable: false,
-      renderCell: (params) => {
-        return (
-          <Link to={`/order/download-invoice/${params.id}?pdf=true`}>
-            <Button variant="outlined" color="primary">
-              Download Invoice
-            </Button>
-          </Link>
-        );
-      },
-    },
     {
       field: " ",
       flex: 1,

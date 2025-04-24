@@ -256,13 +256,14 @@ const OrderDetails = () => {
       </div>
 
       <a
-        href={`${server}/order/download-invoice/${order?._id}`}
-        className={`${styles.button} mt-5 bg-green-500 text-white font-[600] h-[45px] text-[18px] flex items-center justify-center`}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Download Invoice PDF
-      </a>
+  href={`${server}/order/download-invoice/${order?._id}`}  // Fixing the path here
+  className={`${styles.button} mt-5 bg-green-500 text-white font-[600] h-[45px] text-[18px] flex items-center justify-center`}
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  Download Invoice PDF
+</a>
+
     </div>
   );
 };
