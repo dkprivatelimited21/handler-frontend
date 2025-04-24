@@ -17,6 +17,14 @@ const ShopCreate = () => {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+const [street, setStreet] = useState("");
+const [city, setCity] = useState("");
+const [state, setState] = useState("");
+const [country, setCountry] = useState("");
+
+
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,13 +32,18 @@ const ShopCreate = () => {
 
     axios
       .post(`${server}/shop/create-shop`, {
-        name,
-        email,
-        password,
-        avatar,
-        zipCode,
-        address,
-        phoneNumber,
+   name,
+  email,
+  password,
+  avatar,
+  phoneNumber,
+  address: {
+    street,
+    city,
+    state,
+    country,
+    zipCode,
+  },
       })
       .then((res) => {
         toast.success(res.data.message);
@@ -124,14 +137,45 @@ const ShopCreate = () => {
                 Address
               </label>
               <div className="mt-1">
-                <input
-                  type="address"
-                  name="address"
-                  required
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
+               {/* Street */}
+<input
+  type="text"
+  required
+  value={street}
+  onChange={(e) => setStreet(e.target.value)}
+  placeholder="Street address"
+  className="..."
+/>
+
+{/* City */}
+<input
+  type="text"
+  required
+  value={city}
+  onChange={(e) => setCity(e.target.value)}
+  placeholder="City"
+  className="..."
+/>
+
+{/* State */}
+<input
+  type="text"
+  value={state}
+  onChange={(e) => setState(e.target.value)}
+  placeholder="State"
+  className="..."
+/>
+
+{/* Country */}
+<input
+  type="text"
+  required
+  value={country}
+  onChange={(e) => setCountry(e.target.value)}
+  placeholder="Country"
+  className="..."
+/>
+
               </div>
             </div>
 
