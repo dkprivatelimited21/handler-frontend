@@ -5,60 +5,57 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { server } from "../../server";
 import { toast } from "react-toastify";
-import { RxAvatar } from "react-icons/rx";
 
 const ShopCreate = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState();
-  const [address, setAddress] = useState("");
   const [zipCode, setZipCode] = useState();
-  const [avatar, setAvatar] = useState("https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?ga=GA1.1.1182256531.1745483135&semt=ais_hybrid&w=740"); // Default avatar image
+  const [avatar, setAvatar] = useState("https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?ga=GA1.1.1182256531.1745483135&semt=ais_hybrid&w=740");
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-const [street, setStreet] = useState("");
-const [city, setCity] = useState("");
-const [state, setState] = useState("");
-const [country, setCountry] = useState("");
-
-
-
-
+  const [street, setStreet] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [country, setCountry] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // show spinner
+    setLoading(true);
 
     axios
       .post(`${server}/shop/create-shop`, {
-   name,
-  email,
-  password,
-  avatar,
-  phoneNumber,
-  address: {
-    street,
-    city,
-    state,
-    country,
-    zipCode,
-  },
+        name,
+        email,
+        password,
+        avatar,
+        phoneNumber,
+        address: {
+          street,
+          city,
+          state,
+          country,
+          zipCode,
+        },
       })
       .then((res) => {
         toast.success(res.data.message);
         setName("");
         setEmail("");
         setPassword("");
-        setAvatar("https://example.com/default-avatar.png"); // Reset to default avatar
+        setAvatar("https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?ga=GA1.1.1182256531.1745483135&semt=ais_hybrid&w=740");
         setZipCode();
-        setAddress("");
         setPhoneNumber();
+        setStreet("");
+        setCity("");
+        setState("");
+        setCountry("");
       })
       .catch((error) => {
         toast.error(error.response?.data?.message || "Something went wrong");
       })
-      .finally(() => setLoading(false)); // hide spinner
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -68,152 +65,113 @@ const [country, setCountry] = useState("");
           Register as a seller
         </h2>
       </div>
+
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-[35rem]">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {/* Shop Name */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label className="block text-sm font-medium text-gray-700">
                 Shop Name
               </label>
-              <div className="mt-1">
-                <input
-                  type="name"
-                  name="name"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
             </div>
 
+            {/* Phone Number */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label className="block text-sm font-medium text-gray-700">
                 Phone Number
               </label>
-              <div className="mt-1">
-                <input
-                  type="number"
-                  name="phone-number"
-                  required
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
+              <input
+                type="number"
+                required
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
             </div>
 
+            {/* Email */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label className="block text-sm font-medium text-gray-700">
                 Email address
               </label>
-              <div className="mt-1">
-                <input
-                  type="email"
-                  name="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
+              <input
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
             </div>
 
+            {/* Address Fields */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label className="block text-sm font-medium text-gray-700">
                 Address
               </label>
-              <div className="block text-sm font-medium text-gray-700">
-               {/* Street */}
-<input
-  type="text"
-  required
-  value={street}
-  onChange={(e) => setStreet(e.target.value)}
-  placeholder="Street address"
-  className="..."
-/>
-</div>
-<div className="block text-sm font-medium text-gray-700">
-{/* City */}
-<input
-  type="text"
-  required
-  value={city}
-  onChange={(e) => setCity(e.target.value)}
-  placeholder="City"
-  className="..."
-/>
-</div>
-<div className="block text-sm font-medium text-gray-700">
-
-{/* State */}
-<input
-  type="text"
-  value={state}
-  onChange={(e) => setState(e.target.value)}
-  placeholder="State"
-  className="..."
-/>
-</div>
-<div className="block text-sm font-medium text-gray-700">
-
-{/* Country */}
-<input
-  type="text"
-  required
-  value={country}
-  onChange={(e) => setCountry(e.target.value)}
-  placeholder="Country"
-  className="..."
-/>
-</div>
-              </div>
+              <input
+                type="text"
+                required
+                value={street}
+                onChange={(e) => setStreet(e.target.value)}
+                placeholder="Street address"
+                className="appearance-none block w-full px-3 py-2 mt-1 mb-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+              <input
+                type="text"
+                required
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="City"
+                className="appearance-none block w-full px-3 py-2 mb-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+              <input
+                type="text"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+                placeholder="State"
+                className="appearance-none block w-full px-3 py-2 mb-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
+              <input
+                type="text"
+                required
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+                placeholder="Country"
+                className="appearance-none block w-full px-3 py-2 mb-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
             </div>
 
+            {/* Zip Code */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label className="block text-sm font-medium text-gray-700">
                 Zip Code
               </label>
-              <div className="mt-1">
-                <input
-                  type="number"
-                  name="zipcode"
-                  required
-                  value={zipCode}
-                  onChange={(e) => setZipCode(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                />
-              </div>
+              <input
+                type="number"
+                required
+                value={zipCode}
+                onChange={(e) => setZipCode(e.target.value)}
+                className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              />
             </div>
 
+            {/* Password */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label className="block text-sm font-medium text-gray-700">
                 Password
               </label>
               <div className="mt-1 relative">
                 <input
                   type={visible ? "text" : "password"}
-                  name="password"
                   autoComplete="current-password"
                   required
                   value={password}
@@ -236,11 +194,11 @@ const [country, setCountry] = useState("");
               </div>
             </div>
 
+            {/* Avatar Display */}
             <div>
-              <label
-                htmlFor="avatar"
-                className="block text-sm font-medium text-gray-700"
-              ></label>
+              <label className="block text-sm font-medium text-gray-700">
+                Avatar
+              </label>
               <div className="mt-2 flex items-center">
                 <span className="inline-block h-8 w-8 rounded-full overflow-hidden">
                   <img
@@ -252,6 +210,7 @@ const [country, setCountry] = useState("");
               </div>
             </div>
 
+            {/* Submit Button */}
             <div>
               <button
                 type="submit"
@@ -286,6 +245,8 @@ const [country, setCountry] = useState("");
                 )}
               </button>
             </div>
+
+            {/* Link to login */}
             <div className={`${styles.noramlFlex} w-full`}>
               <h4>Already have an account?</h4>
               <Link to="/shop-login" className="text-blue-600 pl-2">
