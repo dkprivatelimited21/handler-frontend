@@ -22,7 +22,7 @@ const Signup = () => {
         name,
         email,
         password,
-        avatar: "https://cdn-icons-png.flaticon.com/512/149/149071.png", // default avatar URL
+        avatar: "https://th.bing.com/th/id/OIP.bWllJuCbia6Vbt18CzJWQQHaHY?rs=1&pid=ImgDetMain", // default avatar URL
       });
       toast.success(res.data.message);
       setName("");

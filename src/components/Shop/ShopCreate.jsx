@@ -13,7 +13,7 @@ const ShopCreate = () => {
   const [phoneNumber, setPhoneNumber] = useState();
   const [address, setAddress] = useState("");
   const [zipCode, setZipCode] = useState();
-  const [avatar, setAvatar] = useState("https://example.com/default-avatar.png"); // Default avatar image
+  const [avatar, setAvatar] = useState("https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?ga=GA1.1.1182256531.1745483135&semt=ais_hybrid&w=740"); // Default avatar image
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -136,7 +136,7 @@ const [country, setCountry] = useState("");
               >
                 Address
               </label>
-              <div className="mt-1">
+              <div className="block text-sm font-medium text-gray-700">
                {/* Street */}
 <input
   type="text"
@@ -146,7 +146,8 @@ const [country, setCountry] = useState("");
   placeholder="Street address"
   className="..."
 />
-
+</div>
+<div className="block text-sm font-medium text-gray-700">
 {/* City */}
 <input
   type="text"
@@ -156,6 +157,8 @@ const [country, setCountry] = useState("");
   placeholder="City"
   className="..."
 />
+</div>
+<div className="block text-sm font-medium text-gray-700">
 
 {/* State */}
 <input
@@ -165,6 +168,8 @@ const [country, setCountry] = useState("");
   placeholder="State"
   className="..."
 />
+</div>
+<div className="block text-sm font-medium text-gray-700">
 
 {/* Country */}
 <input
@@ -175,7 +180,7 @@ const [country, setCountry] = useState("");
   placeholder="Country"
   className="..."
 />
-
+</div>
               </div>
             </div>
 
