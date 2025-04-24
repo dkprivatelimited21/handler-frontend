@@ -29,7 +29,6 @@ const ShopCreate = () => {
         name,
         email,
         password,
-        avatar,
         phoneNumber,
         zipCode,
         address: {
