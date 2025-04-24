@@ -24,20 +24,21 @@ const ShopCreate = () => {
     e.preventDefault();
     setLoading(true);
 
-    axios
-      .post(`${server}/shop/create-shop`, {
-        name,
-        email,
-        password,
-        phoneNumber,
-        zipCode,
-        address: {
-          street,
-          city,
-          state,
-          country,
-        },
-      })
+  axios.post(`${server}/shop/create-shop`, {
+  name,
+  email,
+  password,
+  phoneNumber,
+  zipCode,
+  address: {
+    street,
+    city,
+    state,
+    country,
+  },
+});
+
+
       .then((res) => {
         toast.success(res.data.message);
         setName("");

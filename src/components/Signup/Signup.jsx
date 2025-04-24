@@ -19,11 +19,11 @@ const Signup = () => {
     setLoading(true);
     try {
       const res = await axios.post(`${server}/user/create-user`, {
-        name,
-        email,
-        password,
-        avatar: "https://th.bing.com/th/id/OIP.bWllJuCbia6Vbt18CzJWQQHaHY?rs=1&pid=ImgDetMain", // default avatar URL
-      });
+  name,
+  email,
+  password,
+});
+
       toast.success(res.data.message);
       setName("");
       setEmail("");
